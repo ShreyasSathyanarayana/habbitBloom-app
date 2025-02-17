@@ -77,10 +77,10 @@ export const adjustFontConfig = (
     fontConfig[deviceType][sizeCategory] = { min: minScale, max: maxScale };
 };
 
-// Example usage
-console.log('Device type:', getDeviceType());
-console.log('Font size for 16:', getFontSize(16));
+// // Example usage
+// console.log('Device type:', getDeviceType());
+// console.log('Font size for 16:', getFontSize(16));
 
-// Example of adjusting font configuration
-adjustFontConfig('phone', 'medium', 0.95, 1.15);
-console.log('Adjusted font size for 16:', getFontSize(16));
+// // Example of adjusting font configuration
+// adjustFontConfig('phone', 'medium', 0.95, 1.15);
+// console.log('Adjusted font size for 16:', getFontSize(16));
