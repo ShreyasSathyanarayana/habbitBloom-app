@@ -27,6 +27,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useRouter } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -62,6 +63,7 @@ const Onboarding = () => {
   const pagerRef = useRef<PagerView>(null);
   const flatListRef = useRef<FlatList<any>>(null);
   const scrollX = useSharedValue(0);
+  const router = useRouter();
 
   const handleNext = () => {
     if (currentPage < OnboardingDetails.length - 1) {
@@ -70,8 +72,8 @@ const Onboarding = () => {
         animated: true,
       });
       setCurrentPage(currentPage + 1);
-    }
-    else{
+    } else {
+      router.push("/(not-auth)/(auth)/weclome-screen");
       // add the next page here
     }
   };

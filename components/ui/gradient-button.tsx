@@ -12,11 +12,15 @@ import { useEffect } from "react";
 
 interface GradientButtonProps extends TouchableOpacityProps {
   title: string;
+  type?: string;
+  disable?: boolean;
   color?: [string, string, ...string[]]; // Custom gradient colors
 }
 
 export function GradientButton({
   title,
+  type = "primary", // secondary
+  disable = false,
   color = ["#00FFFF", "#8A2BE2", "#FF1493"], // Default gradient colors
   style,
   ...props
@@ -44,18 +48,24 @@ export function GradientButton({
 
   return (
     <TouchableOpacity
+      disabled={disable}
       {...props}
-      style={[{ borderRadius: 8, overflow: "hidden", flex: 1 }, style]}
+      style={[
+        { borderRadius: 8, overflow: "hidden" },
+        style,
+        disable && { backgroundColor: "rgba(60, 60, 67, 0.6)" },
+      ]}
     >
       <LinearGradient
-        colors={color}
+        colors={
+          disable ? ["rgba(60, 60, 67, 0.6)", "rgba(60, 60, 67, 0.6)"] : color
+        }
         start={{ x: -1, y: 0 }} // Approx. -96.01% (Left-Extended)
         end={{ x: 2, y: 1 }} // Approx. 198.2% (Right-Extended)
         style={{
-          paddingVertical: verticalScale(12),
-          paddingHorizontal: horizontalScale(20),
-          alignItems: "center",
-          justifyContent: "center",
+          // alignItems: "center",
+          // justifyContent: "center",
+          padding: 2,
           borderRadius: 10,
         }}
       >
@@ -65,8 +75,15 @@ export function GradientButton({
               color: "white",
               fontSize: getFontSize(16),
               fontFamily: "Poppins_700Bold",
+              paddingVertical: verticalScale(12),
+              paddingHorizontal: horizontalScale(20),
+              // backgroundColor: "black",
+              borderRadius: 10,
+              textAlign: "center",
             },
             animatedStyle,
+            type != "primary" && { backgroundColor: "black" },
+            disable && { color: "rgba(118, 118, 118, 1)" },
           ]}
         >
           {title}

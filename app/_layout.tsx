@@ -78,7 +78,7 @@ const RootLayout = () => {
     Poppins_600SemiBold,
     Poppins_700Bold,
     Poppins_500Medium,
-    Poppins_400Regular
+    Poppins_400Regular,
   });
 
   useEffect(() => {
