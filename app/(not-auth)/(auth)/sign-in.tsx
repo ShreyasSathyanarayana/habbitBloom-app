@@ -5,7 +5,7 @@ import TextField from "@/components/ui/TextField";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
@@ -21,16 +21,22 @@ import { router } from "expo-router";
 import SampleIcon from "@/assets/svg/sample-icon.svg";
 import GoogleIcon from "@/assets/svg/google-icon.svg";
 import AppleIcon from "@/assets/svg/apple-icon.svg";
+import PasswordShowIcon from "@/assets/svg/password-show.svg";
+import PasswordHideIcon from "@/assets/svg/password-hide.svg";
 
 const SignIn = () => {
-  const { control } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       email: "",
-      fullName: "",
       password: "",
-      confirmPassword: "",
     },
   });
+  // console.log(control._fields);
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
 
   return (
     <>
@@ -57,46 +63,78 @@ const SignIn = () => {
               {/* Email */}
               <Controller
                 control={control}
-                rules={{ required: "Enter your email" }}
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Enter a valid email address",
+                  },
+                }}
                 render={({
                   field: { onChange, onBlur, value },
-                  formState: { errors },
-                }) => (
-                  <TextField
-                    label="Email"
-                    placeholder="Enter Email"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    helperText={errors.email?.message}
-                    error={!!errors.email}
-                    leftIcon={<EmailIcon width={24} height={24} fill="white" />}
-                  />
-                )}
+                  formState: { errors, touchedFields },
+                }) => {
+                  return (
+                    <TextField
+                      label="Email"
+                      placeholder="Enter Email"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      helperText={errors.email?.message}
+                      error={!!errors.email}
+                      leftIcon={
+                        <EmailIcon width={24} height={24} fill="white" />
+                      }
+                    />
+                  );
+                }}
                 name="email"
               />
 
               {/* Password */}
               <Controller
                 control={control}
-                rules={{ required: "Enter your password" }}
+                rules={{
+                  required: "Enter your password",
+                  validate: (val) =>
+                    val?.length > 8 ||
+                    "Password should contain atleast 8 Character",
+                }}
                 render={({
                   field: { onChange, onBlur, value },
-                  formState: { errors },
-                }) => (
-                  <TextField
-                    label="Password"
-                    placeholder="Enter Password"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    helperText={errors.password?.message}
-                    error={!!errors.password}
-                    leftIcon={
-                      <PasswordIcon width={24} height={24} fill="white" />
-                    }
-                  />
-                )}
+                  formState: { errors, touchedFields },
+                }) => {
+                  return (
+                    <TextField
+                      label="Password"
+                      placeholder="Enter Password"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      secureTextEntry={showConfirmPassword}
+                      helperText={errors.password?.message}
+                      error={!!errors.password}
+                      // success={success}
+                      leftIcon={
+                        <PasswordIcon width={24} height={24} fill="white" />
+                      }
+                      rightIcon={
+                        <TouchableOpacity
+                          onPress={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <PasswordHideIcon />
+                          ) : (
+                            <PasswordShowIcon />
+                          )}
+                        </TouchableOpacity>
+                      }
+                    />
+                  );
+                }}
                 name="password"
               />
             </View>
@@ -112,6 +150,7 @@ const SignIn = () => {
               </ThemedText>
             </View>
             <GradientButton
+              onPress={handleSubmit(onSubmit)}
               title="LOG IN"
               style={{ marginVertical: verticalScale(32) }}
             />
@@ -139,7 +178,7 @@ const SignIn = () => {
               />
             </TouchableOpacity>
           </View>
-          <View
+          {/* <View
             style={{
               alignItems: "center",
               position: "absolute",
@@ -163,7 +202,7 @@ const SignIn = () => {
                 Sign Up now
               </ThemedText>
             </ThemedText>
-          </View>
+          </View> */}
         </KeyboardAwareScrollView>
 
         {/* Keyboard Toolbar (Must be outside the scroll view) */}

@@ -9,11 +9,14 @@ interface TextFieldRawProps extends React.ComponentProps<typeof TextInput> {
   rightIcon?: React.ReactNode;
   leftIcon?: React.ReactNode;
   disabled?: boolean;
+  error?: boolean;
+  success?: boolean;
 }
 
 export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
-  ({ rightIcon, leftIcon, disabled, value, ...rest }, ref) => {
+  ({ rightIcon, leftIcon, disabled, value, error, success, ...rest }, ref) => {
     // console.log("value", value);
+    // console.log(success);
 
     return (
       <View
@@ -22,6 +25,8 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
           disabled ? { backgroundColor: "#f3f3f3" } : null,
           typeof value === "string" &&
             value.length > 0 && { borderColor: "white" },
+          error && { borderColor: "rgba(255, 0, 0, 1)" },
+          success && { borderColor: "green" },
         ]}
       >
         {leftIcon &&
@@ -32,7 +37,11 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
           })}
         <TextInput
           ref={ref}
-          style={[styles.textField]}
+          style={[
+            styles.textField,
+            error && { color: "rgba(255, 0, 0, 1)" },
+            success && { borderColor: "green" },
+          ]}
           {...rest}
           placeholderTextColor={"rgba(81, 85, 98, 1)"}
           editable={!disabled}
@@ -57,7 +66,7 @@ const TextField = forwardRef<TextInput, TextFieldProps>(
         success={success}
         helperComponent={helperComponent}
       >
-        <TextFieldRaw {...rest} ref={ref} />
+        <TextFieldRaw success={success} error={error} {...rest} ref={ref} />
       </Label>
     );
   }

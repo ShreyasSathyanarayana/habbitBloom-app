@@ -25,7 +25,7 @@ const Label: React.FC<LabelProps> = ({
 }) => {
   let helperTextColor = "rgba(255, 255, 255, 1)";
   if (error) {
-    helperTextColor = "rgba(255, 0, 0, 0.6)";
+    helperTextColor = "rgba(255, 0, 0, 1)";
   } else if (success) {
     helperTextColor = "rgba(0, 255, 0, 0.6)";
   }

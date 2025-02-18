@@ -5,9 +5,9 @@ import TextField from "@/components/ui/TextField";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   KeyboardAwareScrollView,
   KeyboardToolbar,
@@ -18,9 +18,11 @@ import PasswordIcon from "@/assets/svg/password-icon.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { router } from "expo-router";
+import PasswordShowIcon from "@/assets/svg/password-show.svg";
+import PasswordHideIcon from "@/assets/svg/password-hide.svg";
 
 const SignUp = () => {
-  const { control } = useForm({
+  const { control, handleSubmit, watch } = useForm({
     defaultValues: {
       email: "",
       fullName: "",
@@ -28,6 +30,14 @@ const SignUp = () => {
       confirmPassword: "",
     },
   });
+  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
+  const password = watch("password"); // Watch the password field
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    router.push('/(not-auth)/(auth)/verify-number')
+  };
 
   return (
     <>
@@ -54,7 +64,13 @@ const SignUp = () => {
               {/* Email */}
               <Controller
                 control={control}
-                rules={{ required: "Enter your email" }}
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Enter a valid email address",
+                  },
+                }}
                 render={({
                   field: { onChange, onBlur, value },
                   formState: { errors },
@@ -100,7 +116,12 @@ const SignUp = () => {
               {/* Password */}
               <Controller
                 control={control}
-                rules={{ required: "Enter your password" }}
+                rules={{
+                  required: "Enter your password",
+                  validate: (val) =>
+                    val?.length > 8 ||
+                    "Password should contain atleast 8 Character",
+                }}
                 render={({
                   field: { onChange, onBlur, value },
                   formState: { errors },
@@ -109,12 +130,24 @@ const SignUp = () => {
                     label="Password"
                     placeholder="Enter Password"
                     onBlur={onBlur}
+                    secureTextEntry={showPassword}
                     onChangeText={onChange}
                     value={value}
                     helperText={errors.password?.message}
                     error={!!errors.password}
                     leftIcon={
                       <PasswordIcon width={24} height={24} fill="white" />
+                    }
+                    rightIcon={
+                      <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <PasswordHideIcon />
+                        ) : (
+                          <PasswordShowIcon />
+                        )}
+                      </TouchableOpacity>
                     }
                   />
                 )}
@@ -124,7 +157,11 @@ const SignUp = () => {
               {/* Confirm Password */}
               <Controller
                 control={control}
-                rules={{ required: "Confirm your password" }}
+                rules={{
+                  required: "Confirm your password",
+                  validate: (val) =>
+                    val === password || "Passwords do not match",
+                }}
                 render={({
                   field: { onChange, onBlur, value },
                   formState: { errors },
@@ -132,6 +169,7 @@ const SignUp = () => {
                   <TextField
                     label="Confirm Password"
                     placeholder="Confirm Password"
+                    secureTextEntry={showConfirmPassword}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -140,29 +178,46 @@ const SignUp = () => {
                     leftIcon={
                       <PasswordIcon width={24} height={24} fill="white" />
                     }
+                    rightIcon={
+                      <TouchableOpacity
+                        onPress={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <PasswordHideIcon />
+                        ) : (
+                          <PasswordShowIcon />
+                        )}
+                      </TouchableOpacity>
+                    }
                   />
                 )}
                 name="confirmPassword"
               />
             </View>
             <GradientButton
+              onPress={handleSubmit(onSubmit)}
               title="PROCEED"
               style={{ marginVertical: verticalScale(32) }}
             />
           </View>
-          <View style={{ alignItems: "center" }}>
+          {/* <View style={{ alignItems: "center" }}>
             <ThemedText>
               Already have an account?{" "}
               <ThemedText
-                onPress={() =>{
-                  router.replace('/(not-auth)/(auth)/weclome-screen')
-                   router.push("/(not-auth)/(auth)/sign-in")}}
+                onPress={() => {
+                  console.log(router);
+                  
+                  router.replace("/(not-auth)/(auth)/sign-in");
+                  // router.push("/(not-auth)/(auth)/sign-in");
+                }}
                 style={{ color: "rgba(138, 43, 226, 1)" }}
               >
                 Log In
               </ThemedText>
             </ThemedText>
-          </View>
+          </View> */}
         </KeyboardAwareScrollView>
 
         {/* Keyboard Toolbar (Must be outside the scroll view) */}
