@@ -7,7 +7,7 @@ import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   KeyboardAwareScrollView,
   KeyboardToolbar,
@@ -23,6 +23,8 @@ import GoogleIcon from "@/assets/svg/google-icon.svg";
 import AppleIcon from "@/assets/svg/apple-icon.svg";
 import PasswordShowIcon from "@/assets/svg/password-show.svg";
 import PasswordHideIcon from "@/assets/svg/password-hide.svg";
+import { supabase } from "@/utils/SupaLegend";
+import { useToast } from "react-native-toast-notifications";
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm({
@@ -32,10 +34,26 @@ const SignIn = () => {
     },
   });
   // console.log(control._fields);
+  const toast = useToast();
 
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+    if (error) {
+      // Alert.alert('Something went wrong')
+      toast.show(error.message, {
+        type: "danger",
+      });
+
+      return;
+    }
+    toast.show("Login Succesful", {
+      type: "success",
+    });
+    // Alert.alert("Login Succesful");
   };
 
   return (

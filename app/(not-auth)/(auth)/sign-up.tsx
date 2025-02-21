@@ -20,6 +20,8 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { router } from "expo-router";
 import PasswordShowIcon from "@/assets/svg/password-show.svg";
 import PasswordHideIcon from "@/assets/svg/password-hide.svg";
+import { supabase } from "@/utils/SupaLegend";
+import { useToast } from "react-native-toast-notifications";
 
 const SignUp = () => {
   const { control, handleSubmit, watch } = useForm({
@@ -33,10 +35,47 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
   const password = watch("password"); // Watch the password field
+  const toast = useToast();
 
-  const onSubmit = (data: any) => {
+  const checkExistingUser = async (email: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id")
+      .or(`email.eq.${email}`);
+    console.log(data,error);
+    
+
+    if (data?.length) {
+      toast.show("User Already Exist", {
+        type: "danger",
+      });
+      return true;
+    }
+    return false;
+  };
+
+  const onSubmit = async (data: any) => {
     console.log(data);
-    router.push('/(not-auth)/(auth)/verify-number')
+    // const router = useRouter();
+
+    // let { data: signupData, error } = await supabase.auth.signUp({
+    //   email: data.email,
+    //   password: data.password,
+    // });
+    // console.log("data", signupData);
+    // console.log("error:", error);
+
+    // ✅ Check if user already exists before signing up
+    if (await checkExistingUser(data.email)) return;
+
+    router.push({
+      pathname: "/(not-auth)/(auth)/verify-number",
+      params: {
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+      },
+    });
   };
 
   return (

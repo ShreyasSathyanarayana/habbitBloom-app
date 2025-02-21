@@ -1,3 +1,5 @@
+import Container from "@/components/ui/container";
+import { ThemedText } from "@/components/ui/theme-text";
 import React from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 import {
@@ -7,35 +9,9 @@ import {
 
 export default function FormScreen() {
   return (
-    <>
-      <KeyboardAwareScrollView
-        bottomOffset={65}
-        contentContainerStyle={styles.container}
-      >
-        <View>
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-        </View>
-        <TextInput placeholder="Type a message..." style={styles.textInput} />
-        <View>
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-        </View>
-        <View>
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-        </View>
-        <View>
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-          <TextInput placeholder="Type a message..." style={styles.textInput} />
-        </View>
-        <TextInput placeholder="Type a message..." style={styles.textInput} />
-      </KeyboardAwareScrollView>
-      <KeyboardToolbar />
-    </>
+    <Container>
+      <ThemedText>Home page</ThemedText>
+    </Container>
   );
 }
 
