@@ -22,6 +22,8 @@
     <string>1.0.0</string>
     <key>CFBundleSignature</key>
     <string>????</string>
+
+    <!-- ✅ Google Sign-In URL Schemes -->
     <key>CFBundleURLTypes</key>
     <array>
       <dict>
@@ -40,29 +42,45 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps._some_id_here_</string>
+          <!-- ✅ Use your iOS Client ID without .apps.googleusercontent.com -->
+          <string>com.googleusercontent.apps.163765196168-9vfrq9gnenovtfnkf6p2aeuo39kmdc5u</string>
         </array>
       </dict>
     </array>
+
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
     <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+
+    <!-- ✅ Allow Firebase & Google Auth to communicate with your app -->
+    <key>GoogleService-Info</key>
+    <dict>
+      <key>CLIENT_ID</key>
+      <string>163765196168-9vfrq9gnenovtfnkf6p2aeuo39kmdc5u.apps.googleusercontent.com</string>
+      <key>REVERSED_CLIENT_ID</key>
+      <string>com.googleusercontent.apps.163765196168-9vfrq9gnenovtfnkf6p2aeuo39kmdc5u</string>
+    </dict>
+
+    <!-- ✅ Required Permissions -->
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
-      <false/>
+      <true/>
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
+
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
     </array>
+
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
@@ -73,11 +91,13 @@
     <false/>
     <key>UIStatusBarStyle</key>
     <string>UIStatusBarStyleDefault</string>
+
     <key>UISupportedInterfaceOrientations</key>
     <array>
       <string>UIInterfaceOrientationPortrait</string>
       <string>UIInterfaceOrientationPortraitUpsideDown</string>
     </array>
+
     <key>UISupportedInterfaceOrientations~ipad</key>
     <array>
       <string>UIInterfaceOrientationPortrait</string>
@@ -85,6 +105,7 @@
       <string>UIInterfaceOrientationLandscapeLeft</string>
       <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+
     <key>UIUserInterfaceStyle</key>
     <string>Automatic</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>

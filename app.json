@@ -10,14 +10,21 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shreyas8747.habitBloom"
+      "bundleIdentifier": "com.shreyas8747.habitBloom",
+      "googleServicesFile": "GoogleService-Info.plist",
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd.apps.googleusercontent.com"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.shreyas8747.habitBloom"
+      "package": "com.shreyas8747.habitBloom",
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -40,7 +47,7 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps._some_id_here_"
+          "iosUrlScheme": "com.googleusercontent.apps.163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd"
         }
       ]
     ],
