@@ -1,7 +1,11 @@
 import { getFontSize } from "@/font";
 import { Stack } from "expo-router";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { ToastProvider, ToastType } from "react-native-toast-notifications";
+import {
+  ToastProvider,
+  ToastType,
+  useToast,
+} from "react-native-toast-notifications";
 import {
   Poppins_100Thin,
   Poppins_200ExtraLight,
@@ -20,8 +24,10 @@ import { Slot, SplashScreen, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { ThemedText } from "@/components/ui/theme-text";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -75,6 +81,7 @@ SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
   const router = useRouter();
   const { logout } = useAuth();
+  const toast = useToast();
 
   const [load, error] = useFonts({
     Poppins_100Thin,
@@ -88,6 +95,7 @@ const RootLayout = () => {
   useEffect(() => {
     (async () => {
       await SplashScreen.hideAsync();
+      // toast.show("Testing");
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const token = await SecureStore.getItemAsync("refreshToken");
       const isAuthenticated = !!token;
@@ -100,6 +108,7 @@ const RootLayout = () => {
         }
       } else {
         router.replace("/onboarding"); // /onboarding
+        // toast.show("hlsdjl")
       }
     })();
   }, []);
@@ -107,8 +116,8 @@ const RootLayout = () => {
 };
 
 export const RootLayoutWrapper = () => {
-  console.log('Logged in');
-  
+  console.log("Logged in");
+
   return (
     <KeyboardProvider>
       <Providers>
@@ -130,14 +139,15 @@ export const RootLayoutWrapper = () => {
           }
           // warningIcon={<WarningIcon />}
           textStyle={{ fontSize: getFontSize(16) }}
-          offset={50} // offset for both top and bottom toasts
-          offsetTop={30}
+          offset={10} // offset for both top and bottom toasts
+          offsetTop={10}
           offsetBottom={40}
           swipeEnabled={true}
           renderToast={(toast) => (
             <CustomToast
               message={toast.message}
               type={toast.type as ToastType}
+              id={toast.id}
             />
           )}
         >
@@ -153,14 +163,31 @@ export default RootLayoutWrapper;
 
 interface CustomToastProps {
   message: string;
-  type: ToastType;
+  type: ToastType | string;
 }
 
-const CustomToast: React.FC<CustomToastProps> = ({ message, type }) => {
+const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
+  message,
+  type,
+  id,
+}) => {
+  const toast = useToast();
+
   const getIcon = () => {
     switch (type) {
       case "success":
-        return <Ionicons name="checkmark-circle" size={24} color="green" />;
+        return (
+          <Ionicons
+            style={{
+              backgroundColor: "rgba(62, 77, 71, 0.8)",
+              padding: 2,
+              borderRadius: 60,
+            }}
+            name="checkmark-circle"
+            size={24}
+            color="rgba(1, 225, 123, 1)"
+          />
+        );
       case "danger":
         return <Ionicons name="close-circle" size={24} color="red" />;
       case "warning":
@@ -171,10 +198,52 @@ const CustomToast: React.FC<CustomToastProps> = ({ message, type }) => {
   };
 
   return (
-    <View style={[styles.toastContainer, styles[type]]}>
-      {getIcon()}
-      <Text style={styles.toastText}>{message}</Text>
-    </View>
+    <LinearGradient
+      colors={["#4B6F60", "#343836"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.toastContainer}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 12,
+          justifyContent: "space-between",
+        }}
+      >
+        <View
+          style={{ flexDirection: "row", alignItems: "center", width: "80%" }}
+        >
+          {getIcon()}
+          <ThemedText
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            style={styles.toastText}
+          >
+            {message}
+          </ThemedText>
+        </View>
+        <TouchableOpacity onPress={() => toast.hide(id)}>
+          <AntDesign
+            name="close"
+            size={24}
+            color="rgba(1, 225, 123, 1)"
+            style={[styles.closeButton]}
+          />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          width: "100%",
+          height: 6,
+          backgroundColor: "rgba(1, 225, 123, 1)",
+          // position: 'static',
+          // bottom: 0,
+          // right: 0,
+        }}
+      ></View>
+    </LinearGradient>
   );
 };
 
@@ -187,9 +256,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   toastContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
+    // flexDirection: "row",
+    // alignItems: "center",
+    // padding: 12,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -197,6 +266,11 @@ const styles = StyleSheet.create({
     shadowOffset: { height: 3, width: 0 },
     elevation: 5,
     width: "90%",
+    justifyContent: "space-between",
+    marginVertical: 10,
+    overflow: "hidden",
+    // borderWidth: 5,
+    // borderColor: "green",
   },
   success: {
     backgroundColor: "#E6F4EA",
@@ -215,9 +289,10 @@ const styles = StyleSheet.create({
   },
   toastText: {
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: getFontSize(16),
     fontWeight: "bold",
-    color: "#333",
+    fontFamily: "Poppins_700Bold",
+    // color: "#333",
   },
   button: {
     padding: 12,
@@ -231,6 +306,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  closeButton: {},
 });
 
 // export default App;

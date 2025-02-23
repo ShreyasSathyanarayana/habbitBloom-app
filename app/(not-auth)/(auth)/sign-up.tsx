@@ -22,6 +22,12 @@ import PasswordShowIcon from "@/assets/svg/password-show.svg";
 import PasswordHideIcon from "@/assets/svg/password-hide.svg";
 import { supabase } from "@/utils/SupaLegend";
 import { useToast } from "react-native-toast-notifications";
+import Label from "@/components/ui/Label";
+import PhoneInput, {
+  ICountry,
+  isValidPhoneNumber,
+} from "react-native-international-phone-number";
+import { phoneInputStyles } from "./verify-number";
 
 const SignUp = () => {
   const { control, handleSubmit, watch } = useForm({
@@ -30,20 +36,27 @@ const SignUp = () => {
       fullName: "",
       password: "",
       confirmPassword: "",
+      phoneNumber: "",
     },
   });
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
+  const [selectedCountry, setSelectedCountry] = useState<ICountry | undefined>(
+    undefined
+  );
   const password = watch("password"); // Watch the password field
   const toast = useToast();
+
+  function handleSelectedCountry(country: ICountry) {
+    setSelectedCountry(country);
+  }
 
   const checkExistingUser = async (email: string) => {
     const { data, error } = await supabase
       .from("profiles")
       .select("id")
       .or(`email.eq.${email}`);
-    console.log(data,error);
-    
+    console.log(data, error);
 
     if (data?.length) {
       toast.show("User Already Exist", {
@@ -54,27 +67,65 @@ const SignUp = () => {
     return false;
   };
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    // const router = useRouter();
+  const onSubmit = async (formData: any) => {
+    console.log(formData);
+    const phoneNumber = `${selectedCountry?.callingCode}${formData.phoneNumber}`;
+    const formattedPhone = phoneNumber.replace(/\s+/g, ""); // Remove spaces
+    console.log("Button is clicked");
 
-    // let { data: signupData, error } = await supabase.auth.signUp({
-    //   email: data.email,
-    //   password: data.password,
-    // });
-    // console.log("data", signupData);
-    // console.log("error:", error);
+    const isValid = isValidPhoneNumber(
+      formData.phoneNumber,
+      selectedCountry as ICountry
+    );
+
+    if (!isValid) {
+      // Alert.alert("Error", "Enter a valid phone number.");
+      toast.show("Enter a valid phone number.", {
+        type: "danger",
+      });
+      return;
+    }
 
     // ✅ Check if user already exists before signing up
-    if (await checkExistingUser(data.email)) return;
+    if (await checkExistingUser(formData.email)) return;
+
+    // ✅ Sign up the user
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
+      {
+        email: formData?.email,
+        password: formData.password,
+        // phone: formattedPhone,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            // mobile: formattedPhone,
+          },
+        },
+      }
+    );
+
+    if (signUpError) {
+      console.log("SignUp Error:", signUpError);
+      // Alert.alert("Error", signUpError.message);
+      toast.show(signUpError.message, {
+        type: "danger",
+        // duration: 4000,
+      });
+      return;
+    }
+
+    // // ✅ Insert user data into 'profiles' table
+    const { error: insertError } = await supabase.from("profiles").insert([
+      {
+        id: signUpData.user?.id, // Store the auth UID
+        full_name: formData.fullName,
+        // mobile: formattedPhone,
+        email: formData.email,
+      },
+    ]);
 
     router.push({
-      pathname: "/(not-auth)/(auth)/verify-number",
-      params: {
-        name: data.fullName,
-        email: data.email,
-        password: data.password,
-      },
+      pathname: "/(not-auth)/(auth)/sign-in",
     });
   };
 
@@ -233,6 +284,62 @@ const SignUp = () => {
                   />
                 )}
                 name="confirmPassword"
+              />
+              <Controller
+                name="phoneNumber"
+                control={control}
+                rules={{
+                  required: "Phone number is required",
+                  validate: (value) =>
+                    (selectedCountry &&
+                      isValidPhoneNumber(value, selectedCountry)) ||
+                    "Invalid phone number",
+                }}
+                render={({
+                  field: { onChange, value },
+                  formState: { errors },
+                }) => (
+                  <Label
+                    label="Phone Number"
+                    helperText={errors.phoneNumber?.message}
+                    error={!!errors.phoneNumber}
+                  >
+                    <PhoneInput
+                      defaultValue="+91"
+                      value={value}
+                      theme="dark"
+                      popularCountries={["IN"]}
+                      modalStyles={{
+                        modal: {
+                          backgroundColor: "black",
+                          borderTopWidth: 1,
+                          borderColor: "rgba(91, 91, 99, 0.6)",
+                        },
+                        countryButton: {
+                          backgroundColor: "rgba(31, 34, 42, 1)",
+                          borderColor: "rgba(60, 60, 67, 0.6)",
+                          height: verticalScale(56),
+                        },
+                        searchInput: {
+                          backgroundColor: "rgba(31, 34, 42, 1)",
+                          borderColor: "rgba(31, 34, 42, 1)",
+                          fontSize: getFontSize(16),
+                          height: verticalScale(56),
+                        },
+                      }}
+                      phoneInputStyles={{
+                        container: phoneInputStyles.inputContainer,
+                        flagContainer: phoneInputStyles.flagContainer,
+                        input: phoneInputStyles.inputText,
+                        callingCode: phoneInputStyles.callingCode,
+                      }}
+                      onChangePhoneNumber={onChange}
+                      selectedCountry={selectedCountry}
+                      onChangeSelectedCountry={handleSelectedCountry}
+                      placeholder="Phone Number"
+                    />
+                  </Label>
+                )}
               />
             </View>
             <GradientButton

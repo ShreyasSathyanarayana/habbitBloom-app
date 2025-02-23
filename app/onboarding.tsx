@@ -28,6 +28,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
+import { useToast } from "react-native-toast-notifications";
 
 const DropShadow = require("@/assets/images/shadow-effect.png");
 
@@ -66,6 +67,7 @@ const Onboarding = () => {
   const flatListRef = useRef<FlatList<any>>(null);
   const scrollX = useSharedValue(0);
   const router = useRouter();
+  const toast = useToast();
 
   const handleNext = () => {
     if (currentPage < OnboardingDetails.length - 1) {
@@ -74,6 +76,9 @@ const Onboarding = () => {
         animated: true,
       });
       setCurrentPage(currentPage + 1);
+      toast.show("Testing jdsaldjal;djajdadkhashjdkdsjhak", {
+        type: "success",
+      });
     } else {
       router.push("/(not-auth)/(auth)/weclome-screen");
       // add the next page here

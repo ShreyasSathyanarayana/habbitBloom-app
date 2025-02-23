@@ -215,10 +215,10 @@ const VerifyNumber = () => {
                   },
                 }}
                 phoneInputStyles={{
-                  container: styles.inputContainer,
-                  flagContainer: styles.flagContainer,
-                  input: styles.inputText,
-                  callingCode: styles.callingCode,
+                  container: phoneInputStyles.inputContainer,
+                  flagContainer: phoneInputStyles.flagContainer,
+                  input: phoneInputStyles.inputText,
+                  callingCode: phoneInputStyles.callingCode,
                 }}
                 onChangePhoneNumber={onChange}
                 selectedCountry={selectedCountry}
@@ -242,7 +242,7 @@ const VerifyNumber = () => {
   );
 };
 
-const styles = StyleSheet.create({
+export const phoneInputStyles = StyleSheet.create({
   inputContainer: {
     backgroundColor: "rgba(60, 60, 67, 0.6)",
     borderWidth: 1,
