@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.shreyas8747.habbitBloom'
+    namespace 'com.shreyas8747.habitBloom'
     defaultConfig {
-        applicationId 'com.shreyas8747.habbitBloom'
+        applicationId 'com.shreyas8747.habitBloom'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

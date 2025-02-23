@@ -17,7 +17,7 @@ interface GradientButtonProps extends TouchableOpacityProps {
   color?: [string, string, ...string[]]; // Custom gradient colors
 }
 
-export function GradientButton({
+export function OutlineButton({
   title,
   type = "primary", // secondary
   disable = false,
@@ -69,7 +69,7 @@ export function GradientButton({
           borderRadius: 10,
         }}
       >
-        <Animated.Text
+        <Text
           style={[
             {
               color: "white",
@@ -77,21 +77,21 @@ export function GradientButton({
               fontFamily: "Poppins_700Bold",
               paddingVertical: verticalScale(12),
               paddingHorizontal: horizontalScale(20),
+              backgroundColor: "black",
+              borderRadius: 10,
+              textAlign: "center",
               includeFontPadding: false,
               textShadowColor: "transparent",
               textShadowOffset: { width: 0, height: 0 },
               textShadowRadius: 0,
-              // backgroundColor: "black",
-              borderRadius: 10,
-              textAlign: "center",
             },
-            animatedStyle,
-            type != "primary" && { backgroundColor: "black" },
+            // animatedStyle,
+            // type != "primary" && { backgroundColor: "black" },
             disable && { color: "rgba(118, 118, 118, 1)" },
           ]}
         >
           {title}
-        </Animated.Text>
+        </Text>
       </LinearGradient>
     </TouchableOpacity>
   );

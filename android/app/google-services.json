@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "768017691184",
+    "project_id": "habitbloom-ae4ce",
+    "storage_bucket": "habitbloom-ae4ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768017691184:android:ff3c12bab8bff5ac4333f5",
+        "android_client_info": {
+          "package_name": "com.shreyas8747.habitBloom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdvkD461gMnbc9hKWCx0mVPzSv1FKY5uI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

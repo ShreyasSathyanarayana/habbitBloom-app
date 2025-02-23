@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_500Medium",
   },
   helperText: {
-    fontSize: getFontSize(14),
+    fontSize: getFontSize(12),
     // fontWeight: 400,
     marginTop: verticalScale(4),
     fontFamily: "Poppins_400Regular",

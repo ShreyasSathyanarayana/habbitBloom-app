@@ -41,6 +41,12 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
             styles.textField,
             error && { color: "rgba(255, 0, 0, 1)" },
             success && { borderColor: "green" },
+            {
+              includeFontPadding: false,
+              textShadowColor: "transparent",
+              textShadowOffset: { width: 0, height: 0 },
+              textShadowRadius: 0,
+            },
           ]}
           {...rest}
           placeholderTextColor={"rgba(81, 85, 98, 1)"}

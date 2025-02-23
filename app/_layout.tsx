@@ -107,6 +107,8 @@ const RootLayout = () => {
 };
 
 export const RootLayoutWrapper = () => {
+  console.log('Logged in');
+  
   return (
     <KeyboardProvider>
       <Providers>

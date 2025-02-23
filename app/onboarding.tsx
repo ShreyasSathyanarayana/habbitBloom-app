@@ -29,6 +29,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
+const DropShadow = require("@/assets/images/shadow-effect.png");
+
 const { width, height } = Dimensions.get("window");
 
 // Onboarding Screens Data
@@ -105,13 +107,27 @@ const Onboarding = () => {
   }) => (
     <View style={[styles.page, { width: pageWidth }]}>
       {currentPage === index && (
-        <Image
-          //  key={
-          //    currentPage === index ? `gif-${index}-${Date.now()}` : `gif-${index}`
-          //  }
-          source={item.image}
-          style={styles.image}
-        />
+        <>
+          <Image
+            //  key={
+            //    currentPage === index ? `gif-${index}-${Date.now()}` : `gif-${index}`
+            //  }
+            source={item.image}
+            style={styles.image}
+          />
+          {/* <Image
+            source={DropShadow}
+            style={[
+              styles.image,
+              {
+                position: "absolute",
+                width: width * 0.9,
+                height,
+                zIndex: -1,
+              },
+            ]}
+          /> */}
+        </>
       )}
       {currentPage !== index && <View style={styles.image} />}
       <ThemedText style={styles.title}>{item.title}</ThemedText>
@@ -260,6 +276,7 @@ const styles = StyleSheet.create({
     height: "60%",
     resizeMode: "contain",
     marginBottom: verticalScale(24),
+    backgroundColor: "transparent",
   },
   title: {
     fontSize: getFontSize(24),

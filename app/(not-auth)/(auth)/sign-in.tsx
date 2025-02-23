@@ -25,6 +25,8 @@ import PasswordShowIcon from "@/assets/svg/password-show.svg";
 import PasswordHideIcon from "@/assets/svg/password-hide.svg";
 import { supabase } from "@/utils/SupaLegend";
 import { useToast } from "react-native-toast-notifications";
+import GoogleButton from "@/components/auth/google-button";
+import AppleButton from "@/components/auth/apple-button";
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm({
@@ -183,18 +185,14 @@ const SignIn = () => {
               flexDirection: "row",
             }}
           >
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <GoogleIcon
                 width={horizontalScale(36)}
                 height={verticalScale(36)}
               />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <AppleIcon
-                width={horizontalScale(36)}
-                height={verticalScale(36)}
-              />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <GoogleButton />
+            <AppleButton />
           </View>
           {/* <View
             style={{

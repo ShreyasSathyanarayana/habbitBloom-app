@@ -1,4 +1,4 @@
-package com.shreyas8747.habbitBloom
+package com.shreyas8747.habitBloom
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

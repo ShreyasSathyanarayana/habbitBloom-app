@@ -1,6 +1,7 @@
 <resources>
-  <string name="app_name">habbitBloom</string>
+  <string name="app_name">habitBloom</string>
   <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+  <string name="server_client_id">163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd.apps.googleusercontent.com</string>
 </resources>

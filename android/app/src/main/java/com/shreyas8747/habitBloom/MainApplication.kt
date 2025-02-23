@@ -1,4 +1,4 @@
-package com.shreyas8747.habbitBloom
+package com.shreyas8747.habitBloom
 
 import android.app.Application
 import android.content.res.Configuration

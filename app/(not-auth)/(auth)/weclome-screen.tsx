@@ -12,6 +12,9 @@ import { router } from "expo-router";
 import SampleIcon from "@/assets/svg/sample-icon.svg";
 import GoogleIcon from "@/assets/svg/google-icon.svg";
 import AppleIcon from "@/assets/svg/apple-icon.svg";
+import GoogleButton from "@/components/auth/google-button";
+import { OutlineButton } from "@/components/ui/outline-button";
+import AppleButton from "@/components/auth/apple-button";
 
 const WeclomeScreen = () => {
   return (
@@ -51,7 +54,7 @@ const WeclomeScreen = () => {
           style={{ width: "100%", marginVertical: verticalScale(24) }}
           title="SIGN UP"
         />
-        <GradientButton
+        <OutlineButton
           type="secondary"
           style={{ width: "100%", marginBottom: verticalScale(20) }}
           title="LOG IN"
@@ -68,15 +71,14 @@ const WeclomeScreen = () => {
             flexDirection: "row",
           }}
         >
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <GoogleIcon
               width={horizontalScale(36)}
               height={verticalScale(36)}
             />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <AppleIcon width={horizontalScale(36)} height={verticalScale(36)} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <GoogleButton />
+         <AppleButton/>
         </View>
       </View>
       <View
