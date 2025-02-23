@@ -43,7 +43,7 @@ const GoogleButton = () => {
 
         if (error) {
           console.error("Supabase Auth Error:", error.message);
-          toast.show("Google Sign-In Failed!", { type: "danger" });
+          toast.show(error.message, { type: "danger" });
           return;
         }
 
