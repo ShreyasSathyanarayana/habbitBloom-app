@@ -76,9 +76,9 @@ const Onboarding = () => {
         animated: true,
       });
       setCurrentPage(currentPage + 1);
-      toast.show("Testing jdsaldjal;djajdadkhashjdkdsjhak", {
-        type: "success",
-      });
+      // toast.show("Testing jdsaldjal;djajdadkhashjdkdsjhak", {
+      //   type: "success",
+      // });
     } else {
       router.push("/(not-auth)/(auth)/weclome-screen");
       // add the next page here

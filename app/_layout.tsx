@@ -123,7 +123,7 @@ export const RootLayoutWrapper = () => {
       <Providers>
         <ToastProvider
           placement="top"
-          duration={3000}
+          duration={5000}
           animationType="slide-in"
           animationDuration={400}
           successColor="green"

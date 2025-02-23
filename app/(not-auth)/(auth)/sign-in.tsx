@@ -27,6 +27,8 @@ import { supabase } from "@/utils/SupaLegend";
 import { useToast } from "react-native-toast-notifications";
 import GoogleButton from "@/components/auth/google-button";
 import AppleButton from "@/components/auth/apple-button";
+import { useMutation } from "@tanstack/react-query";
+import { signIn } from "@/api/auth-api";
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm({
@@ -35,26 +37,41 @@ const SignIn = () => {
       password: "",
     },
   });
-  // console.log(control._fields);
-  const toast = useToast();
-
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
-  const onSubmit = async (data: any) => {
-    const { data: signInData, error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-    if (error) {
-      // Alert.alert('Something went wrong')
+  const mutation = useMutation({
+    mutationKey: ["signIn"],
+    mutationFn: (data: any) => {
+      return signIn(data.email, data.password);
+    },
+    onError: (error: any) => {
       toast.show(error.message, {
         type: "danger",
       });
+    },
+    onSuccess: () => {
+      toast.show("Login Succesful", {
+        type: "success",
+      });
+    },
+  });
+  const toast = useToast();
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
+  const onSubmit = async (data: any) => {
+    mutation.mutateAsync(data);
+    // const { data: signInData, error } = await supabase.auth.signInWithPassword({
+    //   email: data.email,
+    //   password: data.password,
+    // });
+    // if (error) {
+    //   // Alert.alert('Something went wrong')
+    //   toast.show(error.message, {
+    //     type: "danger",
+    //   });
 
-      return;
-    }
-    toast.show("Login Succesful", {
-      type: "success",
-    });
+    //   return;
+    // }
+    // toast.show("Login Succesful", {
+    //   type: "success",
+    // });
     // Alert.alert("Login Succesful");
   };
 
@@ -165,9 +182,15 @@ const SignIn = () => {
                 marginTop: verticalScale(24),
               }}
             >
-              <ThemedText style={{ color: "rgba(135, 144, 169, 1)" }}>
-                Forgot Your Password?
-              </ThemedText>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push("/(not-auth)/(auth)/forgot-password")
+                }
+              >
+                <ThemedText style={{ color: "rgba(135, 144, 169, 1)" }}>
+                  Forgot Your Password?
+                </ThemedText>
+              </TouchableOpacity>
             </View>
             <GradientButton
               onPress={handleSubmit(onSubmit)}

@@ -67,67 +67,83 @@ const SignUp = () => {
     return false;
   };
 
-  const onSubmit = async (formData: any) => {
-    console.log(formData);
-    const phoneNumber = `${selectedCountry?.callingCode}${formData.phoneNumber}`;
-    const formattedPhone = phoneNumber.replace(/\s+/g, ""); // Remove spaces
-    console.log("Button is clicked");
+ const onSubmit = async (formData: any) => {
+   try {
+     console.log("Form Data:", formData);
+     console.log("Button is clicked");
 
-    const isValid = isValidPhoneNumber(
-      formData.phoneNumber,
-      selectedCountry as ICountry
-    );
+     if (!selectedCountry?.callingCode) {
+       toast.show("Invalid country selection.", { type: "danger" });
+       return;
+     }
 
-    if (!isValid) {
-      // Alert.alert("Error", "Enter a valid phone number.");
-      toast.show("Enter a valid phone number.", {
-        type: "danger",
-      });
-      return;
-    }
+     // ✅ Format Phone Number
+     const phoneNumber =
+       `${selectedCountry.callingCode}${formData.phoneNumber}`.replace(
+         /\s+/g,
+         ""
+       ); // Remove spaces
 
-    // ✅ Check if user already exists before signing up
-    if (await checkExistingUser(formData.email)) return;
+     // ✅ Validate Phone Number
+     if (
+       !isValidPhoneNumber(formData.phoneNumber, selectedCountry as ICountry)
+     ) {
+       toast.show("Enter a valid phone number.", { type: "danger" });
+       return;
+     }
 
-    // ✅ Sign up the user
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
-      {
-        email: formData?.email,
-        password: formData.password,
-        // phone: formattedPhone,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            // mobile: formattedPhone,
-          },
-        },
-      }
-    );
+     // ✅ Check if user already exists before signing up
+     const userExists = await checkExistingUser(formData.email);
+     if (userExists) return;
 
-    if (signUpError) {
-      console.log("SignUp Error:", signUpError);
-      // Alert.alert("Error", signUpError.message);
-      toast.show(signUpError.message, {
-        type: "danger",
-        // duration: 4000,
-      });
-      return;
-    }
+     // ✅ Sign Up the User
+     const { data: signUpData, error: signUpError } =
+       await supabase.auth.signUp({
+         email: formData?.email,
+         password: formData.password,
+         options: {
+           data: {
+             full_name: formData.fullName,
+           },
+         },
+       });
 
-    // // ✅ Insert user data into 'profiles' table
-    const { error: insertError } = await supabase.from("profiles").insert([
-      {
-        id: signUpData.user?.id, // Store the auth UID
-        full_name: formData.fullName,
-        // mobile: formattedPhone,
-        email: formData.email,
-      },
-    ]);
+     if (signUpError) {
+       console.error("SignUp Error:", signUpError);
+       toast.show(signUpError.message, { type: "danger" });
+       return;
+     }
 
-    router.push({
-      pathname: "/(not-auth)/(auth)/sign-in",
-    });
-  };
+     // ✅ Ensure user ID is available before inserting into "profiles"
+     if (!signUpData.user?.id) {
+       toast.show("User ID not found after sign-up.", { type: "danger" });
+       return;
+     }
+
+     // ✅ Insert user data into 'profiles' table
+     const { error: insertError } = await supabase.from("profiles").insert([
+       {
+         id: signUpData.user.id, // Store the auth UID
+         full_name: formData.fullName,
+         mobile: phoneNumber, // Use formatted phone number
+         email: formData.email,
+       },
+     ]);
+
+     if (insertError) {
+       console.error("Insert Error:", insertError);
+       toast.show("Failed to save user profile.", { type: "danger" });
+       return;
+     }
+
+     // ✅ Navigate to Sign-in Page
+     router.push("/(not-auth)/(auth)/sign-in");
+   } catch (error: any) {
+     console.error("Unexpected Error:", error);
+     toast.show(error.message || "Something went wrong.", { type: "danger" });
+   }
+ };
+
 
   return (
     <>

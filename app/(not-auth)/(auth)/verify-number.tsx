@@ -248,6 +248,7 @@ export const phoneInputStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(205, 205, 205, 0.09)",
     height: verticalScale(56),
+  
   },
   flagContainer: {
     backgroundColor: "rgba(60, 60, 67, 0.6)",
