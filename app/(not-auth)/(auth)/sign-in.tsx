@@ -44,7 +44,7 @@ const SignIn = () => {
     },
     onError: (error: any) => {
       toast.show(error.message, {
-        type: "danger",
+        type: error.type,
       });
     },
     onSuccess: () => {

@@ -85,7 +85,7 @@ const VerifyNumber = () => {
     if (!isValid) {
       // Alert.alert("Error", "Enter a valid phone number.");
       toast.show("Enter a valid phone number.", {
-        type:'danger'
+        type: "danger",
       });
       return;
     }
@@ -193,6 +193,7 @@ const VerifyNumber = () => {
             >
               <PhoneInput
                 defaultValue="+91"
+                allowFontScaling={false}
                 value={value}
                 theme="dark"
                 popularCountries={["IN"]}
@@ -205,12 +206,12 @@ const VerifyNumber = () => {
                   countryButton: {
                     backgroundColor: "rgba(31, 34, 42, 1)",
                     borderColor: "rgba(60, 60, 67, 0.6)",
-                    height: verticalScale(56),
+                    height: verticalScale(50),
                   },
                   searchInput: {
                     backgroundColor: "rgba(31, 34, 42, 1)",
                     borderColor: "rgba(31, 34, 42, 1)",
-                    fontSize: getFontSize(16),
+                    fontSize: getFontSize(14),
                     height: verticalScale(56),
                   },
                 }}
@@ -248,16 +249,17 @@ export const phoneInputStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(205, 205, 205, 0.09)",
     height: verticalScale(56),
-  
   },
   flagContainer: {
     backgroundColor: "rgba(60, 60, 67, 0.6)",
   },
   inputText: {
-    fontSize: getFontSize(16),
+    fontSize: getFontSize(15),
+    fontFamily: "Poppins_400Regular",
+    includeFontPadding: false,
   },
   callingCode: {
-    fontSize: getFontSize(16),
+    fontSize: getFontSize(14),
   },
 });
 

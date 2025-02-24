@@ -2,6 +2,7 @@ import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 import React from "react";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
+import { ThemedText } from "./theme-text";
 // import { HelperText } from 'react-native-paper';
 
 interface LabelProps {
@@ -32,12 +33,12 @@ const Label: React.FC<LabelProps> = ({
 
   return (
     <View style={labelStyle}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <ThemedText style={styles.label}>{label}</ThemedText>}
       {children}
       {helperText ? (
-        <Text style={[styles.helperText, { color: helperTextColor }]}>
+        <ThemedText style={[styles.helperText, { color: helperTextColor }]}>
           {helperText}
-        </Text>
+        </ThemedText>
       ) : null}
       {helperComponent}
     </View>

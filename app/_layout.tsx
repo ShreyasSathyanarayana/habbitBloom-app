@@ -24,10 +24,14 @@ import { Slot, SplashScreen, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedText } from "@/components/ui/theme-text";
+import CheckIcon from "@/assets/svg/check_circle.svg";
+import WrongIcon from "@/assets/svg/cancel.svg";
+import InfoIcon from "@/assets/svg/Info.svg";
+import { horizontalScale } from "@/metric";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -114,6 +118,10 @@ const RootLayout = () => {
   }, []);
   return <Slot />;
 };
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
 
 export const RootLayoutWrapper = () => {
   return (
@@ -175,29 +183,67 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
     switch (type) {
       case "success":
         return (
-          <Ionicons
-            style={{
-              backgroundColor: "rgba(62, 77, 71, 0.8)",
-              padding: 2,
-              borderRadius: 60,
-            }}
-            name="checkmark-circle"
-            size={24}
-            color="rgba(1, 225, 123, 1)"
-          />
+          // <Ionicons
+          //   style={{
+          //     backgroundColor: "rgba(62, 77, 71, 0.8)",
+          //     padding: 2,
+          //     borderRadius: 60,
+          //   }}
+          //   name="checkmark-circle"
+          //   size={24}
+          //   color="rgba(1, 225, 123, 1)"
+          // />
+          <View style={styles.toastIconContainer}>
+            <CheckIcon
+              width={horizontalScale(24)}
+              height={horizontalScale(24)}
+            />
+          </View>
         );
       case "danger":
-        return <Ionicons name="close-circle" size={24} color="red" />;
+        return (
+          <View style={styles.toastIconContainer}>
+            <WrongIcon
+              width={horizontalScale(24)}
+              height={horizontalScale(24)}
+            />
+          </View>
+        );
       case "warning":
-        return <Ionicons name="alert-circle" size={24} color="orange" />;
+        return (
+          <View style={styles.toastIconContainer}>
+            <InfoIcon
+              width={horizontalScale(24)}
+              height={horizontalScale(24)}
+            />
+          </View>
+        );
       default:
         return <Ionicons name="information-circle" size={24} color="gray" />;
     }
   };
 
+  const getGradientColor = (): [string, string, ...string[]] => {
+    switch (type) {
+      case "success":
+        return ["#4B6F60", "#343836"];
+      case "danger":
+        return ["rgba(144, 79, 80, 1)", "rgba(69, 62, 62, 1)"];
+      case "warning":
+        return ["rgba(129, 118, 73, 1)", "rgba(57, 56, 54, 1)"];
+      default:
+        return ["gray", "black"]; // Added fallback gradient
+    }
+  };
+
+  const toastColor: Record<string, string> = {
+    success: "rgba(1, 225, 123, 1)",
+    danger: "rgba(250, 1, 2, 1)",
+    warning: "rgba(255, 210, 31, 1)",
+  };
   return (
     <LinearGradient
-      colors={["#4B6F60", "#343836"]}
+      colors={getGradientColor()}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={styles.toastContainer}
@@ -226,7 +272,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
           <AntDesign
             name="close"
             size={24}
-            color="rgba(1, 225, 123, 1)"
+            color={toastColor[type.toString()] || "white"}
             style={[styles.closeButton]}
           />
         </TouchableOpacity>
@@ -235,7 +281,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
         style={{
           width: "100%",
           height: 6,
-          backgroundColor: "rgba(1, 225, 123, 1)",
+          backgroundColor: toastColor[type.toString()] || "white",
           // position: 'static',
           // bottom: 0,
           // right: 0,
@@ -305,6 +351,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   closeButton: {},
+  toastIconContainer: {
+    padding: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(62, 77, 71, 0.8)",
+    borderRadius: 150,
+  },
 });
 
 // export default App;

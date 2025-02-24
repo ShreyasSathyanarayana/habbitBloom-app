@@ -51,9 +51,9 @@ const ForgotPassword = () => {
       });
       router.back();
     },
-    onError: (error) => {
+    onError: (error:any) => {
       toast.show(error.message, {
-        type: "danger",
+        type: error.type,
       });
     },
   });

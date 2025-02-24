@@ -43,7 +43,7 @@ export const updatePassword = async (password: string) => {
 
   // Check if user is signed in
   if (!user || userError) {
-    throw new Error("You need to be signed in to update your password.");  
+    throw { message: "You need to be signed in to update your password.", type: "warning" };
   }
 
   // Attempt to update the password
@@ -53,21 +53,23 @@ export const updatePassword = async (password: string) => {
     console.log("Update Password Error:", error.status, error.message);
 
     // Custom error messages based on Supabase response
-    const errorMessages: Record<string, string> = {
-      "400": "Invalid password format. Please choose a stronger password.",
-      "401": "Session expired. Please sign in again to update your password.",
-      "403": "You don't have permission to change this password.",
-      "429": "Too many attempts. Try again later.",
-      "Invalid login credentials": "Incorrect current password. Please try again.",
+    const errorMessages: Record<string, { message: string; type: "danger" | "warning" }> = {
+      "400": { message: "Invalid password format. Please choose a stronger password.", type: "warning" },
+      "401": { message: "Session expired. Please sign in again to update your password.", type: "danger" },
+      "403": { message: "You don't have permission to change this password.", type: "danger" },
+      "429": { message: "Too many attempts. Try again later.", type: "warning" },
+      "Invalid login credentials": { message: "Incorrect current password. Please try again.", type: "danger" },
     };
 
-    // Find a matching error message or use a default
-    const customMessage =
-      
-      errorMessages[error.status?.toString()||""] ||errorMessages[error.message] ||
-      "Failed to update password. Please try again.";
+    // Get a custom error message or a default one
+    const customError =
+      errorMessages[error.message] ||
+      errorMessages[error.status?.toString() || ""] || {
+        message: error.message,
+        type: "warning",
+      };
 
-    throw new Error(customMessage);
+    throw customError;
   }
 
   return data; // Return only necessary data
@@ -75,9 +77,23 @@ export const updatePassword = async (password: string) => {
 
 
 
+
 export const signIn = async (email: string, password: string) => {
-  console.log(email,password);
+  // console.log(email, password);
+
+  // Step 1: Check if the email exists in the database
+  const { data: userExists, error: userError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("email", email)
+    .single();
+  console.log(userExists,userError);
   
+  if (!userExists) {
+    throw { message: "No account found. Please sign up first.", type: "warning" };
+  }
+
+  // Step 2: Attempt sign-in with password
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -86,22 +102,24 @@ export const signIn = async (email: string, password: string) => {
   if (error) {
     console.log("Login Error:", error.status, error.message);
 
-    // Custom error messages based on Supabase error responses
-    const errorMessages: Record<string, string> = {
-      "400": "No account found. Please sign up first.",
-      "401": "Unauthorized access. Please check your credentials.",
-      "403": "Access denied. Contact support if this is a mistake.",
-      "429": "Too many login attempts. Try again later.",
-       "Invalid login credentials": "Incorrect email or password. Try again.",
-      "Email not confirmed": "Please confirm your email before signing in.",
+    const errorMessages: Record<string, { message: string; type: "danger" | "warning" }> = {
+      "401": { message: "Unauthorized access. Please check your credentials.", type: "danger" },
+      "403": { message: "Access denied. Contact support if this is a mistake.", type: "danger" },
+      "429": { message: "Too many login attempts. Try again later.", type: "warning" },
+      // "Invalid login credentials": { message: "Incorrect password. Try again.", type: "danger" },
+      "Email not confirmed": { message: "Please confirm your email before signing in.", type: "warning" },
     };
 
-    // Check if the error message exists in our custom map
-    const customMessage =  errorMessages[error.status?.toString()||""] ||errorMessages[error.message] || "An unexpected error occurred.";
+    const customError =
+      errorMessages[error.message] ||
+      errorMessages[error.status?.toString() || ""] || {
+        message: error.message,
+        type: "warning",
+      };
 
-    throw new Error(customMessage);
+    throw customError; // Throw the custom error object
   }
 
-  return data; // Return only user data
+  return data;
 };
 

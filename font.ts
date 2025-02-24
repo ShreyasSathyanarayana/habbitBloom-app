@@ -42,7 +42,7 @@ export const getFontSize = (size: number): number => {
 
     // Calculate scale factor
     const scaleFactor = SCALE / BASE_WIDTH;
-    const clampedScaleFactor = Math.min(Math.max(scaleFactor, config.min), config.max);
+    const clampedScaleFactor = Math.max(Math.max(scaleFactor, config.min), config.max);
 
     let newSize = size * clampedScaleFactor;
 
@@ -66,6 +66,6 @@ export const adjustFontConfig = (
 };
 
 // Debug Logs
-// console.log('Device type:', getDeviceType());
-// console.log('Font size for 16:', getFontSize(16));
-// console.log('Screen dimensions:', SCREEN_WIDTH, SCREEN_HEIGHT);
+console.log('Device type:', getDeviceType());
+console.log('Font size for 16:', getFontSize(16));
+console.log('Screen dimensions:', SCREEN_WIDTH, SCREEN_HEIGHT);

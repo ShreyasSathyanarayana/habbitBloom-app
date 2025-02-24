@@ -67,83 +67,82 @@ const SignUp = () => {
     return false;
   };
 
- const onSubmit = async (formData: any) => {
-   try {
-     console.log("Form Data:", formData);
-     console.log("Button is clicked");
+  const onSubmit = async (formData: any) => {
+    try {
+      console.log("Form Data:", formData);
+      console.log("Button is clicked");
 
-     if (!selectedCountry?.callingCode) {
-       toast.show("Invalid country selection.", { type: "danger" });
-       return;
-     }
+      if (!selectedCountry?.callingCode) {
+        toast.show("Invalid country selection.", { type: "danger" });
+        return;
+      }
 
-     // ✅ Format Phone Number
-     const phoneNumber =
-       `${selectedCountry.callingCode}${formData.phoneNumber}`.replace(
-         /\s+/g,
-         ""
-       ); // Remove spaces
+      // ✅ Format Phone Number
+      const phoneNumber =
+        `${selectedCountry.callingCode}${formData.phoneNumber}`.replace(
+          /\s+/g,
+          ""
+        ); // Remove spaces
 
-     // ✅ Validate Phone Number
-     if (
-       !isValidPhoneNumber(formData.phoneNumber, selectedCountry as ICountry)
-     ) {
-       toast.show("Enter a valid phone number.", { type: "danger" });
-       return;
-     }
+      // ✅ Validate Phone Number
+      if (
+        !isValidPhoneNumber(formData.phoneNumber, selectedCountry as ICountry)
+      ) {
+        toast.show("Enter a valid phone number.", { type: "danger" });
+        return;
+      }
 
-     // ✅ Check if user already exists before signing up
-     const userExists = await checkExistingUser(formData.email);
-     if (userExists) return;
+      // ✅ Check if user already exists before signing up
+      const userExists = await checkExistingUser(formData.email);
+      if (userExists) return;
 
-     // ✅ Sign Up the User
-     const { data: signUpData, error: signUpError } =
-       await supabase.auth.signUp({
-         email: formData?.email,
-         password: formData.password,
-         options: {
-           data: {
-             full_name: formData.fullName,
-           },
-         },
-       });
+      // ✅ Sign Up the User
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email: formData?.email,
+          password: formData.password,
+          options: {
+            data: {
+              full_name: formData.fullName,
+            },
+          },
+        });
 
-     if (signUpError) {
-       console.error("SignUp Error:", signUpError);
-       toast.show(signUpError.message, { type: "danger" });
-       return;
-     }
+      if (signUpError) {
+        console.error("SignUp Error:", signUpError);
+        toast.show(signUpError.message, { type: "danger" });
+        return;
+      }
 
-     // ✅ Ensure user ID is available before inserting into "profiles"
-     if (!signUpData.user?.id) {
-       toast.show("User ID not found after sign-up.", { type: "danger" });
-       return;
-     }
+      // ✅ Ensure user ID is available before inserting into "profiles"
+      if (!signUpData.user?.id) {
+        toast.show("User ID not found after sign-up.", { type: "danger" });
+        return;
+      }
 
-     // ✅ Insert user data into 'profiles' table
-     const { error: insertError } = await supabase.from("profiles").insert([
-       {
-         id: signUpData.user.id, // Store the auth UID
-         full_name: formData.fullName,
-         mobile: phoneNumber, // Use formatted phone number
-         email: formData.email,
-       },
-     ]);
+      // ✅ Insert user data into 'profiles' table
+      const { error: insertError } = await supabase.from("profiles").insert([
+        {
+          id: signUpData.user.id, // Store the auth UID
+          full_name: formData.fullName,
+          mobile: phoneNumber, // Use formatted phone number
+          email: formData.email,
+        },
+      ]);
 
-     if (insertError) {
-       console.error("Insert Error:", insertError);
-       toast.show("Failed to save user profile.", { type: "danger" });
-       return;
-     }
+      if (insertError) {
+        console.error("Insert Error:", insertError);
+        toast.show("Failed to save user profile.", { type: "danger" });
+        return;
+      }
 
-     // ✅ Navigate to Sign-in Page
-     router.push("/(not-auth)/(auth)/sign-in");
-   } catch (error: any) {
-     console.error("Unexpected Error:", error);
-     toast.show(error.message || "Something went wrong.", { type: "danger" });
-   }
- };
-
+      // ✅ Navigate to Sign-in Page
+      router.push("/(not-auth)/(auth)/sign-in");
+    } catch (error: any) {
+      console.error("Unexpected Error:", error);
+      toast.show(error.message || "Something went wrong.", { type: "danger" });
+    }
+  };
 
   return (
     <>
@@ -323,6 +322,7 @@ const SignUp = () => {
                     <PhoneInput
                       defaultValue="+91"
                       value={value}
+                      allowFontScaling={false}
                       theme="dark"
                       popularCountries={["IN"]}
                       modalStyles={{
@@ -343,12 +343,13 @@ const SignUp = () => {
                           height: verticalScale(56),
                         },
                       }}
-                      phoneInputStyles={{
+                      phoneInputStyles={{ 
                         container: phoneInputStyles.inputContainer,
                         flagContainer: phoneInputStyles.flagContainer,
                         input: phoneInputStyles.inputText,
                         callingCode: phoneInputStyles.callingCode,
                       }}
+                      
                       onChangePhoneNumber={onChange}
                       selectedCountry={selectedCountry}
                       onChangeSelectedCountry={handleSelectedCountry}
