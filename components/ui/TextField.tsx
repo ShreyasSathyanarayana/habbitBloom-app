@@ -37,6 +37,8 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
           })}
         <TextInput
           ref={ref}
+          // numberOfLines={1}
+          allowFontScaling={false}
           style={[
             styles.textField,
             error && { color: "rgba(255, 0, 0, 1)" },

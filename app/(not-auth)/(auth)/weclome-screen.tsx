@@ -78,7 +78,7 @@ const WeclomeScreen = () => {
             />
           </TouchableOpacity> */}
           <GoogleButton />
-         <AppleButton/>
+          <AppleButton />
         </View>
       </View>
       <View

@@ -116,8 +116,6 @@ const RootLayout = () => {
 };
 
 export const RootLayoutWrapper = () => {
-  console.log("Logged in");
-
   return (
     <KeyboardProvider>
       <Providers>
@@ -146,7 +144,7 @@ export const RootLayoutWrapper = () => {
           renderToast={(toast) => (
             <CustomToast
               message={toast.message}
-              type={toast.type as ToastType}
+              type={toast.type as unknown as ToastType}
               id={toast.id}
             />
           )}
@@ -162,7 +160,7 @@ export const RootLayoutWrapper = () => {
 export default RootLayoutWrapper;
 
 interface CustomToastProps {
-  message: string;
+  message: React.ReactNode;
   type: ToastType | string;
 }
 
