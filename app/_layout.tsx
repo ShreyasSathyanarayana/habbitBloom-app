@@ -195,7 +195,12 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
         );
       case "danger":
         return (
-          <View style={styles.toastIconContainer}>
+          <View
+            style={[
+              styles.toastIconContainer,
+              { backgroundColor: "rgba(97, 48, 50, 0.8)" },
+            ]}
+          >
             <WrongIcon
               width={horizontalScale(24)}
               height={horizontalScale(24)}
@@ -204,7 +209,12 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
         );
       case "warning":
         return (
-          <View style={styles.toastIconContainer}>
+          <View
+            style={[
+              styles.toastIconContainer,
+              { backgroundColor: "rgba(80, 78, 70, 0.8)" },
+            ]}
+          >
             <InfoIcon
               width={horizontalScale(24)}
               height={horizontalScale(24)}

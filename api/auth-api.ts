@@ -114,7 +114,7 @@ export const signIn = async (email: string, password: string) => {
       errorMessages[error.message] ||
       errorMessages[error.status?.toString() || ""] || {
         message: error.message,
-        type: "warning",
+        type: "danger",
       };
 
     throw customError; // Throw the custom error object
