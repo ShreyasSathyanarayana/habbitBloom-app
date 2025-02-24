@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     gap: horizontalScale(5),
   },
   skipText: {
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "PoppinsMedium",
     fontSize: getFontSize(16),
   },
   section2: {
@@ -285,14 +285,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: getFontSize(24),
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "PoppinsRegular",
     textAlign: "center",
     color: "white",
     marginBottom: verticalScale(16),
   },
   description: {
     fontSize: getFontSize(14),
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "PoppinsRegular",
     textAlign: "center",
   },
   paginationContainer: {

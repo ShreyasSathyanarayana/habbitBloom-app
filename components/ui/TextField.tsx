@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     height: "100%",
     padding: 16,
     color: "white",
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "PoppinsMedium",
     fontSize: getFontSize(14),
   },
 });

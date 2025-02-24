@@ -32,7 +32,7 @@ const WeclomeScreen = () => {
         <ThemedText
           style={{
             fontSize: getFontSize(28),
-            fontFamily: "Poppins_700Bold",
+            fontFamily: "PoppinsBold",
             marginTop: verticalScale(21),
           }}
         >
@@ -93,7 +93,10 @@ const WeclomeScreen = () => {
             Terms of Service{" "}
           </ThemedText>
           and{" "}
-          <ThemedText style={{ color: "#8A2BE2" }}>Privacy Policy</ThemedText>.
+          <ThemedText style={{ color: "#8A2BE2" }}>
+            Privacy Policy
+          </ThemedText>
+          .
         </ThemedText>
       </View>
     </Container>

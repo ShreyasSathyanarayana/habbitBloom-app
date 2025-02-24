@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: getFontSize(24),
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "PoppinsSemiBold",
   },
   subtitle: {
     color: "rgba(209, 209, 209, 1)",

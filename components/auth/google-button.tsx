@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   GoogleSignin,
   statusCodes,
@@ -8,6 +8,8 @@ import GoogleIcon from "@/assets/svg/google-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useToast } from "react-native-toast-notifications";
 import { supabase } from "@/utils/SupaLegend";
+import { OutlineButton } from "../ui/outline-button";
+import { ThemedText } from "../ui/theme-text";
 
 const GoogleButton = () => {
   const configGoogleSignIn = () => {
@@ -108,12 +110,43 @@ const GoogleButton = () => {
   };
 
   return (
-    <TouchableOpacity onPress={signIn}>
-      <GoogleIcon width={horizontalScale(36)} height={verticalScale(36)} />
-    </TouchableOpacity>
+    <>
+      {Platform.OS != "ios" ? (
+        <OutlineButton onPress={signIn} style={{ width: "100%" }}>
+          <View
+            style={{
+              backgroundColor: "black",
+              borderRadius: 10,
+              paddingVertical: verticalScale(12),
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+              gap: horizontalScale(10),
+            }}
+          >
+            <GoogleIcon
+              width={horizontalScale(24)}
+              height={verticalScale(24)}
+            />
+            <ThemedText style={{ fontFamily: "PoppinsBold" }}>
+              CONTINUE WITH GOOGLE
+            </ThemedText>
+          </View>
+        </OutlineButton>
+      ) : (
+        <TouchableOpacity onPress={signIn}>
+          <GoogleIcon width={horizontalScale(36)} height={verticalScale(36)} />
+        </TouchableOpacity>
+      )}
+    </>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  androidBtn: {
+    borderWidth: 1,
+    borderColor: "red",
+  },
+});
 
 export default GoogleButton;

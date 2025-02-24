@@ -52,13 +52,13 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(16),
     marginBottom: 8,
     color: "white",
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "PoppinsMedium",
   },
   helperText: {
     fontSize: getFontSize(12),
     // fontWeight: 400,
     marginTop: verticalScale(4),
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "PoppinsRegular",
     marginLeft: horizontalScale(15),
   },
 });

@@ -101,7 +101,7 @@ const VerifyOtp = () => {
       </View>
       <View style={globalStyles.heroSection}>
         <ThemedText
-          style={{ fontSize: getFontSize(24), fontFamily: "Poppins_700Bold" }}
+          style={{ fontSize: getFontSize(24), fontFamily: "PoppinsBold" }}
         >
           Create an Account
         </ThemedText>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "PoppinsBold",
   },
   subtitle: {
     fontSize: 16,

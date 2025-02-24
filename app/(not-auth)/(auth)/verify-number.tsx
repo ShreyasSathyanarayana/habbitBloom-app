@@ -164,7 +164,7 @@ const VerifyNumber = () => {
 
       <View style={globalStyles.heroSection}>
         <ThemedText
-          style={{ fontSize: getFontSize(24), fontFamily: "Poppins_700Bold" }}
+          style={{ fontSize: getFontSize(24), fontFamily: "PoppinsBold" }}
         >
           Create an Account
         </ThemedText>
@@ -248,14 +248,14 @@ export const phoneInputStyles = StyleSheet.create({
     backgroundColor: "rgba(60, 60, 67, 0.6)",
     borderWidth: 1,
     borderColor: "rgba(205, 205, 205, 0.09)",
-    height: verticalScale(56),
+    height: verticalScale(50),
   },
   flagContainer: {
     backgroundColor: "rgba(60, 60, 67, 0.6)",
   },
   inputText: {
     fontSize: getFontSize(15),
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "PoppinsRegular",
     includeFontPadding: false,
   },
   callingCode: {

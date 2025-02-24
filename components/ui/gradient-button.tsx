@@ -74,7 +74,7 @@ export function GradientButton({
             {
               color: "white",
               fontSize: getFontSize(16),
-              fontFamily: "Poppins_700Bold",
+              fontFamily: "PoppinsBold",
               paddingVertical: verticalScale(12),
               paddingHorizontal: horizontalScale(20),
               includeFontPadding: false,

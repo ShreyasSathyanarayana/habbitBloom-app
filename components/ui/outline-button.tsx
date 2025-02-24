@@ -8,12 +8,14 @@ import Animated, {
   withTiming,
   withSpring,
 } from "react-native-reanimated";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { ThemedText } from "./theme-text";
 
 interface GradientButtonProps extends TouchableOpacityProps {
-  title: string;
+  title?: string;
   type?: string;
   disable?: boolean;
+  children: React.ReactNode;
   color?: [string, string, ...string[]]; // Custom gradient colors
 }
 
@@ -23,29 +25,9 @@ export function OutlineButton({
   disable = false,
   color = ["#00FFFF", "#8A2BE2", "#FF1493"], // Default gradient colors
   style,
+  children,
   ...props
 }: GradientButtonProps) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(10);
-
-  useEffect(() => {
-    opacity.value = 0;
-    translateY.value = 10;
-
-    // opacity.value = withTiming(1, { duration: 300 });
-    opacity.value = withSpring(1, { damping: 40, stiffness: 200 });
-    // translateY.value = withTiming(0, { duration: 500 });
-    translateY.value = withSpring(0, {
-      damping: 40,
-      stiffness: 200,
-    });
-  }, [title]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
   return (
     <TouchableOpacity
       disabled={disable}
@@ -69,29 +51,33 @@ export function OutlineButton({
           borderRadius: 10,
         }}
       >
-        <Text
-          style={[
-            {
-              color: "white",
-              fontSize: getFontSize(16),
-              fontFamily: "Poppins_700Bold",
-              paddingVertical: verticalScale(12),
-              paddingHorizontal: horizontalScale(20),
-              backgroundColor: "black",
-              borderRadius: 10,
-              textAlign: "center",
-              includeFontPadding: false,
-              textShadowColor: "transparent",
-              textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 0,
-            },
-            // animatedStyle,
-            // type != "primary" && { backgroundColor: "black" },
-            disable && { color: "rgba(118, 118, 118, 1)" },
-          ]}
-        >
-          {title}
-        </Text>
+        {children}
+        {title && (
+          <ThemedText
+            allowFontScaling={false}
+            style={[
+              {
+                color: "white",
+                fontSize: getFontSize(16),
+                fontFamily: "PoppinsBold",
+                paddingVertical: verticalScale(12),
+                paddingHorizontal: horizontalScale(20),
+                backgroundColor: "black",
+                borderRadius: 10,
+                textAlign: "center",
+                includeFontPadding: false,
+                textShadowColor: "transparent",
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 0,
+              },
+              // animatedStyle,
+              // type != "primary" && { backgroundColor: "black" },
+              disable && { color: "rgba(118, 118, 118, 1)" },
+            ]}
+          >
+            {title}
+          </ThemedText>
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );

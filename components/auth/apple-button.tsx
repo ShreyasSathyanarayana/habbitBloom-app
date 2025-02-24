@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   GoogleSignin,
   statusCodes,
@@ -8,17 +8,16 @@ import AppleIcon from "@/assets/svg/apple-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useToast } from "react-native-toast-notifications";
 
-const AppleButton
- = () => {
-//   const configGoogleSignIn = () => {
-//     GoogleSignin.configure({
-//       webClientId:
-//         "163765196168-5o87bk1dt4vrkjf88e87kfujlv9g14qh.apps.googleusercontent.com",
-//     });
-//   };
-//   useEffect(() => {
-//     configGoogleSignIn(); // will execute everytime the component mounts
-//   }, []);
+const AppleButton = () => {
+  //   const configGoogleSignIn = () => {
+  //     GoogleSignin.configure({
+  //       webClientId:
+  //         "163765196168-5o87bk1dt4vrkjf88e87kfujlv9g14qh.apps.googleusercontent.com",
+  //     });
+  //   };
+  //   useEffect(() => {
+  //     configGoogleSignIn(); // will execute everytime the component mounts
+  //   }, []);
   const toast = useToast();
 
   const signIn = async () => {
@@ -44,7 +43,7 @@ const AppleButton
     }
   };
   return (
-    <TouchableOpacity>
+    <TouchableOpacity style={Platform.OS !== "ios" && { display: "none" }}>
       <AppleIcon
         // onPress={signIn}
         width={horizontalScale(36)}
@@ -56,5 +55,4 @@ const AppleButton
 
 const styles = StyleSheet.create({});
 
-export default AppleButton
-;
+export default AppleButton;

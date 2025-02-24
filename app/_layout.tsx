@@ -6,15 +6,9 @@ import {
   ToastType,
   useToast,
 } from "react-native-toast-notifications";
-import {
-  Poppins_100Thin,
-  Poppins_200ExtraLight,
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-  useFonts,
-} from "@expo-google-fonts/poppins";
+// import {
+//   useFonts,
+// } from "@expo-google-fonts/poppins";
 import React, { useEffect } from "react";
 import { useAuth } from "@/context/AuthProvider";
 import Providers from "@/components/Provider";
@@ -32,6 +26,7 @@ import CheckIcon from "@/assets/svg/check_circle.svg";
 import WrongIcon from "@/assets/svg/cancel.svg";
 import InfoIcon from "@/assets/svg/Info.svg";
 import { horizontalScale } from "@/metric";
+import { useFonts } from "expo-font";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -88,12 +83,10 @@ const RootLayout = () => {
   const toast = useToast();
 
   const [load, error] = useFonts({
-    Poppins_100Thin,
-    Poppins_200ExtraLight,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-    Poppins_500Medium,
-    Poppins_400Regular,
+    PoppinsRegular: require("@/assets/fonts/Poppins-Regular.ttf"),
+    PoppinsSemiBold: require("@/assets/fonts/Poppins-SemiBold.ttf"),
+    PoppinsBold: require("@/assets/fonts/Poppins-Bold.ttf"),
+    PoppinsMedium: require("@/assets/fonts/Poppins-Medium.ttf"),
   });
 
   useEffect(() => {
@@ -333,9 +326,9 @@ const styles = StyleSheet.create({
   },
   toastText: {
     marginLeft: 10,
-    fontSize: getFontSize(16),
+    fontSize: getFontSize(15),
     fontWeight: "bold",
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "PoppinsBold",
     // color: "#333",
   },
   button: {
