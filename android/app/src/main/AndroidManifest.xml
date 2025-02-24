@@ -26,7 +26,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
         <data android:scheme="com.shreyas8747.habitBloom"/>
-        <data android:scheme="exp+habitbloom"/>
+        <data android:scheme="exp+habbitbloom"/>
       </intent-filter>
     </activity>
   </application>
