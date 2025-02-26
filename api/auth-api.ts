@@ -3,18 +3,16 @@
 import { supabase } from "@/utils/SupaLegend";
 
 // ✅ Step 1: Send OTP to the user's phone
-export const sendOTP = async (phone: string) => {
-  try {
-    const { error } = await supabase.auth.signInWithOtp({
-      phone,
-    });
+export const sendOTP = async (email: string) => {
+  const { error } = await supabase.auth.signInWithOtp({ email, });
 
-    if (error) throw error;
-
-    return { success: true, message: "OTP sent successfully!" };
-  } catch (error: any) {
-    return { success: false, message: error.message };
+  if (error) {
+    console.error("Error sending OTP:", error.message);
+    return false;
   }
+
+  console.log("OTP sent successfully!");
+  return true;
 };
 
 // ✅ Step 2: Verify OTP and log in the user

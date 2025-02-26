@@ -4,7 +4,7 @@
     "slug": "habbitBloom",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ios-icon.png",
     "scheme": "habitbloom",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,8 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/android-icon.png"
       },
       "package": "com.shreyas8747.habitBloom"
     },

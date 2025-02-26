@@ -27,6 +27,7 @@ import WrongIcon from "@/assets/svg/cancel.svg";
 import InfoIcon from "@/assets/svg/Info.svg";
 import { horizontalScale } from "@/metric";
 import { useFonts } from "expo-font";
+import { sendOTP } from "@/api/auth-api";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -95,6 +96,7 @@ const RootLayout = () => {
       // toast.show("Testing");
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const token = await SecureStore.getItemAsync("refreshToken");
+      // const otp = sendOTP('shreyas24s2001@gmail.com')  
       const isAuthenticated = !!token;
       if (isAuthenticated) {
         if (false) {
