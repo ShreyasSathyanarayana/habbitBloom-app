@@ -3,14 +3,14 @@ import { View, StatusBar, ScrollViewProps, Platform } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
+  useDerivedValue,
   runOnJS,
 } from "react-native-reanimated";
 import { useTabBar } from "@/context/TabBarContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SCROLL_THRESHOLD = 30; // Adjust as needed
-const SCROLL_HIDE_THRESHOLD = 2; // Scroll threshold to trigger hide
-const SCROLL_SHOW_THRESHOLD = -1; // Scroll threshold to trigger show
+const SCROLL_HIDE_THRESHOLD = 10; // Minimum scroll distance before hiding
+const SCROLL_SHOW_THRESHOLD = -5; // Threshold for showing the tab bar
 
 interface ScrollableContainerProps extends ScrollViewProps {
   children: React.ReactNode;
@@ -22,34 +22,34 @@ const ScrollableContainer: React.FC<ScrollableContainerProps> = ({
 }) => {
   const [statusBarHeight, setStatusBarHeight] = useState(0);
   const insets = useSafeAreaInsets();
-  //  console.log(Platform.OS, StatusBar.currentHeight, insets.bottom, insets.top);
-  // const statusBarHeight = insets.top;
+  const { showTabBar, hideTabBar } = useTabBar();
 
   useEffect(() => {
     setStatusBarHeight(StatusBar.currentHeight || insets.top || 0);
   }, []);
-  const { showTabBar, hideTabBar } = useTabBar();
+
   const scrollY = useSharedValue(0);
-  const prevScrollY = useSharedValue(0); // Track previous scroll position
+  const prevScrollY = useSharedValue(0);
 
   // Handle scroll event
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      const currentY = event.contentOffset.y;
-      const diffY = currentY - prevScrollY.value;
-
-      // HIDE if scrolling down fast enough
-      if (diffY > SCROLL_HIDE_THRESHOLD && currentY > SCROLL_THRESHOLD) {
-        runOnJS(hideTabBar)();
-      }
-
-      // SHOW if scrolling up slightly
-      if (diffY < SCROLL_SHOW_THRESHOLD) {
-        runOnJS(showTabBar)();
-      }
-
-      prevScrollY.value = currentY; // Update previous scroll position
+      scrollY.value = event.contentOffset.y;
     },
+  });
+
+  // Derived value to detect scroll direction
+  useDerivedValue(() => {
+    const diffY = scrollY.value - prevScrollY.value;
+
+    if (diffY > SCROLL_HIDE_THRESHOLD) {
+      runOnJS(hideTabBar)();
+    } else if (diffY < SCROLL_SHOW_THRESHOLD) {
+      runOnJS(showTabBar)();
+    }
+
+    // Update previous Y position
+    prevScrollY.value = scrollY.value;
   });
 
   return (
@@ -58,8 +58,8 @@ const ScrollableContainer: React.FC<ScrollableContainerProps> = ({
     >
       <Animated.ScrollView
         onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        scrollEventThrottle={16} // Ensures smooth performance
+        contentContainerStyle={Platform.OS === "ios" && { paddingBottom: 100 }}
         {...scrollProps}
       >
         {children}

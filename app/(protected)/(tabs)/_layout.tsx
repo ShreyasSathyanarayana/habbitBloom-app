@@ -16,6 +16,7 @@ const _layout = () => {
       <Tabs
         screenOptions={{
           headerShown: false,
+          // tabBarActiveTintColor: "rgba(138, 43, 226, 1)",
         }}
         tabBar={(props) => <TabBar {...props} />}
       >

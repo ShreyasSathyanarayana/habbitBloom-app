@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import TabBarButton from "./TabBarButton";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -20,8 +20,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
-  const primaryColor = "#0891b2";
-  const greyColor = "#737373";
+  const primaryColor = "rgba(138, 43, 226, 1)";
+  const greyColor = "rgba(157, 178, 206, 1)";
   const { isTabBarVisible } = useTabBar();
 
   // Shared value for animating tab bar visibility
@@ -29,7 +29,7 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   // console.log(isTabBarVisible);
 
   // React to visibility changes
-  React.useEffect(() => {
+  useEffect(() => {
     translateY.value = withSpring(isTabBarVisible ? 0 : 100, {
       damping: 40,
       stiffness: 200,
