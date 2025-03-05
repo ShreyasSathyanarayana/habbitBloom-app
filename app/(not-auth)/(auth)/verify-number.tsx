@@ -60,9 +60,9 @@ const VerifyNumber = () => {
 
   // Use Animated Keyboard Hook for Smooth Transition
   const keyboard = useAnimatedKeyboard();
-  useEffect(() => {
-    StatusBar.setHidden(true);
-  }, []);
+  // useEffect(() => {
+  //   StatusBar.setHidden(true);
+  // }, []);
 
   const animatedKeyboardStyle = useAnimatedStyle(() => ({
     height: withTiming(keyboard.height.value, { duration: 300 }),

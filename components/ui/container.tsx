@@ -8,7 +8,10 @@ type ContainerProps = {
 
 const Container = ({ children, style, ...rest }: ContainerProps) => {
   return (
-    <SafeAreaView {...rest} style={[styles.container, style]}>
+    <SafeAreaView
+      {...rest}
+      style={[styles.container, style]}
+    >
       {children}
     </SafeAreaView>
   );

@@ -17,7 +17,7 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
-import CircleArrow from "@/assets/svg/circle-arrow.svg";
+import CircleArrow from "@/assets/svg/skip-icon.svg";
 import Animated, {
   FadeInUp,
   FadeOutDown,

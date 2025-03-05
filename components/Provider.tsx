@@ -12,7 +12,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     <>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <StatusBar style="dark" />
+          <StatusBar
+            style="light"
+            // backgroundColor="#000"
+            // hidden
+          />
           <GestureHandlerRootView>
             {/* <BottomSheetModalProvider>{children}</BottomSheetModalProvider> */}
             {children}

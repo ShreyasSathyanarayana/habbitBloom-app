@@ -96,7 +96,7 @@ const RootLayout = () => {
       // toast.show("Testing");
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const token = await SecureStore.getItemAsync("refreshToken");
-      // const otp = sendOTP('shreyas24s2001@gmail.com')  
+      // const otp = sendOTP('shreyas24s2001@gmail.com')
       const isAuthenticated = !!token;
       if (isAuthenticated) {
         if (false) {
@@ -106,7 +106,7 @@ const RootLayout = () => {
           router.replace("/home");
         }
       } else {
-        router.replace("/onboarding"); // /onboarding
+        router.replace("/(protected)/(tabs)"); // /onboarding
         // toast.show("hlsdjl")
       }
     })();
@@ -152,7 +152,7 @@ export const RootLayoutWrapper = () => {
             />
           )}
         >
-          <StatusBar hidden={true} />
+          {/* <StatusBar hidden={true} /> */}
           <RootLayout />
         </ToastProvider>
       </Providers>
