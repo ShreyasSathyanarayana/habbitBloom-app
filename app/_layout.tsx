@@ -28,6 +28,8 @@ import InfoIcon from "@/assets/svg/Info.svg";
 import { horizontalScale } from "@/metric";
 import { useFonts } from "expo-font";
 import { sendOTP } from "@/api/auth-api";
+import { SheetProvider } from "react-native-actions-sheet";
+import "@/action-sheets/sheet";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -121,41 +123,43 @@ TextInput.defaultProps.allowFontScaling = false;
 export const RootLayoutWrapper = () => {
   return (
     <KeyboardProvider>
-      <Providers>
-        <ToastProvider
-          placement="top"
-          duration={5000}
-          animationType="slide-in"
-          animationDuration={400}
-          successColor="green"
-          dangerColor="red"
-          warningColor="orange"
-          normalColor="gray"
-          // icon={<Icon />}
-          successIcon={
-            <AntDesign size={24} color={"white"} name="checkcircle" />
-          }
-          dangerIcon={
-            <AntDesign size={24} color={"white"} name="closecircle" />
-          }
-          // warningIcon={<WarningIcon />}
-          textStyle={{ fontSize: getFontSize(16) }}
-          offset={10} // offset for both top and bottom toasts
-          offsetTop={10}
-          offsetBottom={40}
-          swipeEnabled={true}
-          renderToast={(toast) => (
-            <CustomToast
-              message={toast.message}
-              type={toast.type as unknown as ToastType}
-              id={toast.id}
-            />
-          )}
-        >
-          {/* <StatusBar hidden={true} /> */}
-          <RootLayout />
-        </ToastProvider>
-      </Providers>
+      <SheetProvider>
+        <Providers>
+          <ToastProvider
+            placement="top"
+            duration={5000}
+            animationType="slide-in"
+            animationDuration={400}
+            successColor="green"
+            dangerColor="red"
+            warningColor="orange"
+            normalColor="gray"
+            // icon={<Icon />}
+            successIcon={
+              <AntDesign size={24} color={"white"} name="checkcircle" />
+            }
+            dangerIcon={
+              <AntDesign size={24} color={"white"} name="closecircle" />
+            }
+            // warningIcon={<WarningIcon />}
+            textStyle={{ fontSize: getFontSize(16) }}
+            offset={10} // offset for both top and bottom toasts
+            offsetTop={10}
+            offsetBottom={40}
+            swipeEnabled={true}
+            renderToast={(toast) => (
+              <CustomToast
+                message={toast.message}
+                type={toast.type as unknown as ToastType}
+                id={toast.id}
+              />
+            )}
+          >
+            {/* <StatusBar hidden={true} /> */}
+            <RootLayout />
+          </ToastProvider>
+        </Providers>
+      </SheetProvider>
     </KeyboardProvider>
   );
 };
