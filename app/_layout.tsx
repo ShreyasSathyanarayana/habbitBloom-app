@@ -108,7 +108,7 @@ const RootLayout = () => {
           router.replace("/home");
         }
       } else {
-        router.replace("/(protected)/(tabs)"); // /onboarding
+        router.replace("/(protected)/create-habit"); // /onboarding
         // toast.show("hlsdjl")
       }
     })();

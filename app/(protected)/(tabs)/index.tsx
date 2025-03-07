@@ -59,7 +59,6 @@ export default function HabitsScreen() {
           <PlusIcon />
         </TouchableOpacity>
       </Animated.View>
-      
     </View>
   );
 }
