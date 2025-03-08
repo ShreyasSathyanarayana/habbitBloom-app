@@ -11,20 +11,24 @@ interface Login {
 interface AuthContext {
   login: (arg: Login) => Promise<void>;
   logout: () => Promise<void>;
+  user_id: string;
 }
 
 const AuthContext = createContext<AuthContext | null>(null);
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [userid, setUserId] = React.useState<string>("");
   const login = async (arg: Login) => {
     const { accessToken, refreshToken } = arg;
+    setUserId(accessToken);
     await SecureStore.setItemAsync("accessToken", accessToken);
     await SecureStore.setItemAsync("refreshToken", refreshToken);
     if (router.canDismiss()) {
       router.dismissAll();
     }
     // router.replace("/(protected)/(tabs)/home");
+    router.replace("/(protected)/(tabs)");
   };
 
   const logout = async () => {
@@ -40,6 +44,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     login,
     logout,
+    user_id: userid,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

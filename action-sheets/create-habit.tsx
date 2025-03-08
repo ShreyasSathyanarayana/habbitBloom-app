@@ -7,16 +7,18 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import ActionSheet, { SheetManager } from "react-native-actions-sheet";
 import GoodHabitIcon from "@/assets/svg/good-habit.svg";
 import BadHabitIcon from "@/assets/svg/bad-habit.svg";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import RightArrow from "@/assets/svg/skip-icon.svg";
+import { router } from "expo-router";
 
 const CreateHabit = () => (
   <View>
     <ActionSheet
+      id="create-habit"
       containerStyle={{
         backgroundColor: "black", // Fix for Android transparency issue
         paddingBottom: horizontalScale(16),
@@ -28,7 +30,13 @@ const CreateHabit = () => (
       }}
       gestureEnabled={true}
     >
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        onPress={() => {
+          SheetManager.hide("create-habit");
+          router.push("/(protected)/create-habit");
+        }}
+        style={styles.button}
+      >
         <View
           style={{
             flexDirection: "row",

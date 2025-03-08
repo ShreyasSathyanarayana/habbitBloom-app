@@ -29,6 +29,7 @@ import GoogleButton from "@/components/auth/google-button";
 import AppleButton from "@/components/auth/apple-button";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api/auth-api";
+import { useAuth } from "@/context/AuthProvider";
 
 const SignIn = () => {
   const { control, handleSubmit } = useForm({
@@ -37,6 +38,7 @@ const SignIn = () => {
       password: "",
     },
   });
+  const { login } = useAuth();
   const mutation = useMutation({
     mutationKey: ["signIn"],
     mutationFn: (data: any) => {
@@ -47,9 +49,17 @@ const SignIn = () => {
         type: error.type,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data: {
+      user: {
+        id: string;
+      };
+    }) => {
       toast.show("Login Succesful", {
         type: "success",
+      });
+      login({
+        accessToken: data?.user.id, // Replace with actual access token
+        refreshToken: data?.user.id,
       });
     },
   });

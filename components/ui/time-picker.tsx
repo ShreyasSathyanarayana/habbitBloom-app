@@ -20,10 +20,19 @@ interface TimePickerProps {
   leftIcon?: React.ReactNode;
 }
 
+// Generate number array for hours/minutes
 const generateNumberArray = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) =>
     (start + i).toString().padStart(2, "0")
   );
+};
+
+// Convert selected time to "HH:mm:ss" format
+const formatTime = (hour: string, minute: string, ampm: string) => {
+  let hours = parseInt(hour, 10);
+  if (ampm === "PM" && hours !== 12) hours += 12;
+  if (ampm === "AM" && hours === 12) hours = 0;
+  return `${hours.toString().padStart(2, "0")}:${minute}:00`;
 };
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -46,10 +55,9 @@ const TimePicker: React.FC<TimePickerProps> = ({
     SheetManager.show("time-picker-sheet");
   };
 
-  const confirmTime = () => {
-    const formattedTime = `${selectedHour}:${selectedMinute} ${selectedAmPm}`;
+  const updateTime = (hour: string, minute: string, ampm: string) => {
+    const formattedTime = formatTime(hour, minute, ampm);
     onChange(formattedTime);
-    SheetManager.hide("time-picker-sheet");
   };
 
   return (
@@ -82,7 +90,10 @@ const TimePicker: React.FC<TimePickerProps> = ({
             textColor={"white"}
             selectedValue={selectedHour}
             pickerData={generateNumberArray(1, 12)}
-            onValueChange={(value) => setSelectedHour(value)}
+            onValueChange={(value: string) => {
+              setSelectedHour(value);
+              updateTime(value, selectedMinute, selectedAmPm);
+            }}
           />
           <Text style={styles.separator}>:</Text>
           <Picker
@@ -91,7 +102,10 @@ const TimePicker: React.FC<TimePickerProps> = ({
             isLoop={true}
             selectedValue={selectedMinute}
             pickerData={generateNumberArray(0, 59)}
-            onValueChange={(value) => setSelectedMinute(value)}
+            onValueChange={(value: string) => {
+              setSelectedMinute(value);
+              updateTime(selectedHour, value, selectedAmPm);
+            }}
           />
           <Text style={styles.separator}>:</Text>
           <Picker
@@ -99,12 +113,12 @@ const TimePicker: React.FC<TimePickerProps> = ({
             textColor={"white"}
             selectedValue={selectedAmPm}
             pickerData={["AM", "PM"]}
-            onValueChange={(value) => setSelectedAmPm(value)}
+            onValueChange={(value: string) => {
+              setSelectedAmPm(value);
+              updateTime(selectedHour, selectedMinute, value);
+            }}
           />
         </View>
-        <TouchableOpacity style={styles.confirmButton} onPress={confirmTime}>
-          <Text style={styles.confirmButtonText}>Confirm</Text>
-        </TouchableOpacity>
       </ActionSheet>
     </Label>
   );
@@ -159,17 +173,5 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(24),
     fontFamily: "PoppinsBold",
     marginHorizontal: 10,
-  },
-  confirmButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: verticalScale(12),
-    borderRadius: 10,
-    alignItems: "center",
-    marginHorizontal: horizontalScale(20),
-  },
-  confirmButtonText: {
-    color: "white",
-    fontSize: getFontSize(16),
-    fontFamily: "PoppinsBold",
   },
 });

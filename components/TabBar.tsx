@@ -49,7 +49,7 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
         style={[
           styles.tabbar,
           Platform.OS === "ios"
-            ? { paddingBottom: verticalScale(30) }
+            ? { paddingBottom: verticalScale(20) }
             : { paddingBottom: verticalScale(10) },
           Platform.OS !== "ios" && { backgroundColor: "black" },
         ]}

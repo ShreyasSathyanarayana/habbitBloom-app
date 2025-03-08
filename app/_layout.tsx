@@ -105,10 +105,10 @@ const RootLayout = () => {
           // isTokenExpiered(token)
           logout();
         } else {
-          router.replace("/home");
+          router.replace("/(protected)/(tabs)");
         }
       } else {
-        router.replace("/(protected)/create-habit"); // /onboarding
+        router.replace("/onboarding"); // /onboarding
         // toast.show("hlsdjl")
       }
     })();

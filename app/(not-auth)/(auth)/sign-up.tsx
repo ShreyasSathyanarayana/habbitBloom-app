@@ -28,9 +28,10 @@ import PhoneInput, {
   isValidPhoneNumber,
 } from "react-native-international-phone-number";
 import { phoneInputStyles } from "./verify-number";
+import { useAuth } from "@/context/AuthProvider";
 
 const SignUp = () => {
-  const { control, handleSubmit, watch } = useForm({
+  const { control, handleSubmit, watch, reset } = useForm({
     defaultValues: {
       email: "",
       fullName: "",
@@ -39,6 +40,7 @@ const SignUp = () => {
       phoneNumber: "",
     },
   });
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState<boolean>(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
   const [selectedCountry, setSelectedCountry] = useState<ICountry | undefined>(
@@ -96,14 +98,14 @@ const SignUp = () => {
       const userExists = await checkExistingUser(formData.email);
       if (userExists) return;
 
-      // ✅ Sign Up the User
       const { data: signUpData, error: signUpError } =
         await supabase.auth.signUp({
-          email: formData?.email,
+          email: formData?.email?.toLowerCase(),
           password: formData.password,
           options: {
             data: {
               full_name: formData.fullName,
+              mobile: phoneNumber,
             },
           },
         });
@@ -120,24 +122,14 @@ const SignUp = () => {
         return;
       }
 
-      // ✅ Insert user data into 'profiles' table
-      const { error: insertError } = await supabase.from("profiles").insert([
-        {
-          id: signUpData.user.id, // Store the auth UID
-          full_name: formData.fullName,
-          mobile: phoneNumber, // Use formatted phone number
-          email: formData.email,
-        },
-      ]);
-
-      if (insertError) {
-        console.error("Insert Error:", insertError);
-        toast.show("Failed to save user profile.", { type: "danger" });
-        return;
-      }
+      reset();
+      login({
+        refreshToken: signUpData.user.id,
+        accessToken: signUpData.user.id,
+      });
 
       // ✅ Navigate to Sign-in Page
-      router.push("/(not-auth)/(auth)/sign-in");
+      // router.push("/(protected)/(tabs)");
     } catch (error: any) {
       console.error("Unexpected Error:", error);
       toast.show(error.message || "Something went wrong.", { type: "danger" });
@@ -343,13 +335,12 @@ const SignUp = () => {
                           height: verticalScale(56),
                         },
                       }}
-                      phoneInputStyles={{ 
+                      phoneInputStyles={{
                         container: phoneInputStyles.inputContainer,
                         flagContainer: phoneInputStyles.flagContainer,
                         input: phoneInputStyles.inputText,
                         callingCode: phoneInputStyles.callingCode,
                       }}
-                      
                       onChangePhoneNumber={onChange}
                       selectedCountry={selectedCountry}
                       onChangeSelectedCountry={handleSelectedCountry}

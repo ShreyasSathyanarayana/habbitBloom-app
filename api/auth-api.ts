@@ -80,16 +80,16 @@ export const signIn = async (email: string, password: string) => {
   // console.log(email, password);
 
   // Step 1: Check if the email exists in the database
-  const { data: userExists, error: userError } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("email", email)
-    .single();
-  console.log(userExists,userError);
+  // const { data: userExists, error: userError } = await supabase
+  //   .from("profiles")
+  //   .select("id")
+  //   .eq("email", email.toLowerCase())
+  //   .single();
+  // console.log(userExists,userError);
   
-  if (!userExists) {
-    throw { message: "No account found. Please sign up first.", type: "warning" };
-  }
+  // if (!userExists) {
+  //   throw { message: "No account found. Please sign up first.", type: "warning" };
+  // }
 
   // Step 2: Attempt sign-in with password
   const { data, error } = await supabase.auth.signInWithPassword({

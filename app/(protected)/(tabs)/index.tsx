@@ -17,6 +17,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { SheetManager } from "react-native-actions-sheet";
+import { router } from "expo-router";
 
 export default function HabitsScreen() {
   const { isTabBarVisible } = useTabBar();
@@ -53,7 +54,7 @@ export default function HabitsScreen() {
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
         <TouchableOpacity
-          onPress={() => SheetManager.show("create-habit")}
+          onPress={() => router.push("/(protected)/create-habit")}
           style={styles.floatingBtn}
         >
           <PlusIcon />
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   },
   floatingBtnContainer: {
     position: "absolute",
-    bottom: verticalScale(100),
+    bottom: Platform.OS === "ios" ? verticalScale(110) : verticalScale(100),
     right: horizontalScale(15),
   },
   floatingBtn: {

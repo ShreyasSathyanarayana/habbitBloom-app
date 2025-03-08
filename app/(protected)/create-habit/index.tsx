@@ -24,6 +24,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import TimePicker from "@/components/ui/time-picker";
 import TimerIcon from "@/assets/svg/timer-icon.svg";
 import UpDownIcon from "@/assets/svg/up-down.svg";
+import { useMutation } from "@tanstack/react-query";
+import { createHabit } from "@/api/api";
+import { router } from "expo-router";
+import { useToast } from "react-native-toast-notifications";
 
 const days = ["M", "T", "W", "T", "F", "S", "S"];
 const colors = [
@@ -38,18 +42,32 @@ const colors = [
 ];
 
 const Index = () => {
-  const { control, setValue, watch } = useForm({
+  const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
       habitName: "",
       category: goodHabitsCategories[4].name,
-      reminderTime: "",
+      reminderTime: "12:00:00",
       frequency: [0] as number[],
       notificationEnable: false,
       habitColor: "rgba(255, 59, 48, 1)",
     },
   });
+  const toast = useToast();
   const categoryRef = useRef<FlatList<any>>(null);
   const category = watch("category"); // Watch category value
+  const mutation = useMutation({
+    mutationFn: (data: any) => {
+      return createHabit(data);
+    },
+    onSuccess: () => {
+      router.back();
+    },
+    onError: (error: any) => {
+      toast.show(error.message, {
+        type: "warning",
+      });
+    },
+  });
 
   useEffect(() => {
     if (!categoryRef.current || !category) return;
@@ -219,6 +237,7 @@ const Index = () => {
                       height={horizontalScale(24)}
                     />
                   }
+                  value={value}
                   label="Set Reminder"
                   onChange={onChange}
                 />
@@ -343,6 +362,7 @@ const Index = () => {
       </ScrollView>
       <GradientButton
         title="Save Habit"
+        onPress={handleSubmit((data) => mutation.mutateAsync(data))}
         style={{
           marginHorizontal: horizontalScale(16),
           paddingBottom:
