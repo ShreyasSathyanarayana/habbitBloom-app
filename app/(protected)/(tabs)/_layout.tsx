@@ -9,11 +9,11 @@ import { syncHabitsToSupabase } from "@/database/db";
 // import TabBar from "../components/TabBar";
 
 const _layout = () => {
-  NetInfo.addEventListener((state) => {
-    if (state.isConnected) {
-      syncHabitsToSupabase();
-    }
-  });
+  // NetInfo.addEventListener((state) => {
+  //   if (state.isConnected) {
+  //     syncHabitsToSupabase();
+  //   }
+  // });
   return (
     // <SafeAreaView
 

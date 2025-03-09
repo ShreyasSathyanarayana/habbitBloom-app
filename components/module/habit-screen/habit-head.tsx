@@ -80,7 +80,9 @@ const HabitHead = ({ onPress, selectedWeek }: HabitHeadProps) => {
             width={horizontalScale(16)}
             height={horizontalScale(16)}
           />
-          <ThemedText>{getMonthAndYear()}</ThemedText>
+          <ThemedText style={{ fontSize: getFontSize(12) }}>
+            {getMonthAndYear()}
+          </ThemedText>
         </View>
       </View>
       <FlatList

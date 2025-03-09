@@ -70,3 +70,9 @@ export const goodHabitsCategories = [
     colors: ["rgba(0, 201, 167, 0.7)", "rgba(132, 94, 194, 0.4)"],
   },
 ];
+
+export const getCategoryByName = (categoryName: string) => {
+  return goodHabitsCategories.find(
+    (category) => category.name === categoryName
+  );
+};

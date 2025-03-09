@@ -24,14 +24,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import TimePicker from "@/components/ui/time-picker";
 import TimerIcon from "@/assets/svg/timer-icon.svg";
 import UpDownIcon from "@/assets/svg/up-down.svg";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createHabit } from "@/api/api";
 import { router } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
 import { insertHabit } from "@/database/db";
 import HabitNameIcon from "@/assets/svg/hadit-name.svg";
 
-const days = ["M", "T", "W", "T", "F", "S", "S"];
+const days = ["S", "M", "T", "W", "T", "F", "S"];
 const colors = [
   "rgba(255, 59, 48, 1)",
   "rgba(255, 149, 0, 1)",
@@ -56,12 +56,14 @@ const Index = () => {
   });
   const toast = useToast();
   const categoryRef = useRef<FlatList<any>>(null);
+  const queryClient = useQueryClient();
   const category = watch("category"); // Watch category value
   const mutation = useMutation({
     mutationFn: (data: any) => {
-      return insertHabit(data); //createHabit(data);
+      return createHabit(data);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
       router.back();
     },
     onError: (error: any) => {
