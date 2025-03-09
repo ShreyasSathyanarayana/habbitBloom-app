@@ -46,6 +46,20 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd"
         }
+      ],
+     [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
+          }
+        }
       ]
     ],
     "experiments": {

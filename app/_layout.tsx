@@ -30,6 +30,8 @@ import { useFonts } from "expo-font";
 import { sendOTP } from "@/api/auth-api";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/action-sheets/sheet";
+import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
+
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -91,6 +93,11 @@ const RootLayout = () => {
     PoppinsBold: require("@/assets/fonts/Poppins-Bold.ttf"),
     PoppinsMedium: require("@/assets/fonts/Poppins-Medium.ttf"),
   });
+
+  useEffect(() => {
+    setupDatabase(); // Ensure database is set up
+  }, []);
+
 
   useEffect(() => {
     (async () => {

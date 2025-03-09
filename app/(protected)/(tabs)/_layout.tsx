@@ -4,9 +4,16 @@ import { Tabs } from "expo-router";
 import TabBar from "@/components/TabBar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabBarProvider } from "@/context/TabBarContext";
+import NetInfo from "@react-native-community/netinfo";
+import { syncHabitsToSupabase } from "@/database/db";
 // import TabBar from "../components/TabBar";
 
 const _layout = () => {
+  NetInfo.addEventListener((state) => {
+    if (state.isConnected) {
+      syncHabitsToSupabase();
+    }
+  });
   return (
     // <SafeAreaView
 

@@ -28,6 +28,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createHabit } from "@/api/api";
 import { router } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
+import { insertHabit } from "@/database/db";
+import HabitNameIcon from "@/assets/svg/hadit-name.svg";
 
 const days = ["M", "T", "W", "T", "F", "S", "S"];
 const colors = [
@@ -45,7 +47,7 @@ const Index = () => {
   const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
       habitName: "",
-      category: goodHabitsCategories[4].name,
+      category: goodHabitsCategories?.[0]?.name,
       reminderTime: "12:00:00",
       frequency: [0] as number[],
       notificationEnable: false,
@@ -57,12 +59,14 @@ const Index = () => {
   const category = watch("category"); // Watch category value
   const mutation = useMutation({
     mutationFn: (data: any) => {
-      return createHabit(data);
+      return insertHabit(data); //createHabit(data);
     },
     onSuccess: () => {
       router.back();
     },
     onError: (error: any) => {
+      console.log("error", error);
+
       toast.show(error.message, {
         type: "warning",
       });
@@ -144,17 +148,26 @@ const Index = () => {
             control={control}
             rules={{
               required: "Habit Name is required",
+              validate: (val) =>
+                val?.length < 100 || "can contain only 100 character",
             }}
             render={({
               field: { onChange, onBlur, value },
               formState: { errors },
             }) => (
               <TextField
+                key={"habitName"}
                 label="Habit Name"
                 placeholder="Habit Name"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                leftIcon={
+                  <HabitNameIcon
+                    width={horizontalScale(24)}
+                    height={horizontalScale(24)}
+                  />
+                }
                 helperText={errors.habitName?.message}
                 error={!!errors.habitName}
               />
