@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -17,6 +17,8 @@ type HabitProgress = {
 type HabitProps = {
   id: string;
   habit_name: string;
+  selectedDate: string;
+  isCompleted: boolean;
   category: string;
   reminder_time: string; // Format: "HH:MM:SS"
   frequency: number[]; // Array of numbers (days of the week)
@@ -27,7 +29,8 @@ const { width } = Dimensions.get("window");
 const _cardWidth = (width - horizontalScale(32) - horizontalScale(17)) / 2;
 
 const HabitCard = (props: HabitProps) => {
-  const { habit_name, category, habit_color, habit_progress } = props;
+  const { habit_name, category, selectedDate, isCompleted } = props;
+  const [isChecked, setIsChecked] = useState(isCompleted || false);
   const queryClient = useQueryClient();
   const categoryDetails = getCategoryByName(category);
   const toast = useToast();
@@ -37,27 +40,33 @@ const HabitCard = (props: HabitProps) => {
       return getHabitStreak(props.id);
     },
   });
+
+  useEffect(() => {
+    setIsChecked(isCompleted);
+  }, [isCompleted]);
+
   const mutation = useMutation({
     mutationFn: async () => {
-      const newStatus = !habit_progress?.[0]?.status; // Properly toggle status
-      return markHabitStatus(props.id, newStatus);
+      const newStatus = !isChecked; // Toggle status
+      return markHabitStatus(props.id, newStatus, selectedDate);
+    },
+    onMutate: () => {
+      setIsChecked((prev) => !prev); // Optimistically update UI
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
       queryClient.invalidateQueries({ queryKey: ["streaks", props.id] });
     },
     onError: (error) => {
-      console.error("markHabitAsCompleted error", error);
-      toast.show(error.message, {
-        type: "warning",
-      });
+      toast.show(error?.message || "Something went wrong", { type: "warning" });
+      // Revert checkbox state if mutation fails
+      setIsChecked((prev) => !prev);
     },
   });
-
-  // console.log("Habits streak==>", JSON.stringify(streak.data, null, 2));
+  // console.log("Habits streak==>", JSON.stringify(streakDetails.data, null, 2));
 
   return (
-    <Pressable onPress={() => console.log("button is clicked")}>
+    <Pressable>
       <LinearGradient
         colors={["#4A4A4A", "#1E1E1E"]}
         start={{ x: 0.1, y: 0 }}
@@ -89,7 +98,7 @@ const HabitCard = (props: HabitProps) => {
           </LinearGradient>
           <BouncyCheckbox
             size={horizontalScale(25)}
-            isChecked={habit_progress?.[0]?.status || false}
+            isChecked={isChecked} // Controlled state
             fillColor="rgba(138, 43, 226, 1)"
             unFillColor="transparent"
             iconStyle={{ borderColor: "red" }}
@@ -99,8 +108,7 @@ const HabitCard = (props: HabitProps) => {
               flexDirection: "column",
             }}
             innerIconStyle={{ borderWidth: 2 }}
-            // textStyle={{ fontFamily: "JosefinSans-Regular" }}
-            onPress={(isChecked: boolean) => {
+            onPress={() => {
               mutation.mutateAsync();
             }}
           />

@@ -26,6 +26,9 @@ export default function HabitsScreen() {
   const buttonOpacity = useSharedValue(isTabBarVisible ? 1 : 0);
   const buttonTranslation = useSharedValue(isTabBarVisible ? 0 : 50);
   const [selectedWeek, setSelectedWeek] = useState<number>(new Date().getDay());
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
 
   useEffect(() => {
     buttonOpacity.value = withSpring(isTabBarVisible ? 1 : 0, {
@@ -44,15 +47,20 @@ export default function HabitsScreen() {
     transform: [{ translateX: buttonTranslation.value }],
   }));
 
+  const onWeekChange = (weekNumber: number, date: string) => {
+    setSelectedWeek(weekNumber);
+    setSelectedDate(date);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       <ScrollableContainer>
         <View style={{ paddingHorizontal: horizontalScale(16) }}>
           <HabitHead
             selectedWeek={selectedWeek}
-            onPress={(val) => setSelectedWeek(val)}
+            onPress={(val, date) => onWeekChange(val, date)}
           />
-          <HabitList selectedWeek={selectedWeek} />
+          <HabitList selectedWeek={selectedWeek}  selectedDate={selectedDate} />
         </View>
       </ScrollableContainer>
 

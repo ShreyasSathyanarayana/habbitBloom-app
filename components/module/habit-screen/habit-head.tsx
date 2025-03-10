@@ -19,13 +19,15 @@ const getThisWeekDates = () => {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Get Monday of the current week
 
   return Array.from({ length: 7 }, (_, i) => {
     const date = new Date(monday);
     date.setDate(monday.getDate() + i);
+
     return {
       dateNumber: date.getDate(), // Get only the date (e.g., 24)
+      fullDate: date.toISOString().split("T")[0], // Get full date in YYYY-MM-DD format
       dayShort: date.toLocaleDateString("en-US", { weekday: "short" }), // Get 3-letter day (e.g., Mon)
       weekNumber: date.getDay(), // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     };
@@ -40,7 +42,7 @@ const getMonthAndYear = () => {
 };
 
 type HabitHeadProps = {
-  onPress: (val: number) => void;
+  onPress: (val: number, date: string) => void;
   selectedWeek: number;
 };
 
@@ -97,7 +99,7 @@ const HabitHead = ({ onPress, selectedWeek }: HabitHeadProps) => {
         renderItem={({ item, index }) => {
           return (
             <TouchableOpacity
-              onPress={() => onPress(item.weekNumber)}
+              onPress={() => onPress(item.weekNumber, item.fullDate)}
               style={[
                 styles.weekBtn,
                 { width: itemWidth },

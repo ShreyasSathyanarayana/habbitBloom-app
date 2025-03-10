@@ -47,33 +47,45 @@ export const createHabit = async (formData: CreateHabitSchema) => {
 };
 
 
-export const markHabitStatus = async (habitId: string, status: boolean) => {
+export const markHabitStatus = async (habitId: string, status: boolean, habitDate: string) => {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
     console.error("Error fetching user:", error);
-    return { success: false, error };
+    throw { message: "Authentication error. Please log in again.", type: "danger" };
   }
 
-  const today = new Date().toISOString().split("T")[0]; // Store YYYY-MM-DD format
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
 
-  // Check if a record exists for today
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+  // 🔹 Validate that habitDate is either today or yesterday
+  if (habitDate !== todayStr && habitDate !== yesterdayStr) {
+    throw {
+      message: "You can only update today's or yesterday's habit progress!",
+      type: "warning",
+    };
+  }
+
+  // 🔹 Fetch existing habit progress record
   const { data: existingRecord, error: fetchError } = await supabase
     .from("habit_progress")
     .select("id")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
-    .eq("date", today)
+    .eq("date", habitDate)
     .single();
 
   if (fetchError && fetchError.code !== "PGRST116") {
-    // Ignore "PGRST116" error as it means no record found
     console.error("Error fetching habit progress:", fetchError);
-    return { success: false, error: fetchError };
+    throw { message: "Error fetching habit progress. Try again later.", type: "danger" };
   }
 
+  // 🔹 Update if record exists, else insert
   if (existingRecord) {
-    // If record exists, update the status
     const { error: updateError } = await supabase
       .from("habit_progress")
       .update({ status })
@@ -81,29 +93,31 @@ export const markHabitStatus = async (habitId: string, status: boolean) => {
 
     if (updateError) {
       console.error("Error updating habit status:", updateError);
-      return { success: false, error: updateError };
+      throw { message: "Failed to update habit. Try again later.", type: "danger" };
     }
   } else {
-    // If no record exists, insert a new one
     const { error: insertError } = await supabase
       .from("habit_progress")
       .insert([
         {
           habit_id: habitId,
           user_id: user.id,
-          date: today,
+          date: habitDate,
           status,
         },
       ]);
 
     if (insertError) {
       console.error("Error inserting habit progress:", insertError);
-      return { success: false, error: insertError };
+      throw { message: "Failed to log habit progress. Try again later.", type: "danger" };
     }
   }
 
   return { success: true };
 };
+
+
+
 
 
 export const getHabitStreak = async (habitId: string) => {
@@ -155,7 +169,7 @@ export const getHabitStreak = async (habitId: string) => {
 
 
 
-export const getHabitsByFrequency = async (frequency:number) => {
+export const getHabitsByDate = async (date: string) => {
   // Get the currently authenticated user
   const { data: userData, error: userIdError } = await supabase.auth.getUser();
 
@@ -166,17 +180,17 @@ export const getHabitsByFrequency = async (frequency:number) => {
 
   const userId = userData.user.id;
 
-  // Query habits with progress status using a LEFT JOIN
+  // Query habits with progress for the given date using LEFT JOIN
   const { data, error } = await supabase
     .from("habit")
     .select(
       `
       id, habit_name, category, reminder_time, frequency, habit_color,
-      habit_progress(status)
+      habit_progress(status, date)
     `
     )
     .eq("user_id", userId)
-    .contains("frequency", [frequency]) // Ensure the frequency array contains the given value
+    .eq("habit_progress.date", date) // Get status for the given date
     .order("reminder_time", { ascending: true });
 
   if (error) {
@@ -184,9 +198,9 @@ export const getHabitsByFrequency = async (frequency:number) => {
     return [];
   }
 
-  // Transform data to check if the habit is completed
-  return data.map((habit:any) => ({
+  // Transform data to include status for the given date
+  return data.map((habit: any) => ({
     ...habit,
-    isCompleted: habit.habit_progress ? habit.habit_progress.status : false,
+    isCompleted: habit.habit_progress?.[0]?.status || false, // Default to false if no record
   }));
 };
