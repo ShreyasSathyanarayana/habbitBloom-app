@@ -14,9 +14,14 @@ const Header = ({ title, rightIcon }: HeaderProps) => {
     <View style={styles.container}>
       <BackButton style={{ marginBottom: 0, left: 0 }} />
       <ThemedText style={{ fontFamily: "PoppinsBold" }}>{title}</ThemedText>
-      <View style={{ width: horizontalScale(24), height: horizontalScale(24) }}>
-        {rightIcon}
-      </View>
+      {!rightIcon && (
+        <View
+          style={{ width: horizontalScale(24), height: horizontalScale(24) }}
+        >
+          {rightIcon}
+        </View>
+      )}
+      {rightIcon}
     </View>
   );
 };

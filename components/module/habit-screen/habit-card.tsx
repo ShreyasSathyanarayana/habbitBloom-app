@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getHabitStreak, markHabitStatus } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
 import { getFontSize } from "@/font";
+import { router } from "expo-router";
 
 type HabitProgress = {
   status: boolean;
@@ -66,7 +67,14 @@ const HabitCard = (props: HabitProps) => {
   // console.log("Habits streak==>", JSON.stringify(streakDetails.data, null, 2));
 
   return (
-    <Pressable>
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: "/(protected)/analytics",
+          params: { id: props.id },
+        })
+      }
+    >
       <LinearGradient
         colors={["#4A4A4A", "#1E1E1E"]}
         start={{ x: 0.1, y: 0 }}
