@@ -9,42 +9,80 @@ type CreateHabitSchema = {
   frequency: number[];
   notificationEnable: boolean;
   habitColor: string;
+  googleNotificationEnable:boolean
 };
 
-export const createHabit = async (formData: CreateHabitSchema) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    console.log("Error fetching user:", error);
-    
-    throw new Error("Failed to fetch user: " + error?.message);
+
+export const createOrUpdateHabit = async (
+  formData: CreateHabitSchema,
+  habitId?: string // Optional: If provided, update instead of insert
+) => {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !userData?.user) {
+    console.error("Error fetching user:", userError);
+    throw new Error("Failed to fetch user: " + userError?.message);
   }
-//   console.log("user id==>",user.id);
-  
 
-  const { data, error: insertError } = await supabase
+  const userId = userData.user.id;
+
+  // Build habit data object dynamically
+  const habitData: any = {
+    user_id: userId,
+    habit_name: formData.habitName,
+    category: formData.category,
+    reminder_time: formData.reminderTime,
+    frequency: formData.frequency,
+    notification_enable: formData.notificationEnable,
+    habit_color: formData.habitColor,
+    google_notification_enable: formData.googleNotificationEnable,
+    updated_at: new Date().toISOString(), // Always update timestamp
+  };
+
+  // Include 'id' only if updating an existing habit
+  if (habitId) {
+    habitData.id = habitId;
+  }
+
+  const { data, error: upsertError } = await supabase
     .from("habit")
-    .insert([
-      {
-        user_id: user.id,
-        habit_name: formData.habitName,
-        category: formData.category,
-        reminder_time: formData.reminderTime,
-        frequency: formData.frequency,
-        notification_enable: formData.notificationEnable,
-        habit_color: formData.habitColor,
-      },
-    ])
-    .select(); // Ensures inserted data is returned
+    .upsert([habitData], { onConflict: ["id"] }) // Conflict resolution
+    .select(); // Ensures inserted/updated data is returned
 
-  if (insertError) {
-    console.log("Error inserting habit:", insertError);
-    
-    throw new Error("Failed to insert habit: " + insertError.message);
+  if (upsertError) {
+    console.error("Error inserting/updating habit:", upsertError);
+    throw new Error("Failed to insert/update habit: " + upsertError.message);
   }
 
   return data;
 };
+
+
+export const deleteHabit = async (habitId: string) => {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !userData?.user) {
+    console.error("Error fetching user:", userError);
+    throw new Error("Failed to fetch user: " + userError?.message);
+  }
+
+  const userId = userData.user.id;
+
+  const { error: deleteError } = await supabase
+    .from("habit")
+    .delete()
+    .eq("id", habitId)
+    .eq("user_id", userId); // Ensures the user can only delete their own habits
+
+  if (deleteError) {
+    console.error("Error deleting habit:", deleteError);
+    throw new Error("Failed to delete habit: " + deleteError.message);
+  }
+
+  return { message: "Habit deleted successfully" };
+};
+
 
 
 export const markHabitStatus = async (habitId: string, status: boolean, habitDate: string) => {
@@ -63,9 +101,9 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
   const yesterdayStr = yesterday.toISOString().split("T")[0];
 
   // 🔹 Validate that habitDate is either today or yesterday
-  if (habitDate !== todayStr && habitDate !== yesterdayStr) {
+  if (habitDate !== todayStr ) {
     throw {
-      message: "You can only update today's or yesterday's habit progress!",
+      message: "You can only update today's habit status",
       type: "warning",
     };
   }
@@ -180,17 +218,21 @@ export const getHabitsByDate = async (date: string) => {
 
   const userId = userData.user.id;
 
+  // Convert the given date into a timestamp range for the full day
+  const endOfDay = `${date}T23:59:59.999Z`; // End of the given date
+
   // Query habits with progress for the given date using LEFT JOIN
   const { data, error } = await supabase
     .from("habit")
     .select(
       `
-      id, habit_name, category, reminder_time, frequency, habit_color,
+      id, habit_name, category, reminder_time, frequency, habit_color, created_at,
       habit_progress(status, date)
     `
     )
     .eq("user_id", userId)
     .eq("habit_progress.date", date) // Get status for the given date
+    .lte("created_at", endOfDay) // Ensure habit was created before the next day starts
     .order("reminder_time", { ascending: true });
 
   if (error) {
@@ -203,4 +245,30 @@ export const getHabitsByDate = async (date: string) => {
     ...habit,
     isCompleted: habit.habit_progress?.[0]?.status || false, // Default to false if no record
   }));
+};
+
+
+
+export const getHabitById = async (habitId: string) => {
+  const { data: userData, error: userIdError } = await supabase.auth.getUser();
+
+  if (userIdError || !userData?.user) {
+    console.error("Error fetching user:", userIdError?.message || "User not found");
+    return null; // Return `null` instead of an empty array when there's an error
+  }
+
+  const userId = userData.user.id;
+  const { data, error } = await supabase
+    .from("habit")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("id", habitId)
+    .single(); // Ensures only one habit is returned
+
+  if (error) {
+    console.error("Error fetching habit:", error.message);
+    return null; // Return `null` instead of an empty array when there's an error
+  }
+
+  return data; // Return the habit object
 };

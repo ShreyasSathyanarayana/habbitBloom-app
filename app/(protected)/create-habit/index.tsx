@@ -24,12 +24,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import TimePicker from "@/components/ui/time-picker";
 import TimerIcon from "@/assets/svg/timer-icon.svg";
 import UpDownIcon from "@/assets/svg/up-down.svg";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createHabit } from "@/api/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createOrUpdateHabit, deleteHabit, getHabitById } from "@/api/api";
 import { router } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
 import { insertHabit } from "@/database/db";
 import HabitNameIcon from "@/assets/svg/hadit-name.svg";
+import { useRoute } from "@react-navigation/native";
+import NotificationIcon from "@/assets/svg/notification.svg";
+import GoogleCalenderIcon from "@/assets/svg/google-calender.svg";
 
 const days = ["S", "M", "T", "W", "T", "F", "S"];
 const colors = [
@@ -44,6 +47,12 @@ const colors = [
 ];
 
 const Index = () => {
+  const route = useRoute<{
+    key: string;
+    name: string;
+    params: { id: string };
+  }>();
+  const { id: habitId } = route.params;
   const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
       habitName: "",
@@ -52,19 +61,28 @@ const Index = () => {
       frequency: [0] as number[],
       notificationEnable: false,
       habitColor: "rgba(255, 59, 48, 1)",
+      googleNotificationEnable: false,
     },
   });
   const toast = useToast();
   const categoryRef = useRef<FlatList<any>>(null);
   const queryClient = useQueryClient();
   const category = watch("category"); // Watch category value
+  const habitDetails = useQuery({
+    queryKey: ["HabitDetailsByid", habitId],
+    queryFn: () => {
+      return getHabitById(habitId);
+    },
+    enabled: !!habitId,
+  });
+
   const mutation = useMutation({
     mutationFn: (data: any) => {
-      return createHabit(data);
+      return createOrUpdateHabit(data, habitId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
-      router.back();
+      router.replace("/(protected)/(tabs)");
     },
     onError: (error: any) => {
       console.log("error", error);
@@ -74,6 +92,40 @@ const Index = () => {
       });
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationKey: ["delehabit"],
+    mutationFn: () => {
+      return deleteHabit(habitId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
+      router.replace("/(protected)/(tabs)");
+    },
+    onError: (error: any) => {
+      console.log("error", error);
+
+      toast.show(error.message, {
+        type: "warning",
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (habitId) {
+      // console.log("Habit Details", JSON.stringify(habitDetails.data, null, 2));
+      setValue("category", habitDetails.data?.category);
+      setValue("frequency", habitDetails.data?.frequency);
+      setValue("habitName", habitDetails.data?.habit_name);
+      setValue("notificationEnable", habitDetails.data?.notification_enable);
+      setValue("reminderTime", habitDetails.data?.reminder_time);
+      setValue("habitColor", habitDetails.data?.habit_color);
+      setValue(
+        "googleNotificationEnable",
+        habitDetails.data?.google_notification_enable
+      );
+    }
+  }, [habitDetails.data]);
 
   useEffect(() => {
     if (!categoryRef.current || !category) return;
@@ -94,7 +146,7 @@ const Index = () => {
         });
       }, 800); // Small delay ensures UI is ready before scrolling
     }
-  }, []);
+  }, [category]);
 
   const onFrequencyPress = (day: number) => {
     const currentFrequency = watch("frequency") || [];
@@ -112,7 +164,16 @@ const Index = () => {
 
   return (
     <Container>
-      <Header title="Create Habit" />
+      <Header
+        title="Create Habit"
+        rightIcon={
+          <TouchableOpacity onPress={() => deleteMutation.mutateAsync()}>
+            <ThemedText style={{ fontSize: getFontSize(14) }}>
+              Delete
+            </ThemedText>
+          </TouchableOpacity>
+        }
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, paddingHorizontal: horizontalScale(16) }}
@@ -158,7 +219,7 @@ const Index = () => {
               formState: { errors },
             }) => (
               <TextField
-                key={"habitName"}
+                // key={"habitName"}
                 label="Habit Name"
                 placeholder="Habit Name"
                 onBlur={onBlur}
@@ -259,10 +320,7 @@ const Index = () => {
               );
             }}
           />
-          <Label
-            label="Repeat Frequency"
-            // labelStyle={{ marginBottom: verticalScale(16) }}
-          >
+          <Label label="Repeat Frequency">
             <FlatList
               data={days}
               horizontal
@@ -307,13 +365,25 @@ const Index = () => {
               marginVertical: verticalScale(8),
             }}
           >
-            <View>
-              <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
-                Notification
-              </ThemedText>
-              <ThemedText style={{ fontSize: getFontSize(12) }}>
-                Get habit reminders
-              </ThemedText>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: horizontalScale(12),
+              }}
+            >
+              <NotificationIcon
+                width={horizontalScale(32)}
+                height={horizontalScale(32)}
+              />
+              <View>
+                <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
+                  Notification
+                </ThemedText>
+                <ThemedText style={{ fontSize: getFontSize(12) }}>
+                  Get habit reminders
+                </ThemedText>
+              </View>
             </View>
             <Controller
               control={control}
@@ -323,7 +393,43 @@ const Index = () => {
               )}
             />
           </View>
-          <Label label="Habit Color">
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginVertical: verticalScale(8),
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: horizontalScale(12),
+              }}
+            >
+              <GoogleCalenderIcon
+                width={horizontalScale(32)}
+                height={horizontalScale(32)}
+              />
+              <View>
+                <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
+                  Google Calendar
+                </ThemedText>
+                <ThemedText style={{ fontSize: getFontSize(12) }}>
+                  Get habit reminders
+                </ThemedText>
+              </View>
+            </View>
+            <Controller
+              control={control}
+              name="googleNotificationEnable"
+              render={({ field: { onChange, value } }) => (
+                <Switch value={value} onPress={() => onChange(!value)} />
+              )}
+            />
+          </View>
+          {/* <Label label="Habit Color">
             <View
               style={{
                 flexDirection: "row",
@@ -372,16 +478,15 @@ const Index = () => {
                 );
               })}
             </View>
-          </Label>
+          </Label> */}
         </View>
       </ScrollView>
       <GradientButton
+        disable={!watch("habitName")}
         title="Save Habit"
         onPress={handleSubmit((data) => mutation.mutateAsync(data))}
         style={{
           marginHorizontal: horizontalScale(16),
-          paddingBottom:
-            Platform.OS === "ios" ? verticalScale(8) : verticalScale(16),
           marginVertical: verticalScale(20),
         }}
       />
@@ -391,8 +496,6 @@ const Index = () => {
 
 const styles = StyleSheet.create({
   weekBtn: {
-    // paddingHorizontal: horizontalScale(10),
-    // paddingVertical: horizontalScale(6),
     borderRadius: 6,
     borderWidth: 2,
     borderColor: "rgba(138, 43, 226, 1)",

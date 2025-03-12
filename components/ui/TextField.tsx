@@ -50,6 +50,7 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
               textShadowRadius: 0,
             },
           ]}
+          value={value}
           {...rest}
           placeholderTextColor={"rgba(81, 85, 98, 1)"}
           editable={!disabled}

@@ -1,0 +1,103 @@
+import LinerGradientContainer from "@/components/ui/liner-gradient-container";
+import { ThemedText } from "@/components/ui/theme-text";
+import { horizontalScale, verticalScale } from "@/metric";
+import React from "react";
+import { Dimensions, Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+
+type Props = {
+  onChageMenu: (item: string, index: number) => void;
+};
+
+const menu = ["Weekly", "Monthly", "Year"];
+const { width } = Dimensions.get("window");
+const _selectedWidth = (width - horizontalScale(36)) / menu?.length; // padding(16+16) +spacing(2+2)
+
+const AnalyticsBar = ({ onChageMenu }: Props) => {
+  const [selected, setSelected] = React.useState(menu[0]);
+  const positionX = useSharedValue(0);
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: withSpring(positionX.value, {
+            damping: 40,
+            stiffness: 200,
+          }),
+        },
+      ],
+    };
+  });
+  const onPressMenu = (item: string, index: number) => {
+    setSelected(item);
+    onChageMenu(item, index);
+    positionX.value = index * _selectedWidth;
+  };
+  return (
+    <View style={styles.container}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          //   justifyContent: "space-between",
+        }}
+      >
+        <Animated.View
+          style={[
+            {
+              position: "absolute",
+            },
+            animatedStyle,
+          ]}
+        >
+          <LinerGradientContainer
+            style={{
+              width: _selectedWidth,
+
+              borderRadius: 8,
+            }}
+          ></LinerGradientContainer>
+        </Animated.View>
+        {menu.map((item, index) => (
+          <Pressable
+            onPress={() => onPressMenu(item, index)}
+            style={{
+              flex: 1,
+              paddingVertical: verticalScale(8),
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            key={index}
+          >
+            <ThemedText
+              key={index}
+              style={{
+                fontSize: horizontalScale(14),
+                color: selected == item ? "white" : "rgba(104, 104, 115, 1)",
+                fontFamily:
+                  selected == item ? "PoppinsSemiBold" : "PoppinsRegular",
+              }}
+            >
+              {item}
+            </ThemedText>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    padding: horizontalScale(2),
+    borderRadius: horizontalScale(8),
+  },
+});
+
+export default AnalyticsBar;

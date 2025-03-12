@@ -15,15 +15,13 @@ import Animated from "react-native-reanimated";
 const screenWidth = Dimensions.get("window").width - horizontalScale(32);
 const itemWidth = screenWidth / 9; // Divide equally for 7 days
 
-const getThisWeekDates = () => {
+
+const getLast7Days = () => {
   const today = new Date();
-  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Get Monday of the current week
 
   return Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(monday);
-    date.setDate(monday.getDate() + i);
+    const date = new Date(today);
+    date.setDate(today.getDate() - i); // Subtract i days from today
 
     return {
       dateNumber: date.getDate(), // Get only the date (e.g., 24)
@@ -31,7 +29,7 @@ const getThisWeekDates = () => {
       dayShort: date.toLocaleDateString("en-US", { weekday: "short" }), // Get 3-letter day (e.g., Mon)
       weekNumber: date.getDay(), // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     };
-  });
+  }).reverse(); // Reverse to maintain order from past to today
 };
 
 const getMonthAndYear = () => {
@@ -47,7 +45,7 @@ type HabitHeadProps = {
 };
 
 const HabitHead = ({ onPress, selectedWeek }: HabitHeadProps) => {
-  const weekDates = getThisWeekDates();
+  const weekDates = getLast7Days();
   const todayWeekNumber = new Date().getDay();
 
   // Get selected day's name or "Today"
