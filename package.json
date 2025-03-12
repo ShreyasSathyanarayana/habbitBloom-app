@@ -52,6 +52,7 @@
     "react-native": "^0.76.7",
     "react-native-actions-sheet": "^0.9.7",
     "react-native-bouncy-checkbox": "^4.1.2",
+    "react-native-circular-progress-indicator": "^4.4.2",
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-get-random-values": "~1.11.0",

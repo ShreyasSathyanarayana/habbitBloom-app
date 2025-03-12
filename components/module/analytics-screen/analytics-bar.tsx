@@ -16,7 +16,7 @@ type Props = {
 
 const menu = ["Weekly", "Monthly", "Year"];
 const { width } = Dimensions.get("window");
-const _selectedWidth = (width - horizontalScale(36)) / menu?.length; // padding(16+16) +spacing(2+2)
+const _selectedWidth = (width - horizontalScale(38)) / menu?.length; // padding(16+16) +spacing(2+2)
 
 const AnalyticsBar = ({ onChageMenu }: Props) => {
   const [selected, setSelected] = React.useState(menu[0]);
@@ -51,6 +51,8 @@ const AnalyticsBar = ({ onChageMenu }: Props) => {
           style={[
             {
               position: "absolute",
+              left: horizontalScale(1),
+              // height: "100%",
             },
             animatedStyle,
           ]}
@@ -58,7 +60,6 @@ const AnalyticsBar = ({ onChageMenu }: Props) => {
           <LinerGradientContainer
             style={{
               width: _selectedWidth,
-
               borderRadius: 8,
             }}
           ></LinerGradientContainer>
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     padding: horizontalScale(2),
-    borderRadius: horizontalScale(8),
+    borderRadius: horizontalScale(10),
   },
 });
 
