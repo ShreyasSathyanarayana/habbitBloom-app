@@ -1,4 +1,5 @@
 import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";
+import AnalyticsDetails from "@/components/module/analytics-screen/analytics-details";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { ThemedText } from "@/components/ui/theme-text";
@@ -44,6 +45,7 @@ const AnalyticsScreen = () => {
         }}
       >
         <AnalyticsBar onChageMenu={onPressMenu} />
+        <AnalyticsDetails selectedOption={selectedMenu} />
       </View>
     </Container>
   );
