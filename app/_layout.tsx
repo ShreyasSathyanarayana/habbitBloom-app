@@ -1,6 +1,7 @@
 import { getFontSize } from "@/font";
 import { Stack } from "expo-router";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ToastProvider,
   ToastType,
@@ -31,7 +32,6 @@ import { sendOTP } from "@/api/auth-api";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/action-sheets/sheet";
 import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
-
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -97,7 +97,6 @@ const RootLayout = () => {
   useEffect(() => {
     setupDatabase(); // Ensure database is set up
   }, []);
-
 
   useEffect(() => {
     (async () => {
@@ -184,6 +183,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
   id,
 }) => {
   const toast = useToast();
+  const { top: paddingTop } = useSafeAreaInsets();
 
   const getIcon = () => {
     switch (type) {
@@ -262,7 +262,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
       colors={getGradientColor()}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      style={styles.toastContainer}
+      style={[styles.toastContainer, { paddingTop: paddingTop }]}
     >
       <View
         style={{

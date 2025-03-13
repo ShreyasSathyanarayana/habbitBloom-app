@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 
-const ProtectedLayout = () => {
+const Layout = () => {
   return (
     <Stack
       screenOptions={{
@@ -11,11 +11,8 @@ const ProtectedLayout = () => {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ title: "habbits" }} />
-      <Stack.Screen name="create-habit" options={{ title: "create habit" }} />
-      <Stack.Screen name="analytics" options={{ title: "Analytics" }} />
-     
     </Stack>
   );
 };
 
-export default ProtectedLayout;
+export default Layout;

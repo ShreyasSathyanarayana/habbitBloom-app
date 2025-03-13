@@ -32,7 +32,7 @@ import { signIn } from "@/api/auth-api";
 import { useAuth } from "@/context/AuthProvider";
 
 const SignIn = () => {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, watch } = useForm({
     defaultValues: {
       email: "",
       password: "",
@@ -67,22 +67,6 @@ const SignIn = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(true);
   const onSubmit = async (data: any) => {
     mutation.mutateAsync(data);
-    // const { data: signInData, error } = await supabase.auth.signInWithPassword({
-    //   email: data.email,
-    //   password: data.password,
-    // });
-    // if (error) {
-    //   // Alert.alert('Something went wrong')
-    //   toast.show(error.message, {
-    //     type: "danger",
-    //   });
-
-    //   return;
-    // }
-    // toast.show("Login Succesful", {
-    //   type: "success",
-    // });
-    // Alert.alert("Login Succesful");
   };
 
   return (
@@ -203,6 +187,7 @@ const SignIn = () => {
               </TouchableOpacity>
             </View>
             <GradientButton
+              disable={!watch("email") && !watch("password")}
               onPress={handleSubmit(onSubmit)}
               title="LOG IN"
               style={{ marginVertical: verticalScale(32) }}

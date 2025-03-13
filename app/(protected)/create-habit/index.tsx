@@ -1,8 +1,9 @@
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { horizontalScale, verticalScale } from "@/metric";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Platform,
   ScrollView,
@@ -53,6 +54,8 @@ const Index = () => {
     params: { id: string };
   }>();
   const { id: habitId } = route.params;
+  // console.log("habitId", habitId);
+
   const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
       habitName: "",
@@ -66,6 +69,8 @@ const Index = () => {
   });
   const toast = useToast();
   const categoryRef = useRef<FlatList<any>>(null);
+  const [isCreatingHabit, setIsCreatingHabit] = useState<boolean>(false);
+  const [isDeletingHabit, setIsDeletingHabit] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const category = watch("category"); // Watch category value
   const habitDetails = useQuery({
@@ -78,6 +83,7 @@ const Index = () => {
 
   const mutation = useMutation({
     mutationFn: (data: any) => {
+      setIsCreatingHabit(true);
       return createOrUpdateHabit(data, habitId);
     },
     onSuccess: () => {
@@ -91,11 +97,15 @@ const Index = () => {
         type: "warning",
       });
     },
+    onSettled: () => {
+      setIsCreatingHabit(false);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationKey: ["delehabit"],
     mutationFn: () => {
+      setIsDeletingHabit(true);
       return deleteHabit(habitId);
     },
     onSuccess: () => {
@@ -108,6 +118,9 @@ const Index = () => {
       toast.show(error.message, {
         type: "warning",
       });
+    },
+    onSettled: () => {
+      setIsDeletingHabit(false);
     },
   });
 
@@ -167,11 +180,21 @@ const Index = () => {
       <Header
         title="Create Habit"
         rightIcon={
-          <TouchableOpacity onPress={() => deleteMutation.mutateAsync()}>
-            <ThemedText style={{ fontSize: getFontSize(14) }}>
-              Delete
-            </ThemedText>
-          </TouchableOpacity>
+          habitId && ( // Only show delete button if habitId is present
+            <TouchableOpacity
+              style={{ width: horizontalScale(50), alignItems: "center" }}
+              onPress={() => !isDeletingHabit && deleteMutation.mutateAsync()}
+            >
+              <ThemedText style={{ fontSize: getFontSize(14) }}>
+                {isDeletingHabit ? (
+                  <ActivityIndicator size={"small"} color={"white"} />
+                ) : (
+                  "Delete"
+                )}
+                {/* Delete */}
+              </ThemedText>
+            </TouchableOpacity>
+          )
         }
       />
       <ScrollView
@@ -483,7 +506,8 @@ const Index = () => {
       </ScrollView>
       <GradientButton
         disable={!watch("habitName")}
-        title="Save Habit"
+        title={"Save Habit"}
+        isLoading={isCreatingHabit}
         onPress={handleSubmit((data) => mutation.mutateAsync(data))}
         style={{
           marginHorizontal: horizontalScale(16),

@@ -1,28 +1,35 @@
-import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  ActivityIndicator,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
   withSpring,
 } from "react-native-reanimated";
 import { useEffect } from "react";
 
 interface GradientButtonProps extends TouchableOpacityProps {
-  title: string;
+  title?: string;
   type?: string;
   disable?: boolean;
+  isLoading?: boolean; // Loading state
   color?: [string, string, ...string[]]; // Custom gradient colors
 }
 
 export function GradientButton({
   title,
-  type = "primary", // secondary
+  type = "primary",
   disable = false,
-  color = ["#00FFFF", "#8A2BE2", "#FF1493"], // Default gradient colors
+  isLoading = false,
+  color = ["#00FFFF", "#8A2BE2", "#FF1493"],
   style,
+  children,
   ...props
 }: GradientButtonProps) {
   const opacity = useSharedValue(0);
@@ -32,13 +39,8 @@ export function GradientButton({
     opacity.value = 0;
     translateY.value = 10;
 
-    // opacity.value = withTiming(1, { duration: 300 });
     opacity.value = withSpring(1, { damping: 40, stiffness: 200 });
-    // translateY.value = withTiming(0, { duration: 500 });
-    translateY.value = withSpring(0, {
-      damping: 40,
-      stiffness: 200,
-    });
+    translateY.value = withSpring(0, { damping: 40, stiffness: 200 });
   }, [title]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -48,50 +50,58 @@ export function GradientButton({
 
   return (
     <TouchableOpacity
-      disabled={disable}
+      disabled={disable || isLoading}
       {...props}
       style={[
         { borderRadius: 8, overflow: "hidden" },
         style,
-        disable && { backgroundColor: "rgba(60, 60, 67, 0.6)" },
+        (disable || isLoading) && { backgroundColor: "rgba(60, 60, 67, 0.6)" },
       ]}
     >
       <LinearGradient
         colors={
-          disable ? ["rgba(60, 60, 67, 0.6)", "rgba(60, 60, 67, 0.6)"] : color
+          disable || isLoading
+            ? ["rgba(60, 60, 67, 0.6)", "rgba(60, 60, 67, 0.6)"]
+            : color
         }
-        start={{ x: -1, y: 0 }} // Approx. -96.01% (Left-Extended)
-        end={{ x: 2, y: 1 }} // Approx. 198.2% (Right-Extended)
+        start={{ x: -1, y: 0 }}
+        end={{ x: 2, y: 1 }}
         style={{
-          // alignItems: "center",
-          // justifyContent: "center",
           padding: 2,
           borderRadius: 10,
+          alignItems: "center",
+          paddingVertical: verticalScale(12),
+          paddingHorizontal: horizontalScale(20),
         }}
       >
-        <Animated.Text
-          style={[
-            {
-              color: "white",
-              fontSize: getFontSize(16),
-              fontFamily: "PoppinsBold",
-              paddingVertical: verticalScale(12),
-              paddingHorizontal: horizontalScale(20),
-              includeFontPadding: false,
-              textShadowColor: "transparent",
-              textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 0,
-              // backgroundColor: "black",
-              borderRadius: 10,
-              textAlign: "center",
-            },
-            animatedStyle,
-            type != "primary" && { backgroundColor: "black" },
-            disable && { color: "rgba(118, 118, 118, 1)" },
-          ]}
-        >
-          {title}
-        </Animated.Text>
+        {isLoading ? (
+          <ActivityIndicator
+            size="small"
+            color="white"
+            style={{ paddingVertical: verticalScale(2) }}
+          />
+        ) : (
+          title && (
+            <Animated.Text
+              style={[
+                {
+                  color: "white",
+                  fontSize: getFontSize(16),
+                  fontFamily: "PoppinsBold",
+                  includeFontPadding: false,
+                  textShadowColor: "transparent",
+                  textShadowOffset: { width: 0, height: 0 },
+                  textShadowRadius: 0,
+                },
+                animatedStyle,
+                type !== "primary" && { backgroundColor: "black" },
+                (disable || isLoading) && { color: "rgba(118, 118, 118, 1)" },
+              ]}
+            >
+              {title}
+            </Animated.Text>
+          )
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );
