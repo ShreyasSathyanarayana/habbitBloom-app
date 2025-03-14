@@ -157,7 +157,7 @@ const Index = () => {
           viewPosition:
             index === LAST_INDEX ? 1 : index === INTIAL_INDEX ? 0 : 0.5, // Center the item
         });
-      }, 800); // Small delay ensures UI is ready before scrolling
+      }, 200); // Small delay ensures UI is ready before scrolling
     }
   }, [category]);
 

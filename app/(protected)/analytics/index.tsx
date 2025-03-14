@@ -8,7 +8,12 @@ import { horizontalScale, verticalScale } from "@/metric";
 import { useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TouchableNativeFeedback,
+  TouchableOpacity,
+  View,
+} from "react-native";
 const menu = ["Weekly", "Monthly", "Year"];
 const AnalyticsScreen = () => {
   const [selectedMenu, setSelectedMenu] = React.useState(menu[0]);
@@ -27,6 +32,7 @@ const AnalyticsScreen = () => {
         title="Analytics"
         rightIcon={
           <TouchableOpacity
+            style={{ paddingHorizontal: horizontalScale(3) }}
             onPress={() =>
               router.push({
                 pathname: "/(protected)/create-habit",

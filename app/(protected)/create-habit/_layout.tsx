@@ -6,7 +6,7 @@ const Layout = () => {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: "ios_from_right",
+        // animation: "ios_from_right",
         // animationDuration: 300,
       }}
     >
