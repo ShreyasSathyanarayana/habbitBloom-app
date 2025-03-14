@@ -10,7 +10,7 @@ const Layout = () => {
         // animationDuration: 300,
       }}
     >
-      <Stack.Screen name="(tabs)" options={{ title: "habbits" }} />
+      <Stack.Screen name="index" options={{ title: "habbits" }} />
     </Stack>
   );
 };
