@@ -60,7 +60,7 @@ const AnalyticsBar = ({ onChageMenu }: Props) => {
           <LinerGradientContainer
             style={{
               width: _selectedWidth,
-              borderRadius: 8,
+              borderRadius: horizontalScale(8),
             }}
           ></LinerGradientContainer>
         </Animated.View>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     padding: horizontalScale(2),
-    borderRadius: horizontalScale(10),
+    borderRadius: horizontalScale(8),
   },
 });
 

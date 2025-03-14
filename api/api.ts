@@ -205,6 +205,57 @@ export const getHabitStreak = async (habitId: string) => {
 };
 
 
+export const getHabitStats = async (habitId: string) => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    console.error("Error fetching user:", error);
+    return { completed: 0, notCompleted: 0, streak: 0 };
+  }
+
+  const { data, error: fetchError } = await supabase
+    .from("habit_progress")
+    .select("date, status") // Fetch both date and status
+    .eq("habit_id", habitId)
+    .eq("user_id", user.id)
+    .order("date", { ascending: false });
+
+  if (fetchError) {
+    console.error("Error fetching habit stats:", fetchError);
+    return { completed: 0, notCompleted: 0, streak: 0 };
+  }
+
+  if (!data || data.length === 0) {
+    return { completed: 0, notCompleted: 0, streak: 0 };
+  }
+
+  // Count completed and not completed habits
+  const completedCount = data.filter((entry) => entry.status === true).length;
+  const notCompletedCount = data.filter((entry) => entry.status === false).length;
+
+  // Calculate streak
+  let streak = 0;
+  let currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < data.length; i++) {
+    const habitDate = new Date(data[i].date);
+    habitDate.setHours(0, 0, 0, 0);
+
+    if (habitDate.getTime() === currentDate.getTime() && data[i].status) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else if (habitDate.getTime() === currentDate.getTime() - 86400000 && data[i].status) {
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return { completed: completedCount, notCompleted: notCompletedCount, streak };
+};
+
+
 
 
 export const getHabitsByDate = async (date: string) => {

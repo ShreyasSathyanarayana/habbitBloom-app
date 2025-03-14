@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import HabitCard from "./habit-card";
+import HabitListShimmer from "./habit-list-shimmer";
 
 type HabitListProps = {
   selectedDate: string;
@@ -17,8 +18,9 @@ const HabitList = ({ selectedDate, selectedWeek }: HabitListProps) => {
     // staleTime: 0,
   });
 
-  // console.log("Selected Week==>", selectedDate);
-  // console.log("Habit Details==>", JSON.stringify(habitDetails.data,null,2));
+  if (habitDetails.isLoading) {
+    return <HabitListShimmer />;
+  }
 
   return (
     <View>
@@ -36,6 +38,7 @@ const HabitList = ({ selectedDate, selectedWeek }: HabitListProps) => {
         scrollEnabled={false}
         columnWrapperStyle={{
           justifyContent: "space-between",
+          flex: 1,
         }}
         data={habitDetails.data}
         numColumns={2}

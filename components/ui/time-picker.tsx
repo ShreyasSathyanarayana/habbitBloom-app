@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(60, 60, 67, 0.6)",
     paddingHorizontal: horizontalScale(16),
     justifyContent: "space-between",
+    paddingVertical: verticalScale(8),
   },
   text: {
     color: "white",

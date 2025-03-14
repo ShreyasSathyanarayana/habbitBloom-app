@@ -6,10 +6,11 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { getCategoryByName } from "@/utils/constants";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getHabitStreak, markHabitStatus } from "@/api/api";
+import { getHabitStats, getHabitStreak, markHabitStatus } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
 import { getFontSize } from "@/font";
 import { router } from "expo-router";
+import { Skeleton } from "moti/skeleton";
 
 type HabitProgress = {
   status: boolean;
@@ -35,10 +36,11 @@ const HabitCard = (props: HabitProps) => {
   const queryClient = useQueryClient();
   const categoryDetails = getCategoryByName(category);
   const toast = useToast();
-  const streakDetails = useQuery({
-    queryKey: ["streaks", props.id],
+
+  const habitProgress = useQuery({
+    queryKey: ["habitProgress", props.id],
     queryFn: () => {
-      return getHabitStreak(props.id);
+      return getHabitStats(props.id);
     },
   });
 
@@ -56,7 +58,7 @@ const HabitCard = (props: HabitProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
-      queryClient.invalidateQueries({ queryKey: ["streaks", props.id] });
+      queryClient.invalidateQueries({ queryKey: ["habitProgress", props.id] });
     },
     onError: (error) => {
       toast.show(error?.message || "Something went wrong", { type: "warning" });
@@ -109,7 +111,7 @@ const HabitCard = (props: HabitProps) => {
             isChecked={isChecked} // Controlled state
             fillColor="rgba(138, 43, 226, 1)"
             unFillColor="transparent"
-            iconStyle={{ borderColor: "red" }}
+            // iconStyle={{ borderColor: "red" }}
             style={{
               alignItems: "flex-start",
               justifyContent: "flex-end",
@@ -121,18 +123,30 @@ const HabitCard = (props: HabitProps) => {
             }}
           />
         </View>
-        <ThemedText
-          numberOfLines={2}
-          adjustsFontSizeToFit
-          style={{ fontFamily: "PoppinsSemiBold", marginTop: verticalScale(6) }}
-        >
-          {habit_name}
-        </ThemedText>
-        <ThemedText
-          style={{ marginTop: verticalScale(4), fontSize: getFontSize(14) }}
-        >
-          🔥 {streakDetails?.data || 0} Days
-        </ThemedText>
+        <View style={{ justifyContent: "space-between", flex: 1 }}>
+          <ThemedText
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            style={{
+              fontFamily: "PoppinsSemiBold",
+              marginTop: verticalScale(6),
+            }}
+          >
+            {habit_name}
+          </ThemedText>
+
+          <Skeleton
+            show={habitProgress.isFetching}
+            colorMode={"dark"}
+            width={"60%"}
+          >
+            <ThemedText
+              style={{ marginTop: verticalScale(4), fontSize: getFontSize(14) }}
+            >
+              🔥 {habitProgress?.data?.completed || 0} Days
+            </ThemedText>
+          </Skeleton>
+        </View>
       </LinearGradient>
     </Pressable>
   );
@@ -144,6 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: horizontalScale(10),
     marginVertical: verticalScale(8),
     width: _cardWidth,
+    flex: 1,
     // aspectRatio: 1,
   },
 });

@@ -520,8 +520,8 @@ const Index = () => {
 
 const styles = StyleSheet.create({
   weekBtn: {
-    borderRadius: 6,
-    borderWidth: 2,
+    borderRadius: horizontalScale(6),
+    borderWidth: horizontalScale(2),
     borderColor: "rgba(138, 43, 226, 1)",
     width: horizontalScale(32),
     height: horizontalScale(32),

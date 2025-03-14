@@ -19,6 +19,10 @@ interface SwitchProps {
   trackColors?: { on: string; off: string }; // Colors for the track (on/off states)
 }
 
+const translateXValue = horizontalScale(60 - 35);
+const switchRadius = horizontalScale(40 / 2);
+const tumbNailRadius = horizontalScale(35 / 2);
+
 export const Switch: React.FC<SwitchProps> = ({
   value,
   onPress,
@@ -38,20 +42,21 @@ export const Switch: React.FC<SwitchProps> = ({
 
     return {
       backgroundColor: withTiming(color, { duration }),
-      borderRadius: 40 / 2, // Set a fixed border radius
+      borderRadius: switchRadius, // Set a fixed border radius
     };
   });
 
   const thumbAnimatedStyle = useAnimatedStyle(() => {
+    // const value = horizontalScale(60 - 35);
     const moveValue = interpolate(
       value ? 1 : 0,
       [0, 1],
-      [0, 60 - 35] // Use fixed width and height
+      [0, translateXValue] // Use fixed width and height
     );
 
     return {
       transform: [{ translateX: withTiming(moveValue, { duration }) }],
-      borderRadius: 35 / 2, // Ensure the thumb remains circular
+      borderRadius: tumbNailRadius, // Ensure the thumb remains circular
     };
   });
 

@@ -19,7 +19,13 @@ import { Slot, SplashScreen, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedText } from "@/components/ui/theme-text";
@@ -32,6 +38,8 @@ import { sendOTP } from "@/api/auth-api";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/action-sheets/sheet";
 import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -183,7 +191,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
   id,
 }) => {
   const toast = useToast();
-  const { top: paddingTop } = useSafeAreaInsets();
+  const { top: marginTopValue } = useSafeAreaInsets();
 
   const getIcon = () => {
     switch (type) {
@@ -262,7 +270,10 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
       colors={getGradientColor()}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      style={[styles.toastContainer, { paddingTop: paddingTop }]}
+      style={[
+        styles.toastContainer,
+        { marginTop: Platform.OS == "android" ? marginTopValue : 0 },
+      ]}
     >
       <View
         style={{
@@ -273,7 +284,12 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
         }}
       >
         <View
-          style={{ flexDirection: "row", alignItems: "center", width: "80%" }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            width: "80%",
+            gap: horizontalScale(5),
+          }}
         >
           {getIcon()}
           <ThemedText
@@ -287,7 +303,7 @@ const CustomToast: React.FC<CustomToastProps & { id: string }> = ({
         <TouchableOpacity onPress={() => toast.hide(id)}>
           <AntDesign
             name="close"
-            size={24}
+            size={getFontSize(24)}
             color={toastColor[type.toString()] || "white"}
             style={[styles.closeButton]}
           />

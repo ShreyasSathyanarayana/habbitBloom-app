@@ -48,7 +48,7 @@ export const getFontSize = (size: number): number => {
 
     // Adjust for tablets
     if (deviceType === 'tablet') {
-        newSize *= 1.1;
+        newSize *= 0.65;
     }
 
     // Disable font scaling by ignoring PixelRatio.getFontScale()
@@ -66,6 +66,6 @@ export const adjustFontConfig = (
 };
 
 // Debug Logs
-console.log('Device type:', getDeviceType());
-console.log('Font size for 16:', getFontSize(16));
-console.log('Screen dimensions:', SCREEN_WIDTH, SCREEN_HEIGHT);
+// console.log('Device type:', getDeviceType());
+// console.log('Font size for 16:', getFontSize(16));
+// console.log('Screen dimensions:', SCREEN_WIDTH, SCREEN_HEIGHT);

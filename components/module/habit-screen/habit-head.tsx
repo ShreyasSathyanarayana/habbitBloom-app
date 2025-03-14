@@ -184,7 +184,7 @@ const HabitHead = ({ onPress, selectedWeek }: HabitHeadProps) => {
               size={horizontalScale(45)}
               outerCircleColor="white"
               progressCircleColor="rgba(175, 180, 255, 1)"
-              labelSize={12}
+              labelSize={getFontSize(12)}
               strokeWidth={3}
               // labelStyle={{ fontFamily: "PoppinsMedium" }}
             />
@@ -200,7 +200,7 @@ const HabitHead = ({ onPress, selectedWeek }: HabitHeadProps) => {
               inActiveStrokeColor="white"
               valueSuffix="%"
               allowFontScaling={false}
-              titleFontSize={12}
+              titleFontSize={getFontSize(12)}
               strokeColorConfig={[
                 { color: "rgba(175, 180, 255, 1)", value: 0 },
                 { color: "rgba(175, 180, 255, 1)", value: 49 },
