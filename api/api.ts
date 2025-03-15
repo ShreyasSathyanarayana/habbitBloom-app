@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/utils/SupaLegend";
-import { generateYearlyData } from "@/utils/constants";
 
 type CreateHabitSchema = {
   habitName: string;
@@ -353,12 +352,16 @@ export interface HabitProgressResponse {
   habitId: string;
   data: HabitProgressEntry[];
 }
-
 export const fetchYearlyHabitProgress = async (habitId: string): Promise<HabitProgressResponse | null> => {
   // Get the current year dynamically
   const currentYear = new Date().getFullYear();
+  
   const startOfYear = new Date(`${currentYear}-01-01`);
+  startOfYear.setHours(0, 0, 0, 0);
+
   const endOfYear = new Date(`${currentYear}-12-31`);
+  endOfYear.setHours(23, 59, 59, 999);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -402,11 +405,15 @@ export const fetchYearlyHabitProgress = async (habitId: string): Promise<HabitPr
     const dateString = currentDate.toISOString().split("T")[0];
 
     let status: boolean | null = null;
-    if (progressMap.has(dateString)) {
+
+    // ✅ Before habit creation, status should be `null`
+    if (currentDate < habitStartDate) {
+      status = null;
+    } 
+    // ✅ Use existing status if available
+    else if (progressMap.has(dateString)) {
       status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } else if (currentDate < today && currentDate >= habitStartDate) {
-      status = false; // Missed days before today (after habit creation) are marked as false
-    }
+    } 
 
     result.push({ date: dateString, status });
     currentDate.setDate(currentDate.getDate() + 1);
@@ -430,10 +437,16 @@ export const fetchMonthlyHabitProgress = async (habitId: string): Promise<HabitP
   // Get the current year and month dynamically
   const now = new Date();
   const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // Months are 0-based in JS
+  const currentMonth = now.getMonth(); // 0-based index
 
-  const startOfMonth = new Date(`${currentYear}-${String(currentMonth).padStart(2, "0")}-01`);
-  const endOfMonth = new Date(currentYear, currentMonth, 0); // Last day of the month
+  // First and last day of the month
+  const startOfMonth = new Date(currentYear, currentMonth, 1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  endOfMonth.setHours(23, 59, 59, 999);
+
+  // Get today's date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -477,11 +490,15 @@ export const fetchMonthlyHabitProgress = async (habitId: string): Promise<HabitP
     const dateString = currentDate.toISOString().split("T")[0];
 
     let status: boolean | null = null;
-    if (progressMap.has(dateString)) {
+
+    // ✅ Before habit creation, status should be `null`
+    if (currentDate < habitStartDate) {
+      status = null;
+    } 
+    // ✅ Use existing status if available
+    else if (progressMap.has(dateString)) {
       status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } else if (currentDate < today && currentDate >= habitStartDate) {
-      status = false; // Missed days before today (after habit creation) are marked as false
-    }
+    } 
 
     result.push({ date: dateString, status });
     currentDate.setDate(currentDate.getDate() + 1);
@@ -489,6 +506,7 @@ export const fetchMonthlyHabitProgress = async (habitId: string): Promise<HabitP
 
   return { habitId, data: result };
 };
+
 
 
 
@@ -503,18 +521,21 @@ export interface HabitProgressResponse {
 }
 
 export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitProgressResponse | null> => {
-  // Get today's date
+  // Get today's date and normalize time to midnight
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   // Determine the start (Monday) and end (Sunday) of the current week
   const currentDay = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1)); // Adjust to Monday
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+  startOfWeek.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1)); // Move to Monday
+  startOfWeek.setHours(0, 0, 0, 0);
 
-  // Fetch habit's creation date
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Move to Sunday
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  // Fetch habit's creation timestamp
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at")
@@ -522,21 +543,21 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
     .single();
 
   if (habitError || !habitData) {
-    console.error("Error fetching habit creation date:", habitError);
+    console.error("Error fetching habit creation timestamp:", habitError);
     return null;
   }
 
+  // Convert the timestamp to a date and normalize to midnight
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setHours(0, 0, 0, 0);
 
-  // Fetch habit progress data for the current week
+  // Fetch habit progress for the current week
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .gte("date", startOfWeek.toISOString().split("T")[0])
-    .lte("date", endOfWeek.toISOString().split("T")[0])
-    .order("date", { ascending: true });
+    .lte("date", endOfWeek.toISOString().split("T")[0]);
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -546,7 +567,7 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
   // Convert progress data into a Map for quick lookup
   const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
 
-  // Generate the full week and fill missing days
+  // Generate the full week and ensure Monday starts first
   const result: HabitProgressEntry[] = [];
   let currentDate = new Date(startOfWeek);
 
@@ -554,15 +575,31 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
     const dateString = currentDate.toISOString().split("T")[0];
 
     let status: boolean | null = null;
-    if (progressMap.has(dateString)) {
+
+    // ✅ Before habit creation, status should be `null`
+    if (currentDate < habitStartDate) {
+      status = null;
+    } 
+    // ✅ Use existing status if available
+    else if (progressMap.has(dateString)) {
       status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } else if (currentDate < today && currentDate >= habitStartDate) {
-      status = false; // Missed days before today (after habit creation) are marked as false
     }
 
     result.push({ date: dateString, status });
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  return { habitId, data: result };
+  // ✅ Ensure Monday is first and Sunday is last
+  const orderedResult = result.sort((a, b) => {
+    const dayA = new Date(a.date).getDay();
+    const dayB = new Date(b.date).getDay();
+
+    // Convert Sunday (0) to 7 so it appears last
+    const adjustedDayA = dayA === 0 ? 7 : dayA;
+    const adjustedDayB = dayB === 0 ? 7 : dayB;
+
+    return adjustedDayA - adjustedDayB;
+  });
+
+  return { habitId, data: orderedResult };
 };

@@ -17,8 +17,8 @@ const WeekMap = ({ habitId }: WeekMapProps) => {
     queryKey: ["weeklyHabitProgress", habitId],
     queryFn: () => fetchWeeklyHabitProgress(habitId),
   });
-//   console.log("habit id response", data?.habitId);
-//   console.log("habit data", JSON.stringify(data?.data, null, 2));
+  //   console.log("habit id response", data?.habitId);
+  //   console.log("habit data", JSON.stringify(data?.data, null, 2));
 
   if (isLoading || !data) return null; // Handle loading and null data state appropriately
   if (error) return null; // Handle error state appropriately
@@ -29,6 +29,7 @@ const WeekMap = ({ habitId }: WeekMapProps) => {
       exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
     >
       <FlatList
+        scrollEnabled={false}
         data={data?.data || []}
         contentContainerStyle={styles.container}
         keyExtractor={(_, index) => `weeklyDetails-${index}`}

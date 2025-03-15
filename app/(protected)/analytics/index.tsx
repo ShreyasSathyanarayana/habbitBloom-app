@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
+  ScrollView,
   StyleSheet,
   TouchableNativeFeedback,
   TouchableOpacity,
@@ -37,30 +38,34 @@ const AnalyticsScreen = () => {
   const categoryDetails = getCategoryByName(category);
   return (
     <Container>
-      <Header
-        title={habitName ?? "Analytics"}
-        headerIcon={categoryDetails?.icon}
-        rightIcon={
-          <TouchableOpacity
-            style={{ paddingHorizontal: horizontalScale(3) }}
-            onPress={() => {
-              router.push(`/(protected)/create-habit?id=${habitId}`);
-            }}
-          >
-            <ThemedText style={{ fontSize: getFontSize(14) }}>Edit</ThemedText>
-          </TouchableOpacity>
-        }
-      />
-      <View
-        style={{
-          paddingHorizontal: horizontalScale(16),
-          paddingTop: verticalScale(10),
-        }}
-      >
-        <AnalyticsBar onChageMenu={onPressMenu} />
-        <AnalyticsDetails selectedOption={selectedMenu} />
-        <AnalyticsMap habitId={habitId} selectedMenu={selectedMenu} />
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Header
+          title={habitName ?? "Analytics"}
+          headerIcon={categoryDetails?.icon}
+          rightIcon={
+            <TouchableOpacity
+              style={{ paddingHorizontal: horizontalScale(3) }}
+              onPress={() => {
+                router.push(`/(protected)/create-habit?id=${habitId}`);
+              }}
+            >
+              <ThemedText style={{ fontSize: getFontSize(14) }}>
+                Edit
+              </ThemedText>
+            </TouchableOpacity>
+          }
+        />
+        <View
+          style={{
+            paddingHorizontal: horizontalScale(16),
+            paddingTop: verticalScale(10),
+          }}
+        >
+          <AnalyticsBar onChageMenu={onPressMenu} />
+          <AnalyticsDetails selectedOption={selectedMenu} />
+          <AnalyticsMap habitId={habitId} selectedMenu={selectedMenu} />
+        </View>
+      </ScrollView>
     </Container>
   );
 };
