@@ -77,6 +77,66 @@ const AnalyticsDetails = ({ selectedOption, style, ...rest }: Props) => {
           </View>
         </View>
       </LinerGradientContainer>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: verticalScale(24),
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: horizontalScale(17),
+        }}
+      >
+        <View style={styles.streakContainer}>
+          <ThemedText style={{ fontSize: getFontSize(14) }}>
+            <ThemedText
+              style={{
+                fontSize: getFontSize(24),
+                fontFamily: "PoppinsSemiBold",
+              }}
+            >
+              2{" "}
+            </ThemedText>
+            days
+          </ThemedText>
+          <ThemedText
+            style={{
+              fontFamily: "PoppinsSemiBold",
+              marginTop: verticalScale(8),
+              fontSize: getFontSize(15),
+            }}
+          >
+            🏆 Completed
+          </ThemedText>
+          <ThemedText style={{ fontSize: getFontSize(14) }}>
+            Week Streak
+          </ThemedText>
+        </View>
+        <View style={styles.streakContainer}>
+          <ThemedText style={{ fontSize: getFontSize(14) }}>
+            <ThemedText
+              style={{
+                fontSize: getFontSize(24),
+                fontFamily: "PoppinsSemiBold",
+              }}
+            >
+              2{" "}
+            </ThemedText>
+            days
+          </ThemedText>
+          <ThemedText
+            style={{
+              fontFamily: "PoppinsSemiBold",
+              marginTop: verticalScale(8),
+              fontSize: getFontSize(15),
+            }}
+          >
+            🔥 Streak
+          </ThemedText>
+          <ThemedText style={{ fontSize: getFontSize(14) }}>
+            Highest Streak
+          </ThemedText>
+        </View>
+      </View>
     </View>
   );
 };
@@ -95,6 +155,13 @@ const styles = StyleSheet.create({
   subValue: {
     fontSize: getFontSize(14),
     fontFamily: "PoppinsSemiBold",
+  },
+  streakContainer: {
+    padding: horizontalScale(16),
+    backgroundColor: "rgba(30, 30, 30, 1)",
+    flex: 1,
+    borderRadius: horizontalScale(8),
+    gap: verticalScale(4),
   },
 });
 

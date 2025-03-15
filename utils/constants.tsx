@@ -6,6 +6,7 @@ import SleepIcon from "@/assets/svg/sleep-schedule.svg";
 import JournalingIcon from "@/assets/svg/journal.svg";
 import OthersIcon from "@/assets/svg/others.svg";
 import { horizontalScale } from "@/metric";
+
 export const goodHabitsCategories = [
   {
     id: 1,

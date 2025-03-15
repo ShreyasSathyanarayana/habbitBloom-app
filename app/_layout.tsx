@@ -41,53 +41,6 @@ import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 
-// SplashScreen.preventAutoHideAsync();
-
-// export default function Layout() {
-//   const [loaded, error] = useFonts({
-//     Poppins_100Thin,
-//     Poppins_600SemiBold,
-//   });
-
-//   useEffect(() => {
-//     if (loaded || error) {
-//       SplashScreen.hideAsync();
-//     }
-//   }, [loaded, error]);
-
-//   return (
-//     <KeyboardProvider>
-//       <Providers>
-//         <ToastProvider
-//           placement="top"
-//           duration={100}
-//           animationType="slide-in"
-//           animationDuration={400}
-//           successColor="green"
-//           dangerColor="red"
-//           warningColor="orange"
-//           normalColor="gray"
-//           // icon={<Icon />}
-//           // successIcon={<SuccessIcon />}
-//           // dangerIcon={<DangerIcon />}
-//           // warningIcon={<WarningIcon />}
-//           textStyle={{ fontSize: getFontSize(16) }}
-//           offset={50} // offset for both top and bottom toasts
-//           offsetTop={30}
-//           offsetBottom={40}
-//           swipeEnabled={true}
-//         >
-//           <Stack
-//             screenOptions={{
-//               headerShown: false,
-//             }}
-//           />
-//         </ToastProvider>
-//       </Providers>
-//     </KeyboardProvider>
-//   );
-// }
-
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {

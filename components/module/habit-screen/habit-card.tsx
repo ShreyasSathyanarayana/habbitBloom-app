@@ -73,7 +73,11 @@ const HabitCard = (props: HabitProps) => {
       onPress={() =>
         router.push({
           pathname: "/(protected)/analytics",
-          params: { id: props.id }, //this is habit id
+          params: {
+            id: props.id,
+            name: props.habit_name,
+            category: props.category,
+          }, //this is habit id
         })
       }
     >
