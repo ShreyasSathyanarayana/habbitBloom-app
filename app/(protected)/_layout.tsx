@@ -6,7 +6,7 @@ const ProtectedLayout = () => {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: "slide_from_bottom",
+        // animation: "slide_from_bottom",
         contentStyle: { backgroundColor: "#000" },
         // animationDuration: 300,
       }}

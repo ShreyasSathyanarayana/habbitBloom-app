@@ -136,7 +136,7 @@ const HabitCard = (props: HabitProps) => {
           </ThemedText>
 
           <Skeleton
-            show={habitProgress.isFetching}
+            show={habitProgress.isLoading}
             colorMode={"dark"}
             width={"60%"}
           >

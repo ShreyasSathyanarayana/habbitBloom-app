@@ -7,7 +7,7 @@ import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   TouchableNativeFeedback,
@@ -26,6 +26,7 @@ const AnalyticsScreen = () => {
   const onPressMenu = (item: string, index: number) => {
     setSelectedMenu(item);
   };
+
   return (
     <Container>
       <Header
@@ -33,12 +34,9 @@ const AnalyticsScreen = () => {
         rightIcon={
           <TouchableOpacity
             style={{ paddingHorizontal: horizontalScale(3) }}
-            onPress={() =>
-              router.push({
-                pathname: "/(protected)/create-habit",
-                params: { id: habitId },
-              })
-            }
+            onPress={() => {
+              router.push(`/(protected)/create-habit?id=${habitId}`);
+            }}
           >
             <ThemedText style={{ fontSize: getFontSize(14) }}>Edit</ThemedText>
           </TouchableOpacity>

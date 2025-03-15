@@ -27,7 +27,7 @@ import TimerIcon from "@/assets/svg/timer-icon.svg";
 import UpDownIcon from "@/assets/svg/up-down.svg";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createOrUpdateHabit, deleteHabit, getHabitById } from "@/api/api";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
 import { insertHabit } from "@/database/db";
 import HabitNameIcon from "@/assets/svg/hadit-name.svg";
@@ -47,14 +47,9 @@ const colors = [
   "rgba(216, 27, 96, 1)",
 ];
 
-const Index = () => {
-  const route = useRoute<{
-    key: string;
-    name: string;
-    params: { id: string };
-  }>();
-  const { id: habitId } = route.params;
-  // console.log("habitId", habitId);
+const CreateHabit = () => {
+  const { id } = useLocalSearchParams();
+  const habitId = Array.isArray(id) ? id[0] : id;
 
   const { control, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
@@ -88,6 +83,7 @@ const Index = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
+      router.dismissAll();
       router.replace("/(protected)/(tabs)");
     },
     onError: (error: any) => {
@@ -209,12 +205,12 @@ const Index = () => {
           }}
         >
           <InfoIcon width={horizontalScale(24)} height={horizontalScale(24)} />
-          <ThemedText style={{ fontSize: getFontSize(14) }}>
+          <ThemedText style={{ fontSize: getFontSize(13) }}>
             Learn how to track habits effectively!{" "}
             <ThemedText
               style={{
                 color: "rgba(138, 43, 226, 1)",
-                fontSize: getFontSize(14),
+                fontSize: getFontSize(13),
                 fontFamily: "PoppinsBold",
                 textDecorationLine: "underline",
               }}
@@ -530,4 +526,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Index;
+export default CreateHabit;
