@@ -18,16 +18,14 @@ import Animated, {
 } from "react-native-reanimated";
 import { SheetManager } from "react-native-actions-sheet";
 import { router } from "expo-router";
-
+import HabitHead from "@/components/module/habit-screen/habit-head";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HabitsScreen() {
   const { isTabBarVisible } = useTabBar();
   const buttonOpacity = useSharedValue(isTabBarVisible ? 1 : 0);
   const buttonTranslation = useSharedValue(isTabBarVisible ? 0 : 50);
-  const [selectedWeek, setSelectedWeek] = useState<number>(new Date().getDay());
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     buttonOpacity.value = withSpring(isTabBarVisible ? 1 : 0, {
@@ -46,27 +44,17 @@ export default function HabitsScreen() {
     transform: [{ translateX: buttonTranslation.value }],
   }));
 
-  const onWeekChange = (weekNumber: number, date: string) => {
-    setSelectedWeek(weekNumber);
-    setSelectedDate(date);
-  };
-
   return (
-    <View style={{ flex: 1, }}>
-      <ScrollableContainer>
-        {/* <View style={{ paddingHorizontal: horizontalScale(16) }}>
-          <HabitHead
-            selectedWeek={selectedWeek}
-            onPress={(val, date) => onWeekChange(val, date)}
-          />
-          <HabitList selectedWeek={selectedWeek}  selectedDate={selectedDate} />
-        </View> */}
-        <View
-          style={{ flex: 1, paddingHorizontal: horizontalScale(16) }}
-        >
-
-        </View>
-      </ScrollableContainer>
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: horizontalScale(16),
+        backgroundColor: "black",
+        paddingTop: insets.top,
+      }}
+    >
+      <HabitHead />
+      {/* <ScrollableContainer></ScrollableContainer> */}
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
