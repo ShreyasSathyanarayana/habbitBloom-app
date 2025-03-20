@@ -18,8 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { SheetManager } from "react-native-actions-sheet";
 import { router } from "expo-router";
-import HabitHead from "@/components/module/habit-screen/habit-head";
-import HabitList from "@/components/module/habit-screen/habit-list";
+
 
 export default function HabitsScreen() {
   const { isTabBarVisible } = useTabBar();
@@ -53,14 +52,19 @@ export default function HabitsScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }}>
+    <View style={{ flex: 1, }}>
       <ScrollableContainer>
-        <View style={{ paddingHorizontal: horizontalScale(16) }}>
+        {/* <View style={{ paddingHorizontal: horizontalScale(16) }}>
           <HabitHead
             selectedWeek={selectedWeek}
             onPress={(val, date) => onWeekChange(val, date)}
           />
           <HabitList selectedWeek={selectedWeek}  selectedDate={selectedDate} />
+        </View> */}
+        <View
+          style={{ flex: 1, paddingHorizontal: horizontalScale(16) }}
+        >
+
         </View>
       </ScrollableContainer>
 

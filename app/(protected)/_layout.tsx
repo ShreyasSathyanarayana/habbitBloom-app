@@ -13,7 +13,7 @@ const ProtectedLayout = () => {
     >
       <Stack.Screen name="(tabs)" options={{ title: "habbits" }} />
       <Stack.Screen name="create-habit" options={{ title: "create habit" }} />
-      <Stack.Screen name="analytics" options={{ title: "Analytics" }} />
+      {/* <Stack.Screen name="analytics" options={{ title: "Analytics" }} /> */}
     </Stack>
   );
 };

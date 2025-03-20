@@ -54,7 +54,7 @@ const ScrollableContainer: React.FC<ScrollableContainerProps> = ({
 
   return (
     <View
-      style={{ flex: 1, backgroundColor: "#111", paddingTop: statusBarHeight }}
+      style={{ flex: 1, backgroundColor: "black", paddingTop: statusBarHeight }}
     >
       <Animated.ScrollView
         onScroll={scrollHandler}

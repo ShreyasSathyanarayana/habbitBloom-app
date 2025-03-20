@@ -3,9 +3,9 @@ import {
   fetchWeeklyHabitProgress,
   fetchYearlyHabitProgress,
 } from "@/api/api";
-import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";
-import AnalyticsDetails from "@/components/module/analytics-screen/analytics-details";
-import AnalyticsMap from "@/components/module/analytics-screen/analytics-map";
+import AnalyticsBar from "@/components/module/analytics-screen-old/analytics-bar";
+import AnalyticsDetails from "@/components/module/analytics-screen-old/analytics-details";
+import AnalyticsMap from "@/components/module/analytics-screen-old/analytics-map";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { ThemedText } from "@/components/ui/theme-text";
