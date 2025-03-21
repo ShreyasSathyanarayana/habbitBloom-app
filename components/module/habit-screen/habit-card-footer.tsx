@@ -10,12 +10,13 @@ import HabitStreak from "./habit-streak";
 import HabitComplete from "./habit-complete";
 type Props = {
   habitId: string;
+  onPressThreeDot: () => void;
 };
 const _iconWidth = horizontalScale(16);
 const _iconHeight = horizontalScale(16);
-const HabitCardFooter = ({ habitId }: Props) => {
+const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
   const getHabitStatsQuery = useQuery({
-    queryKey: ["habit-stats",habitId],
+    queryKey: ["habit-stats", habitId],
     queryFn: () => {
       return getHabitStats(habitId);
     },
@@ -27,16 +28,22 @@ const HabitCardFooter = ({ habitId }: Props) => {
     <View style={styles.container}>
       <View style={styles.column}>
         <HabitStreak streakValue={getHabitStatsQuery.data?.streak} />
-        <HabitComplete completedValue={getHabitStatsQuery.data?.completed} notCompletedValue={getHabitStatsQuery.data?.notCompleted}  />
+        <HabitComplete
+          completedValue={getHabitStatsQuery.data?.completed}
+          notCompletedValue={getHabitStatsQuery.data?.notCompleted}
+        />
       </View>
       <View style={styles.column}>
-        <TouchableHighlight>
+        <TouchableHighlight style={{ paddingVertical: horizontalScale(5) }}>
           <CalenderIcon width={_iconWidth} height={_iconHeight} />
         </TouchableHighlight>
-        <TouchableHighlight>
+        <TouchableHighlight style={{ paddingVertical: horizontalScale(5) }}>
           <StatsIcon width={_iconWidth} height={_iconHeight} />
         </TouchableHighlight>
-        <TouchableHighlight>
+        <TouchableHighlight
+          style={{ paddingVertical: horizontalScale(5) }}
+          onPress={onPressThreeDot}
+        >
           <ThreeDotIcon width={_iconWidth} height={_iconHeight} />
         </TouchableHighlight>
       </View>

@@ -349,7 +349,7 @@ export const getAllHabits = async () => {
     .from("habit")
     .select(
       `
-      id, habit_name, category, reminder_time, frequency, habit_color, created_at
+      id, habit_name, category, reminder_time, frequency, habit_color, created_at,archived
     `
     )
     .eq("user_id", userId)

@@ -1,15 +1,28 @@
 import { registerSheet, SheetDefinition } from "react-native-actions-sheet";
-// import ExampleSheet from "./example-sheet";
 import CreateHabit from "./create-habit";
-// import ExampleSheet from "./ExampleSheet";
+import HabitDetailsSheet from "./habit-details-sheet";
 
-// registerSheet("example-sheet", ExampleSheet);
+type HabitDetailsProp = {
+  id: string;
+  habit_name: string;
+  category: string;
+  reminder_time: string;
+  frequency: number[];
+  habit_color: string;
+  created_at: string;
+  archived: boolean;
+};
+
 registerSheet("create-habit", CreateHabit);
+registerSheet("habit-details", HabitDetailsSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
   interface Sheets {
     // "example-sheet": SheetDefinition;
     "create-habit": SheetDefinition;
+    "habit-details": SheetDefinition<{
+      payload: { data: HabitDetailsProp };
+    }>;
   }
 }
