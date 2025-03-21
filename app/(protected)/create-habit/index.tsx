@@ -82,7 +82,7 @@ const CreateHabit = () => {
       return createOrUpdateHabit(data, habitId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
       router.dismissAll();
       router.replace("/(protected)/(tabs)");
     },

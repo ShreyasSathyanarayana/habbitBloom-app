@@ -213,61 +213,82 @@ export const getHabitStats = async (habitId: string) => {
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
-  const { data, error: fetchError } = await supabase
+  // console.log("Fetching stats for Habit ID:", habitId, "User ID:", user.id);
+
+  // Fetch habit creation date
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at")
+    .eq("id", habitId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit creation date:", habitError);
+    return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
+  }
+
+  const habitCreatedAt = new Date(habitData.created_at);
+  habitCreatedAt.setHours(0, 0, 0, 0);
+
+  // console.log("Habit Created At:", habitCreatedAt.toISOString());
+
+  // Fetch habit progress data
+  const { data: progressData, error: fetchError } = await supabase
     .from("habit_progress")
-    .select("date, status") // Fetch both date and status
+    .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
-    .order("date", { ascending: false });
+    .order("date", { ascending: true }); // ✅ Fetch in ascending order
 
   if (fetchError) {
-    console.error("Error fetching habit stats:", fetchError);
+    console.error("Error fetching habit progress:", fetchError);
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
-  if (!data || data.length === 0) {
-    return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
-  }
+  // console.log("Fetched Progress Data:", progressData);
 
-  // Count completed and not completed habits
-  const completedCount = data.filter((entry) => entry.status === true).length;
-  const notCompletedCount = data.filter((entry) => entry.status === false).length;
+  const progressMap = new Map<string, boolean>();
+  progressData.forEach((entry) => {
+    const formattedDate = entry.date.split("T")[0]; // ✅ Ensure correct format
+    progressMap.set(formattedDate, entry.status);
+  });
 
-  // Calculate current streak and highest streak
+  // Iterate from habit creation date to today
+  let completedCount = 0;
+  let notCompletedCount = 0;
   let streak = 0;
   let highestStreak = 0;
   let currentStreak = 0;
+
   let currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < data.length; i++) {
-    const habitDate = new Date(data[i].date);
-    habitDate.setHours(0, 0, 0, 0);
+  while (habitCreatedAt <= currentDate) {
+    const dateString = currentDate.toISOString().split("T")[0];
 
-    if (habitDate.getTime() === currentDate.getTime() && data[i].status) {
-      currentStreak++;
-      streak = currentStreak;
-      highestStreak = Math.max(highestStreak, currentStreak);
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else if (habitDate.getTime() === currentDate.getTime() - 86400000 && data[i].status) {
-      currentStreak++;
-      highestStreak = Math.max(highestStreak, currentStreak);
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else if (data[i].status) {
-      currentStreak = 1;
-      highestStreak = Math.max(highestStreak, currentStreak);
-      currentDate = habitDate;
-      currentDate.setDate(currentDate.getDate() - 1);
+    if (progressMap.has(dateString)) {
+      if (progressMap.get(dateString)) {
+        completedCount++;
+        currentStreak++;
+        streak = currentStreak;
+        highestStreak = Math.max(highestStreak, currentStreak);
+      } else {
+        notCompletedCount++;
+        currentStreak = 0; // Reset streak if a day is explicitly marked not completed
+      }
     } else {
-      currentStreak = 0;
-      currentDate = habitDate;
+      notCompletedCount++; // If no record exists, consider it not completed
+      currentStreak = 0; // Reset streak
     }
+
+    currentDate.setDate(currentDate.getDate() - 1);
   }
+
+  // console.log("Final Stats:", { completed: completedCount, notCompleted: notCompletedCount, streak, highestStreak });
 
   return { completed: completedCount, notCompleted: notCompletedCount, streak, highestStreak };
 };
-
-
 
 
 
@@ -310,6 +331,38 @@ export const getHabitsByDate = async (date: string) => {
     isCompleted: habit.habit_progress?.[0]?.status || false, // Default to false if no record
   }));
 };
+
+
+export const getAllHabits = async () => {
+  // Get the currently authenticated user
+  const { data: userData, error: userIdError } = await supabase.auth.getUser();
+
+  if (userIdError || !userData?.user) {
+    console.error("Error fetching user:", userIdError);
+    return [];
+  }
+
+  const userId = userData.user.id;
+
+  // Fetch all habits for the user
+  const { data, error } = await supabase
+    .from("habit")
+    .select(
+      `
+      id, habit_name, category, reminder_time, frequency, habit_color, created_at
+    `
+    )
+    .eq("user_id", userId)
+    .order("reminder_time", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching habits:", error);
+    return [];
+  }
+
+  return data;
+};
+
 
 
 

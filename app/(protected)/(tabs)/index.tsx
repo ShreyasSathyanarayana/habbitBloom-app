@@ -20,6 +20,9 @@ import { SheetManager } from "react-native-actions-sheet";
 import { router } from "expo-router";
 import HabitHead from "@/components/module/habit-screen/habit-head";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import HabitCard from "@/components/module/habit-screen/habit-card";
+import { Card } from "react-native-ui-lib";
+import HabitList from "@/components/module/habit-screen/habit-list";
 
 export default function HabitsScreen() {
   const { isTabBarVisible } = useTabBar();
@@ -54,7 +57,7 @@ export default function HabitsScreen() {
       }}
     >
       <HabitHead />
-      {/* <ScrollableContainer></ScrollableContainer> */}
+      <HabitList />
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
