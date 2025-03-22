@@ -364,6 +364,73 @@ export const getAllHabits = async () => {
   return data;
 };
 
+  export const getAllHabitsArchived = async () => {
+    // Get the currently authenticated user
+    const { data: userData, error: userIdError } = await supabase.auth.getUser();
+
+    if (userIdError || !userData?.user) {
+      console.error("Error fetching user:", userIdError);
+      return [];
+    }
+
+    const userId = userData.user.id;
+
+    // Fetch all habits for the user
+    const { data, error } = await supabase
+      .from("habit")
+      .select(
+        `
+        id, habit_name, category, reminder_time, frequency, habit_color, created_at,archived
+      `
+      )
+      .eq("user_id", userId)
+      .eq("archived", true)
+      .order("reminder_time", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching habits:", error);
+      return [];
+    }
+
+    return data;
+  }
+
+export const archiveHabit = async (habitId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from("habit")
+    .update({
+      archived: true,
+      archive_date: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", habitId);
+
+  if (error) {
+    console.error("Error archiving habit:", error);
+    return false;
+  }
+
+  return true;
+};
+
+export const unarchiveHabit = async (habitId:string) => {
+   const { error } = await supabase
+    .from("habit")
+    .update({
+      archived: false,
+      archive_date: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", habitId);
+
+  if (error) {
+    console.error("Error archiving habit:", error);
+    return error;
+  }
+
+  return true;
+  
+}
 
 
 

@@ -1,7 +1,7 @@
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import HabitCardHead from "./habit-card-head";
 import HabitFrequencyList from "./habit-frequency-list";
 import HabitCardFooter from "./habit-card-footer";
@@ -29,12 +29,17 @@ const HabitCard = (props: Props) => {
   };
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      onPress={() =>
+        SheetManager.show("habit-details", { payload: { data: props } })
+      }
+      style={styles.container}
+    >
       <HabitCardHead habitName={habit_name} category={category} />
       <HabitFrequencyList frequency={props.frequency} />
       <Divider style={{ marginVertical: verticalScale(12) }} />
       <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
-    </View>
+    </Pressable>
   );
 };
 

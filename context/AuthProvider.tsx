@@ -38,7 +38,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       router.dismissAll();
     }
     router.replace("/");
-    router.push("/onboarding");
+    router.push("/(not-auth)/(auth)/weclome-screen");
   };
 
   const value = {

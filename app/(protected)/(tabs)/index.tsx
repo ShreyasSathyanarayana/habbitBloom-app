@@ -75,7 +75,7 @@ export default function HabitsScreen() {
         paddingTop: insets.top,
       }}
     >
-      <HabitHead />
+      <HabitHead onPressArchive={() => router.push("/(protected)/archive")} />
       <HabitList scrollY={scrollY} />
 
       {/* Floating Button with Animation */}

@@ -2,7 +2,7 @@ import HabitCardHead from "@/components/module/habit-screen/habit-card-head";
 import HabitFrequencyList from "@/components/module/habit-screen/habit-frequency-list";
 import Divider from "@/components/ui/divider";
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import ActionSheet, {
   SheetManager,
@@ -17,7 +17,7 @@ import ArchiveIcon from "@/assets/svg/archive-icon.svg";
 import UnArchiveIcon from "@/assets/svg/unarchive-icon.svg";
 import { router } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteHabit } from "@/api/api";
+import { archiveHabit, deleteHabit, unarchiveHabit } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
 
 const _iconSize = horizontalScale(24);
@@ -29,6 +29,47 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
   const payload = props?.payload?.data;
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const archiveHabitMutation = useMutation({
+    mutationKey: ["archiveHabit"],
+    mutationFn: () => {
+      closeSheet();
+      return archiveHabit(payload?.id ?? "");
+    },
+    onSuccess: (isSuccess: boolean) => {
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      toast.show(`${payload?.habit_name} Archived`, {
+        type: "success",
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
+
+  const unArchiveHabitMutation = useMutation({
+    mutationKey: ["unArchiveHabit"],
+    mutationFn: () => {
+      closeSheet();
+      return unarchiveHabit(payload?.id ?? "");
+    },
+    onSuccess: () => {
+      // console.log("unarchived");
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
+
+      toast.show(`${payload?.habit_name} Unarchived`, {
+        type: "success",
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
 
   const deleteHabitMutation = useMutation({
     mutationKey: ["deleteHabit"],
@@ -95,12 +136,14 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
         <View style={styles.buttonContainer}>
           {!payload?.archived && (
             <ActionSheetButton
+              onPress={() => archiveHabitMutation.mutateAsync()}
               leftIcon={<ArchiveIcon width={_iconSize} height={_iconSize} />}
               buttonName="Archive"
             />
           )}
           {payload?.archived && (
             <ActionSheetButton
+              onPress={() => unArchiveHabitMutation.mutateAsync()}
               leftIcon={<UnArchiveIcon width={_iconSize} height={_iconSize} />}
               buttonName="Unarchive"
             />

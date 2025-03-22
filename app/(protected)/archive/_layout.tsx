@@ -10,7 +10,7 @@ const Layout = () => {
         // animationDuration: 300,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Analytics" }} />
+      <Stack.Screen name="index" options={{ title: "Archive" }} />
     </Stack>
   );
 };
