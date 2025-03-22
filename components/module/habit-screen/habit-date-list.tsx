@@ -18,7 +18,7 @@ const HabitDateList = ({ habitId }: Props) => {
       return fetchLast7DaysHabitProgress(habitId ?? "");
     },
   });
-  console.log("habit dates", JSON.stringify(getHabitDatesQuery.data, null, 2));
+  // console.log("habit dates", JSON.stringify(getHabitDatesQuery.data, null, 2));
 
   return (
     <View style={styles.container}>

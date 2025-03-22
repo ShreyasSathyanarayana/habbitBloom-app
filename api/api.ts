@@ -644,13 +644,13 @@ export interface HabitProgressResponse {
 export const fetchLast7DaysHabitProgress = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
-  // Get today's date and normalize time to midnight
+  // Get today's date and normalize time to midnight (UTC)
   const today = new Date();
-  today.setHours(24, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0); // Ensure UTC consistency
 
   // Calculate the start date (exactly 6 days before today)
   const startOfRange = new Date(today);
-  startOfRange.setDate(today.getDate() - 6); // Ensures exactly 7 days including today
+  startOfRange.setUTCDate(today.getUTCDate() - 6); // Ensures exactly 7 days including today
 
   // Fetch habit's creation timestamp
   const { data: habitData, error: habitError } = await supabase
@@ -664,9 +664,9 @@ export const fetchLast7DaysHabitProgress = async (
     return null;
   }
 
-  // Convert the habit creation timestamp to a Date object and normalize to midnight
+  // Convert the habit creation timestamp to a Date object and normalize to midnight (UTC)
   const habitStartDate = new Date(habitData.created_at);
-  habitStartDate.setHours(0, 0, 0, 0);
+  habitStartDate.setUTCHours(0, 0, 0, 0);
 
   // Fetch habit progress for the last 7 days including today
   const { data: progressData, error: progressError } = await supabase
@@ -700,15 +700,24 @@ export const fetchLast7DaysHabitProgress = async (
     // ✅ Use existing status if available
     else if (progressMap.has(dateString)) {
       status = progressMap.get(dateString)!; // Use existing status (true/false)
-    }
-    else{
-      status=false
+    } 
+    // ✅ Default to `false` if no record exists
+    else {
+      status = false;
     }
 
     result.push({ date: dateString, status });
-    currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+  }
+
+  // ✅ Ensure today's date is always included
+  const todayString = today.toISOString().split("T")[0];
+  if (!result.some(entry => entry.date === todayString)) {
+    result.push({ date: todayString, status: false });
   }
 
   return { habitId, data: result };
 };
+
+
 
