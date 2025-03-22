@@ -12,8 +12,8 @@ type Props = {
   habitId: string;
   onPressThreeDot: () => void;
 };
-const _iconWidth = horizontalScale(16);
-const _iconHeight = horizontalScale(16);
+const _iconWidth = horizontalScale(20);
+const _iconHeight = horizontalScale(20);
 const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
   const getHabitStatsQuery = useQuery({
     queryKey: ["habit-stats", habitId],

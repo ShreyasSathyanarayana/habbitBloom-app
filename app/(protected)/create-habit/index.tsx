@@ -105,7 +105,7 @@ const CreateHabit = () => {
       return deleteHabit(habitId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habitDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
       router.replace("/(protected)/(tabs)");
     },
     onError: (error: any) => {

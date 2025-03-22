@@ -16,6 +16,9 @@ import DeleteIcon from "@/assets/svg/delete-icon.svg";
 import ArchiveIcon from "@/assets/svg/archive-icon.svg";
 import UnArchiveIcon from "@/assets/svg/unarchive-icon.svg";
 import { router } from "expo-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteHabit } from "@/api/api";
+import { useToast } from "react-native-toast-notifications";
 
 const _iconSize = horizontalScale(24);
 const closeSheet = () => {
@@ -23,13 +26,32 @@ const closeSheet = () => {
 };
 
 const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
-  // console.log("props", JSON.stringify(props?.payload?.data, null, 2));
   const payload = props?.payload?.data;
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const deleteHabitMutation = useMutation({
+    mutationKey: ["deleteHabit"],
+    mutationFn: () => {
+      closeSheet();
+      return deleteHabit(payload?.id ?? "");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      toast.show("Habit Deleted", {
+        type: "success",
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
 
   return (
     <View>
       <ActionSheet
-        
         id={props.sheetId}
         containerStyle={{
           backgroundColor: "black", // Fix for Android transparency issue
@@ -60,24 +82,24 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
             leftIcon={<StatsIcon width={_iconSize} height={_iconSize} />}
             buttonName="Statistics"
           />
-          <ActionSheetButton
+          {/* <ActionSheetButton
             onPress={() => {
               closeSheet();
               router.push(`/(protected)/create-habit?id=${payload?.id}`);
             }}
             leftIcon={<EditIcon width={_iconSize} height={_iconSize} />}
             buttonName="Edit"
-          />
+          /> */}
         </View>
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
-          {payload?.archived && (
+          {!payload?.archived && (
             <ActionSheetButton
               leftIcon={<ArchiveIcon width={_iconSize} height={_iconSize} />}
               buttonName="Archive"
             />
           )}
-          {!payload?.archived && (
+          {payload?.archived && (
             <ActionSheetButton
               leftIcon={<UnArchiveIcon width={_iconSize} height={_iconSize} />}
               buttonName="Unarchive"
@@ -85,6 +107,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
           )}
 
           <ActionSheetButton
+            onPress={() => deleteHabitMutation.mutateAsync()}
             leftIcon={<DeleteIcon width={_iconSize} height={_iconSize} />}
             buttonName="Delete"
           />

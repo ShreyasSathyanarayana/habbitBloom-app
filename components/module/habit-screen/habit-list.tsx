@@ -4,8 +4,13 @@ import HabitCard from "./habit-card";
 import { verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
+import { SharedValue } from "react-native-reanimated";
 
-const HabitList = () => {
+type Props = {
+  scrollY: SharedValue<number>;
+};
+
+const HabitList = ({scrollY}:Props) => {
   const gethabitQuery = useQuery({
     queryKey: ["habitList"],
     queryFn: getAllHabits,
@@ -15,6 +20,10 @@ const HabitList = () => {
   return (
     <View style={styles.container}>
       <FlatList
+        onScroll={(e) => {
+          scrollY.value=e.nativeEvent.contentOffset.y
+          // console.log("scroll", e.nativeEvent.contentOffset.y);
+        }}
         // scrollEnabled={false}
         contentContainerStyle={{
           gap: verticalScale(16),

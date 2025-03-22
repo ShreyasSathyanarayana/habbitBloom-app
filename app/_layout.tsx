@@ -72,7 +72,7 @@ const RootLayout = () => {
           // isTokenExpiered(token)
           logout();
         } else {
-          router.replace("/(protected)/(tabs)");
+          router.replace('/(protected)/(tabs)');
         }
       } else {
         router.replace("/onboarding"); // /onboarding
@@ -90,8 +90,8 @@ TextInput.defaultProps.allowFontScaling = false;
 export const RootLayoutWrapper = () => {
   return (
     <KeyboardProvider>
-      <SheetProvider>
-        <Providers>
+      <Providers>
+        <SheetProvider>
           <ToastProvider
             placement="top"
             duration={5000}
@@ -125,8 +125,8 @@ export const RootLayoutWrapper = () => {
             {/* <StatusBar hidden={true} /> */}
             <RootLayout />
           </ToastProvider>
-        </Providers>
-      </SheetProvider>
+        </SheetProvider>
+      </Providers>
     </KeyboardProvider>
   );
 };

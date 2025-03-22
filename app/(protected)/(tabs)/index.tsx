@@ -12,7 +12,9 @@ import PlusIcon from "@/assets/svg/plus-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useTabBar } from "@/context/TabBarContext";
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
@@ -23,12 +25,29 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HabitCard from "@/components/module/habit-screen/habit-card";
 import { Card } from "react-native-ui-lib";
 import HabitList from "@/components/module/habit-screen/habit-list";
+const SCROLL_HIDE_THRESHOLD = 10; // Minimum scroll distance before hiding
+const SCROLL_SHOW_THRESHOLD = -5; // Threshold for showing the tab bar
 
 export default function HabitsScreen() {
-  const { isTabBarVisible } = useTabBar();
+  const { isTabBarVisible, showTabBar, hideTabBar } = useTabBar();
   const buttonOpacity = useSharedValue(isTabBarVisible ? 1 : 0);
   const buttonTranslation = useSharedValue(isTabBarVisible ? 0 : 50);
   const insets = useSafeAreaInsets();
+  const scrollY = useSharedValue(0);
+  const prevScrollY = useSharedValue(0);
+
+  useDerivedValue(() => {
+    const diffY = scrollY.value - prevScrollY.value;
+
+    if (diffY > SCROLL_HIDE_THRESHOLD) {
+      runOnJS(hideTabBar)();
+    } else if (diffY < SCROLL_SHOW_THRESHOLD) {
+      runOnJS(showTabBar)();
+    }
+
+    // Update previous Y position
+    prevScrollY.value = scrollY.value;
+  });
 
   useEffect(() => {
     buttonOpacity.value = withSpring(isTabBarVisible ? 1 : 0, {
@@ -57,7 +76,7 @@ export default function HabitsScreen() {
       }}
     >
       <HabitHead />
-      <HabitList />
+      <HabitList scrollY={scrollY} />
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>

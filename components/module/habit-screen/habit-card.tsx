@@ -16,6 +16,7 @@ type Props = {
   frequency: number[];
   habit_color: string;
   created_at: string;
+  archived: boolean;
 };
 
 const HabitCard = (props: Props) => {

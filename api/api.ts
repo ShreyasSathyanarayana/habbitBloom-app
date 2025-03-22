@@ -353,6 +353,7 @@ export const getAllHabits = async () => {
     `
     )
     .eq("user_id", userId)
+    .eq("archived", false)
     .order("reminder_time", { ascending: true });
 
   if (error) {
