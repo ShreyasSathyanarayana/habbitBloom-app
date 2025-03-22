@@ -79,6 +79,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
       toast.show("Habit Deleted", {
         type: "success",
       });

@@ -8,6 +8,11 @@ import HabitCardFooter from "./habit-card-footer";
 import { Dash } from "react-native-ui-lib";
 import Divider from "@/components/ui/divider";
 import { SheetManager } from "react-native-actions-sheet";
+import HabitDateList from "./habit-date-list";
+import Animated, {
+  LayoutAnimationConfig,
+  LinearTransition,
+} from "react-native-reanimated";
 type Props = {
   id: string;
   habit_name: string;
@@ -19,8 +24,10 @@ type Props = {
   archived: boolean;
 };
 
+const AnimatedBtn = Animated.createAnimatedComponent(Pressable);
+
 const HabitCard = (props: Props) => {
-  const { habit_name, category } = props;
+  const { habit_name, category, archived } = props;
 
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
@@ -29,7 +36,8 @@ const HabitCard = (props: Props) => {
   };
 
   return (
-    <Pressable
+    <AnimatedBtn
+      layout={LinearTransition.springify().damping(40).stiffness(200)}
       onPress={() =>
         SheetManager.show("habit-details", { payload: { data: props } })
       }
@@ -37,9 +45,10 @@ const HabitCard = (props: Props) => {
     >
       <HabitCardHead habitName={habit_name} category={category} />
       <HabitFrequencyList frequency={props.frequency} />
+      {!archived && <HabitDateList habitId={props.id} />}
       <Divider style={{ marginVertical: verticalScale(12) }} />
       <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
-    </Pressable>
+    </AnimatedBtn>
   );
 };
 

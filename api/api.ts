@@ -641,20 +641,16 @@ export interface HabitProgressResponse {
   data: HabitProgressEntry[];
 }
 
-export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitProgressResponse | null> => {
+export const fetchLast7DaysHabitProgress = async (
+  habitId: string
+): Promise<HabitProgressResponse | null> => {
   // Get today's date and normalize time to midnight
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(24, 0, 0, 0);
 
-  // Determine the start (Monday) and end (Sunday) of the current week
-  const currentDay = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1)); // Move to Monday
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Move to Sunday
-  endOfWeek.setHours(23, 59, 59, 999);
+  // Calculate the start date (exactly 6 days before today)
+  const startOfRange = new Date(today);
+  startOfRange.setDate(today.getDate() - 6); // Ensures exactly 7 days including today
 
   // Fetch habit's creation timestamp
   const { data: habitData, error: habitError } = await supabase
@@ -668,17 +664,17 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
     return null;
   }
 
-  // Convert the timestamp to a date and normalize to midnight
+  // Convert the habit creation timestamp to a Date object and normalize to midnight
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setHours(0, 0, 0, 0);
 
-  // Fetch habit progress for the current week
+  // Fetch habit progress for the last 7 days including today
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .gte("date", startOfWeek.toISOString().split("T")[0])
-    .lte("date", endOfWeek.toISOString().split("T")[0]);
+    .gte("date", startOfRange.toISOString().split("T")[0]) // Start date
+    .lte("date", today.toISOString().split("T")[0]); // End date (today)
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -688,11 +684,11 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
   // Convert progress data into a Map for quick lookup
   const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
 
-  // Generate the full week and ensure Monday starts first
+  // Generate the last 7 days list
   const result: HabitProgressEntry[] = [];
-  let currentDate = new Date(startOfWeek);
+  let currentDate = new Date(startOfRange);
 
-  while (currentDate <= endOfWeek) {
+  while (currentDate <= today) {
     const dateString = currentDate.toISOString().split("T")[0];
 
     let status: boolean | null = null;
@@ -705,22 +701,14 @@ export const fetchWeeklyHabitProgress = async (habitId: string): Promise<HabitPr
     else if (progressMap.has(dateString)) {
       status = progressMap.get(dateString)!; // Use existing status (true/false)
     }
+    else{
+      status=false
+    }
 
     result.push({ date: dateString, status });
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  // ✅ Ensure Monday is first and Sunday is last
-  const orderedResult = result.sort((a, b) => {
-    const dayA = new Date(a.date).getDay();
-    const dayB = new Date(b.date).getDay();
-
-    // Convert Sunday (0) to 7 so it appears last
-    const adjustedDayA = dayA === 0 ? 7 : dayA;
-    const adjustedDayB = dayB === 0 ? 7 : dayB;
-
-    return adjustedDayA - adjustedDayB;
-  });
-
-  return { habitId, data: orderedResult };
+  return { habitId, data: result };
 };
+

@@ -4,7 +4,7 @@ import { verticalScale } from "@/metric";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-const weekList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export const weekList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type Props = {
   frequency: number[];
