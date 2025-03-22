@@ -29,6 +29,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
         type: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["habitDates", habitId] });
+      queryClient.invalidateQueries({ queryKey: ["habit-stats", habitId] });
     },
   });
 

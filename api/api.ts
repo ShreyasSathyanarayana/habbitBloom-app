@@ -213,8 +213,6 @@ export const getHabitStats = async (habitId: string) => {
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
-  // console.log("Fetching stats for Habit ID:", habitId, "User ID:", user.id);
-
   // Fetch habit creation date
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
@@ -228,10 +226,9 @@ export const getHabitStats = async (habitId: string) => {
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
+  // Convert habit creation timestamp to a proper date
   const habitCreatedAt = new Date(habitData.created_at);
-  habitCreatedAt.setHours(0, 0, 0, 0);
-
-  // console.log("Habit Created At:", habitCreatedAt.toISOString());
+  habitCreatedAt.setHours(24, 0, 0, 0); // Normalize to midnight
 
   // Fetch habit progress data
   const { data: progressData, error: fetchError } = await supabase
@@ -239,32 +236,34 @@ export const getHabitStats = async (habitId: string) => {
     .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
-    .order("date", { ascending: true }); // ✅ Fetch in ascending order
+    .order("date", { ascending: true });
 
   if (fetchError) {
     console.error("Error fetching habit progress:", fetchError);
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
-  // console.log("Fetched Progress Data:", progressData);
-
+  // Store progress in a Map for quick lookup
   const progressMap = new Map<string, boolean>();
   progressData.forEach((entry) => {
-    const formattedDate = entry.date.split("T")[0]; // ✅ Ensure correct format
+    const formattedDate = entry.date.split("T")[0]; // Ensure date format
     progressMap.set(formattedDate, entry.status);
   });
 
-  // Iterate from habit creation date to today
+  // Initialize tracking variables
   let completedCount = 0;
   let notCompletedCount = 0;
   let streak = 0;
   let highestStreak = 0;
   let currentStreak = 0;
 
-  let currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
+  // Iterate from habit creation date to today
+  const today = new Date();
+  today.setHours(24, 0, 0, 0);
 
-  while (habitCreatedAt <= currentDate) {
+  let currentDate = new Date(habitCreatedAt);
+
+  while (currentDate <= today) {
     const dateString = currentDate.toISOString().split("T")[0];
 
     if (progressMap.has(dateString)) {
@@ -278,17 +277,20 @@ export const getHabitStats = async (habitId: string) => {
         currentStreak = 0; // Reset streak if a day is explicitly marked not completed
       }
     } else {
-      notCompletedCount++; // If no record exists, consider it not completed
-      currentStreak = 0; // Reset streak
+      // ✅ FIX: If the habit was created today, don't count missing progress as "not completed"
+      if (currentDate < today) {
+        notCompletedCount++; // If no record exists before today, consider it not completed
+        currentStreak = 0; // Reset streak
+      }
     }
 
-    currentDate.setDate(currentDate.getDate() - 1);
+    currentDate.setDate(currentDate.getDate() + 1); // Move forward in time
   }
-
-  // console.log("Final Stats:", { completed: completedCount, notCompleted: notCompletedCount, streak, highestStreak });
 
   return { completed: completedCount, notCompleted: notCompletedCount, streak, highestStreak };
 };
+
+
 
 
 

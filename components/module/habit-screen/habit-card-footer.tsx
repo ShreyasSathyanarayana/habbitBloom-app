@@ -22,7 +22,7 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
     },
     enabled: !!habitId,
   });
-  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+  console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
 
   return (
     <View style={styles.container}>
