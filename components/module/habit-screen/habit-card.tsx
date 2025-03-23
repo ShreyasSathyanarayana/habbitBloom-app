@@ -37,6 +37,7 @@ const HabitCard = (props: Props) => {
 
   return (
     <AnimatedBtn
+      key={"habit-card-" + props.id}
       layout={LinearTransition.springify().damping(40).stiffness(200)}
       onPress={() =>
         SheetManager.show("habit-details", { payload: { data: props } })

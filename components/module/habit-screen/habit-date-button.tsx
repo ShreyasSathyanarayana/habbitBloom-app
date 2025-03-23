@@ -34,7 +34,13 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   });
 
   const onPress = () => {
-    if (!isToday) {
+    if (status === null && isToday) {
+      toast.show("This Habit is not in active Frequency", {
+        type: "warning",
+      });
+      return;
+    }
+    if (!isToday && status === null) {
       toast.show("You can Mark only today's habit", {
         type: "warning",
       });
@@ -56,6 +62,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
           : status === true
           ? styles.completed
           : styles.notCompleted,
+        status == null && styles.disableBtn,
       ]}
     >
       <ThemedText

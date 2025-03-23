@@ -1,5 +1,6 @@
 import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";
 import CalenderAnalytics from "@/components/module/analytics-screen/calender-analytics";
+import StatisticsAnalytics from "@/components/module/analytics-screen/statistics/statistics-analytics";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { ThemedText } from "@/components/ui/theme-text";
@@ -29,6 +30,9 @@ const Analytics = () => {
         />
         {selectedOption === "Calendar" && (
           <CalenderAnalytics habitId={id as string} />
+        )}
+        {selectedOption === "Statistics" && (
+          <StatisticsAnalytics habitId={id as string} />
         )}
       </View>
     </Container>

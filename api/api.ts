@@ -479,10 +479,10 @@ export const fetchLast7DaysHabitProgress = async (
   const startOfRange = new Date(today);
   startOfRange.setUTCDate(today.getUTCDate() - 6);
 
-  // Fetch habit's creation timestamp
+  // Fetch habit's creation timestamp & frequency
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
-    .select("created_at")
+    .select("created_at, frequency") // 🔹 Include frequency
     .eq("id", habitId)
     .single();
 
@@ -495,7 +495,10 @@ export const fetchLast7DaysHabitProgress = async (
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setUTCHours(0, 0, 0, 0);
 
-  // Fetch habit progress for the last 7 days including today
+  // Parse frequency (should be an array of numbers like [0, 2, 4])
+  const frequencyDays: number[] = habitData.frequency || []; 
+
+  // Fetch habit progress for the last 7 days
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
@@ -518,18 +521,20 @@ export const fetchLast7DaysHabitProgress = async (
   while (currentDate <= today) {
     const dateString = currentDate.toISOString().split("T")[0];
     const habitStartDateString = habitStartDate.toISOString().split("T")[0];
+    const dayOfWeek = currentDate.getUTCDay(); // 0 = Sunday, 6 = Saturday
 
     let status: boolean | null = null;
 
-    // ✅ Ensure 'false' is assigned only if the date is >= habit creation date
-  if (dateString < habitStartDateString) {
-  status = null; // Before habit creation
-  } else if (progressMap.has(dateString)) {
-  status = progressMap.get(dateString)!; // Use recorded status (true/false)
-} else if (dateString >= habitStartDateString) {
-  status = false; // Default to false only after habit creation
-}
-
+    // ✅ Ensure 'false' is assigned only if the date is in the frequency
+    if (dateString < habitStartDateString) {
+      status = null; // Before habit creation
+    } else if (!frequencyDays.includes(dayOfWeek)) {
+      status = null; // Not a habit day
+    } else if (progressMap.has(dateString)) {
+      status = progressMap.get(dateString)!; // Use recorded status (true/false)
+    } else {
+      status = false; // Default to false if missed on a habit day
+    }
 
     result.push({ date: dateString, status });
     currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
@@ -537,6 +542,7 @@ export const fetchLast7DaysHabitProgress = async (
 
   return { habitId, data: result };
 };
+
 
 
 
@@ -620,5 +626,148 @@ export const fetchHabitProgressFromCreation = async (
   return { habitId, data: result };
 };
 
+
+export const getCompletedHabitStats = async (habitId: string) => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    console.error("Error fetching user:", error);
+    return {
+      completed: 0,
+      notCompleted: 0,
+      streak: 0,
+      highestStreak: 0,
+      weekly: { completed: 0, notCompleted: 0 },
+      monthly: { completed: 0, notCompleted: 0 },
+      yearly: { completed: 0, notCompleted: 0 },
+    };
+  }
+
+  // Fetch habit creation date
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at")
+    .eq("id", habitId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit creation date:", habitError);
+    return {
+      completed: 0,
+      notCompleted: 0,
+      streak: 0,
+      highestStreak: 0,
+      weekly: { completed: 0, notCompleted: 0 },
+      monthly: { completed: 0, notCompleted: 0 },
+      yearly: { completed: 0, notCompleted: 0 },
+    };
+  }
+
+  // Convert habit creation timestamp to a proper date
+  const habitCreatedAt = new Date(habitData.created_at);
+  habitCreatedAt.setUTCHours(0, 0, 0, 0); // Normalize to midnight (UTC)
+
+  // Fetch habit progress data
+  const { data: progressData, error: fetchError } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .eq("user_id", user.id)
+    .order("date", { ascending: true });
+
+  if (fetchError) {
+    console.error("Error fetching habit progress:", fetchError);
+    return {
+      completed: 0,
+      notCompleted: 0,
+      streak: 0,
+      highestStreak: 0,
+      weekly: { completed: 0, notCompleted: 0 },
+      monthly: { completed: 0, notCompleted: 0 },
+      yearly: { completed: 0, notCompleted: 0 },
+    };
+  }
+
+  // Store progress in a Map for quick lookup
+  const progressMap = new Map<string, boolean>();
+  progressData.forEach((entry) => {
+    const formattedDate = entry.date.split("T")[0]; // Ensure date format
+    progressMap.set(formattedDate, entry.status);
+  });
+
+  // Initialize tracking variables
+  let completedCount = 0, notCompletedCount = 0;
+  let streak = 0, highestStreak = 0, currentStreak = 0;
+  
+  let weeklyCompleted = 0, weeklyNotCompleted = 0;
+  let monthlyCompleted = 0, monthlyNotCompleted = 0;
+  let yearlyCompleted = 0, yearlyNotCompleted = 0;
+
+  // Get current date info
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date(today);
+  startOfWeek.setUTCDate(today.getUTCDate() - 6); // 7-day window
+
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+  let currentDate = new Date(habitCreatedAt);
+
+  // Iterate from habit creation date to today
+  while (currentDate <= today) {
+    const dateString = currentDate.toISOString().split("T")[0];
+
+    let isCompleted = false;
+    let isCounted = false;
+
+    if (progressMap.has(dateString)) {
+      if (progressMap.get(dateString)) {
+        completedCount++;
+        isCompleted = true;
+        currentStreak++;
+        highestStreak = Math.max(highestStreak, currentStreak);
+      } else {
+        notCompletedCount++;
+        currentStreak = 0;
+      }
+      isCounted = true;
+    } else if (currentDate < today) {
+      notCompletedCount++; // Default to false if no entry exists before today
+      currentStreak = 0;
+      isCounted = true;
+    }
+
+    // Check for weekly, monthly, and yearly count
+    if (currentDate >= startOfWeek && currentDate <= today) {
+      if (isCompleted) weeklyCompleted++;
+      else if (isCounted) weeklyNotCompleted++;
+    }
+
+    if (currentDate >= startOfMonth && currentDate <= today) {
+      if (isCompleted) monthlyCompleted++;
+      else if (isCounted) monthlyNotCompleted++;
+    }
+
+    if (currentDate >= startOfYear && currentDate <= today) {
+      if (isCompleted) yearlyCompleted++;
+      else if (isCounted) yearlyNotCompleted++;
+    }
+
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+  }
+
+  return {
+    completed: completedCount,
+    notCompleted: notCompletedCount,
+    streak,
+    highestStreak,
+    weekly: { completed: weeklyCompleted, notCompleted: weeklyNotCompleted },
+    monthly: { completed: monthlyCompleted, notCompleted: monthlyNotCompleted },
+    yearly: { completed: yearlyCompleted, notCompleted: yearlyNotCompleted },
+  };
+};
 
 
