@@ -27,7 +27,7 @@ declare module "react-native-actions-sheet" {
       payload: { data: HabitDetailsProp };
     }>;
     "delete-habit": SheetDefinition<{
-      payload: { id: string };
+      payload: { data: HabitDetailsProp };
     }>;
   }
 }

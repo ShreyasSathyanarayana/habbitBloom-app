@@ -44,6 +44,9 @@ export const createOrUpdateHabit = async (
   if (habitId) {
     habitData.id = habitId;
   }
+  else{
+    habitData.created_at = new Date().toISOString();
+  }
 
   const { data, error: upsertError } = await supabase
     .from("habit")
@@ -646,13 +649,13 @@ export interface HabitProgressResponse {
 export const fetchLast7DaysHabitProgress = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
-  // Get today's date and normalize time to midnight (UTC)
+  // Get today's date and normalize to midnight (UTC)
   const today = new Date();
-  today.setUTCHours(0, 0, 0, 0); // Ensure UTC consistency
+  today.setUTCHours(0, 0, 0, 0);
 
-  // Calculate the start date (exactly 6 days before today)
+  // Calculate the start date (6 days before today)
   const startOfRange = new Date(today);
-  startOfRange.setUTCDate(today.getUTCDate() - 6); // Ensures exactly 7 days including today
+  startOfRange.setUTCDate(today.getUTCDate() - 6);
 
   // Fetch habit's creation timestamp
   const { data: habitData, error: habitError } = await supabase
@@ -692,34 +695,27 @@ export const fetchLast7DaysHabitProgress = async (
 
   while (currentDate <= today) {
     const dateString = currentDate.toISOString().split("T")[0];
+    const habitStartDateString = habitStartDate.toISOString().split("T")[0];
 
     let status: boolean | null = null;
 
-    // ✅ Before habit creation, status should be `null`
-    if (currentDate < habitStartDate) {
-      status = null;
-    } 
-    // ✅ Use existing status if available
-    else if (progressMap.has(dateString)) {
-      status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } 
-    // ✅ Default to `false` if no record exists
-    else {
-      status = false;
-    }
+    // ✅ Ensure 'false' is assigned only if the date is >= habit creation date
+  if (dateString < habitStartDateString) {
+  status = null; // Before habit creation
+  } else if (progressMap.has(dateString)) {
+  status = progressMap.get(dateString)!; // Use recorded status (true/false)
+} else if (dateString >= habitStartDateString) {
+  status = false; // Default to false only after habit creation
+}
+
 
     result.push({ date: dateString, status });
     currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
   }
 
-  // ✅ Ensure today's date is always included
-  const todayString = today.toISOString().split("T")[0];
-  if (!result.some(entry => entry.date === todayString)) {
-    result.push({ date: todayString, status: false });
-  }
-
   return { habitId, data: result };
 };
+
 
 
 

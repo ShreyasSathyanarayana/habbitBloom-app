@@ -1,4 +1,4 @@
-import { deleteHabit } from "@/api/api";
+import { archiveHabit, deleteHabit } from "@/api/api";
 import ActionSheetContainer from "@/components/ui/action-sheet-container";
 import { ThemedText } from "@/components/ui/theme-text";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,13 +8,14 @@ import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import { useToast } from "react-native-toast-notifications";
 import SheetHeader from "./sheet-header";
 import { getFontSize } from "@/font";
-import { verticalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
+import Button from "@/components/ui/button";
 const closeSheet = () => {
   SheetManager.hide("delete-habit");
 };
 
 const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
-  const payload = props?.payload;
+  const payload = props?.payload?.data;
   const toast = useToast();
   const queryClient = useQueryClient();
   const deleteHabitMutation = useMutation({
@@ -36,9 +37,27 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       });
     },
   });
+  const archiveHabitMutation = useMutation({
+    mutationKey: ["archiveHabit"],
+    mutationFn: () => {
+      closeSheet();
+      return archiveHabit(payload?.id ?? "");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      toast.show(`Archived`, {
+        type: "success",
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
   return (
     <ActionSheetContainer sheetId={props.sheetId}>
-      <SheetHeader  title="Delete Habit?" onClose={closeSheet} />
+      <SheetHeader title="Delete Habit?" onClose={closeSheet} />
       <ThemedText
         style={{
           fontSize: getFontSize(14),
@@ -48,6 +67,27 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
         If you delete this habit, your streaks will be lost.Instead, you can
         archive it to keep your progress.
       </ThemedText>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: horizontalScale(8),
+        }}
+      >
+        {!payload?.archived && (
+          <Button
+            onPress={() => archiveHabitMutation.mutateAsync()}
+            style={{ flex: 1 }}
+            outline
+            label="Archive"
+          />
+        )}
+        <Button
+          onPress={() => deleteHabitMutation.mutateAsync()}
+          style={{ flex: 1 }}
+          label="Delete"
+        />
+      </View>
     </ActionSheetContainer>
   );
 };

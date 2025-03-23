@@ -86,7 +86,7 @@ export default TextField;
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
-    minHeight: 58,
+    height: 58,
     borderRadius: 12,
     display: "flex",
     flexDirection: "row",
