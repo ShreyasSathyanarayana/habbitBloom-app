@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
 import HabitStreak from "./habit-streak";
 import HabitComplete from "./habit-complete";
+import { router } from "expo-router";
 type Props = {
   habitId: string;
   onPressThreeDot: () => void;
@@ -22,7 +23,7 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
     },
     enabled: !!habitId,
   });
-  console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
 
   return (
     <View style={styles.container}>
@@ -34,10 +35,24 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
         />
       </View>
       <View style={styles.column}>
-        <TouchableHighlight style={{ paddingVertical: horizontalScale(5) }}>
+        <TouchableHighlight
+          onPress={() =>
+            router.push(
+              `/(protected)/analytics?id=${habitId}&category=calender`
+            )
+          }
+          style={{ paddingVertical: horizontalScale(5) }}
+        >
           <CalenderIcon width={_iconWidth} height={_iconHeight} />
         </TouchableHighlight>
-        <TouchableHighlight style={{ paddingVertical: horizontalScale(5) }}>
+        <TouchableHighlight
+          onPress={() =>
+            router.push(
+              `/(protected)/analytics?id=${habitId}&category=statistics`
+            )
+          }
+          style={{ paddingVertical: horizontalScale(5) }}
+        >
           <StatsIcon width={_iconWidth} height={_iconHeight} />
         </TouchableHighlight>
         <TouchableHighlight

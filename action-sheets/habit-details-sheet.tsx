@@ -117,10 +117,20 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
           <ActionSheetButton
+            onPress={() =>
+              router.push(
+                `/(protected)/analytics?id=${payload?.id}&category=calender`
+              )
+            }
             leftIcon={<CalenderIcon width={_iconSize} height={_iconSize} />}
             buttonName={"Calender"}
           />
           <ActionSheetButton
+            onPress={() =>
+              router.push(
+                `/(protected)/analytics?id=${payload?.id}&category=statistics`
+              )
+            }
             leftIcon={<StatsIcon width={_iconSize} height={_iconSize} />}
             buttonName="Statistics"
           />

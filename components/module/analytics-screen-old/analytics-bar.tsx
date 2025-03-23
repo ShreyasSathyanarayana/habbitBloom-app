@@ -11,15 +11,18 @@ import Animated, {
 } from "react-native-reanimated";
 
 type Props = {
-  onChageMenu: (item: string, index: number) => void;
+  onChangeMenu: (item: string, index: number) => void;
+  menu: string[];
 };
 
-const menu = ["Weekly", "Monthly", "Year"];
+// const menu = ["Weekly", "Monthly", "Year"];
 const { width } = Dimensions.get("window");
-const _selectedWidth = (width - horizontalScale(38)) / menu?.length; // padding(16+16) +spacing(2+2)
+// padding(16+16) +spacing(2+2)
 
-const AnalyticsBar = ({ onChageMenu }: Props) => {
+const AnalyticsBar = ({ onChangeMenu, menu }: Props) => {
   const [selected, setSelected] = React.useState(menu[0]);
+  const _selectedWidth = (width - horizontalScale(38)) / menu?.length;
+
   const positionX = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -35,7 +38,7 @@ const AnalyticsBar = ({ onChageMenu }: Props) => {
   });
   const onPressMenu = (item: string, index: number) => {
     setSelected(item);
-    onChageMenu(item, index);
+    onChangeMenu(item, index);
     positionX.value = index * _selectedWidth;
   };
   return (
