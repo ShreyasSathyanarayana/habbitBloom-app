@@ -71,26 +71,6 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
     },
   });
 
-  const deleteHabitMutation = useMutation({
-    mutationKey: ["deleteHabit"],
-    mutationFn: () => {
-      closeSheet();
-      return deleteHabit(payload?.id ?? "");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habitList"] });
-      queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
-      toast.show("Habit Deleted", {
-        type: "success",
-      });
-    },
-    onError: () => {
-      toast.show("Something went wrong", {
-        type: "warning",
-      });
-    },
-  });
-
   return (
     <View>
       <ActionSheet
@@ -161,7 +141,13 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
           )}
 
           <ActionSheetButton
-            onPress={() => deleteHabitMutation.mutateAsync()}
+            onPress={() => {
+              closeSheet(); // Close the current sheet
+              setTimeout(() => {
+                SheetManager.show("delete-habit"); // Open the delete confirmation sheet after a small delay
+              }, 200); // Delay to ensure the first sheet is fully closed
+            }}
+            // onPress={() => deleteHabitMutation.mutateAsync()}
             leftIcon={<DeleteIcon width={_iconSize} height={_iconSize} />}
             buttonName="Delete"
           />
