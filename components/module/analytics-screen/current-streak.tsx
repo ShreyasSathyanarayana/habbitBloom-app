@@ -4,11 +4,22 @@ import StreaksIcon from "@/assets/svg/streak-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
+import { useQuery } from "@tanstack/react-query";
+import { getHabitStats } from "@/api/api";
 type Props = {
   habitId: string;
 };
 const _iconSize = horizontalScale(24);
 const CurrentStreak = ({ habitId }: Props) => {
+  const getHabitStatsQuery = useQuery({
+    queryKey: ["habit-stats", habitId],
+    queryFn: () => {
+      return getHabitStats(habitId);
+    },
+    enabled: !!habitId,
+  });
+  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+
   return (
     <View style={styles.container}>
       <View
@@ -24,7 +35,13 @@ const CurrentStreak = ({ habitId }: Props) => {
         </ThemedText>
       </View>
       <ThemedText style={{ fontSize: getFontSize(14) }}>
-        <ThemedText style={{ fontSize: getFontSize(24) }}>4</ThemedText>  Days
+        <ThemedText
+          style={{ fontSize: getFontSize(24), fontFamily: "PoppinsSemiBold" }}
+        >
+          {getHabitStatsQuery.data?.streak ?? 0}
+        </ThemedText>
+        {"  "}
+        Days
       </ThemedText>
     </View>
   );

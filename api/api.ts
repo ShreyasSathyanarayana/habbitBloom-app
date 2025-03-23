@@ -463,184 +463,6 @@ export const getHabitById = async (habitId: string) => {
   return data; // Return the habit object
 };
 
-
-// *************************Analytics*************************
-
-
-
-
-export interface HabitProgressEntry {
-  date: string;
-  status: boolean | null; // true = completed, false = not completed, null = no entry
-}
-
-export interface HabitProgressResponse {
-  habitId: string;
-  data: HabitProgressEntry[];
-}
-export const fetchYearlyHabitProgress = async (habitId: string): Promise<HabitProgressResponse | null> => {
-  // Get the current year dynamically
-  const currentYear = new Date().getFullYear();
-  
-  const startOfYear = new Date(`${currentYear}-01-01`);
-  startOfYear.setHours(0, 0, 0, 0);
-
-  const endOfYear = new Date(`${currentYear}-12-31`);
-  endOfYear.setHours(23, 59, 59, 999);
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Fetch habit's creation date
-  const { data: habitData, error: habitError } = await supabase
-    .from("habit")
-    .select("created_at")
-    .eq("id", habitId)
-    .single();
-
-  if (habitError || !habitData) {
-    console.error("Error fetching habit creation date:", habitError);
-    return null;
-  }
-
-  const habitStartDate = new Date(habitData.created_at);
-  habitStartDate.setHours(0, 0, 0, 0);
-
-  // Fetch habit progress data for the whole year
-  const { data: progressData, error: progressError } = await supabase
-    .from("habit_progress")
-    .select("date, status")
-    .eq("habit_id", habitId)
-    .gte("date", startOfYear.toISOString().split("T")[0])
-    .lte("date", endOfYear.toISOString().split("T")[0])
-    .order("date", { ascending: true });
-
-  if (progressError) {
-    console.error("Error fetching progress data:", progressError);
-    return null;
-  }
-
-  // Convert progress data into a Map for quick lookup
-  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
-
-  // Generate the full year and fill missing days
-  const result: HabitProgressEntry[] = [];
-  let currentDate = new Date(startOfYear);
-
-  while (currentDate <= endOfYear) {
-    const dateString = currentDate.toISOString().split("T")[0];
-
-    let status: boolean | null = null;
-
-    // ✅ Before habit creation, status should be `null`
-    if (currentDate < habitStartDate) {
-      status = null;
-    } 
-    // ✅ Use existing status if available
-    else if (progressMap.has(dateString)) {
-      status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } 
-
-    result.push({ date: dateString, status });
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return { habitId, data: result };
-};
-
-
-export interface HabitProgressEntry {
-  date: string;
-  status: boolean | null; // true = completed, false = not completed, null = no entry
-}
-
-export interface HabitProgressResponse {
-  habitId: string;
-  data: HabitProgressEntry[];
-}
-
-export const fetchMonthlyHabitProgress = async (habitId: string): Promise<HabitProgressResponse | null> => {
-  // Get the current year and month dynamically
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-based index
-
-  // First and last day of the month
-  const startOfMonth = new Date(currentYear, currentMonth, 1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
-  endOfMonth.setHours(23, 59, 59, 999);
-
-  // Get today's date
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Fetch habit's creation date
-  const { data: habitData, error: habitError } = await supabase
-    .from("habit")
-    .select("created_at")
-    .eq("id", habitId)
-    .single();
-
-  if (habitError || !habitData) {
-    console.error("Error fetching habit creation date:", habitError);
-    return null;
-  }
-
-  const habitStartDate = new Date(habitData.created_at);
-  habitStartDate.setHours(0, 0, 0, 0);
-
-  // Fetch habit progress data for the current month
-  const { data: progressData, error: progressError } = await supabase
-    .from("habit_progress")
-    .select("date, status")
-    .eq("habit_id", habitId)
-    .gte("date", startOfMonth.toISOString().split("T")[0])
-    .lte("date", endOfMonth.toISOString().split("T")[0])
-    .order("date", { ascending: true });
-
-  if (progressError) {
-    console.error("Error fetching progress data:", progressError);
-    return null;
-  }
-
-  // Convert progress data into a Map for quick lookup
-  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
-
-  // Generate the full month and fill missing days
-  const result: HabitProgressEntry[] = [];
-  let currentDate = new Date(startOfMonth);
-
-  while (currentDate <= endOfMonth) {
-    const dateString = currentDate.toISOString().split("T")[0];
-
-    let status: boolean | null = null;
-
-    // ✅ Before habit creation, status should be `null`
-    if (currentDate < habitStartDate) {
-      status = null;
-    } 
-    // ✅ Use existing status if available
-    else if (progressMap.has(dateString)) {
-      status = progressMap.get(dateString)!; // Use existing status (true/false)
-    } 
-
-    result.push({ date: dateString, status });
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return { habitId, data: result };
-};
-
-
-
-
-export interface HabitProgressEntry {
-  date: string;
-  status: boolean | null; // true = completed, false = not completed, null = no entry
-}
-
 export interface HabitProgressResponse {
   habitId: string;
   data: HabitProgressEntry[];
@@ -716,6 +538,87 @@ export const fetchLast7DaysHabitProgress = async (
   return { habitId, data: result };
 };
 
+
+
+// *************************Analytics*************************
+
+
+
+
+
+
+export interface HabitProgressEntry {
+  date: string;
+  status: boolean | null; // true = completed, false = not completed, null = no entry
+}
+
+export interface HabitProgressResponse {
+  habitId: string;
+  data: HabitProgressEntry[];
+}
+
+export const fetchHabitProgressFromCreation = async (
+  habitId: string
+): Promise<HabitProgressResponse | null> => {
+  // Get today's date and normalize to midnight (UTC)
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  // Fetch habit's creation timestamp
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at")
+    .eq("id", habitId)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit creation timestamp:", habitError);
+    return null;
+  }
+
+  // Convert the habit creation timestamp to a Date object and normalize to midnight (UTC)
+  const habitStartDate = new Date(habitData.created_at);
+  habitStartDate.setUTCHours(0, 0, 0, 0);
+
+  // Fetch habit progress from habit creation till today
+  const { data: progressData, error: progressError } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", habitStartDate.toISOString().split("T")[0]) // Start from habit creation
+    .lte("date", today.toISOString().split("T")[0]); // Up to today
+
+  if (progressError) {
+    console.error("Error fetching progress data:", progressError);
+    return null;
+  }
+
+  // Convert progress data into a Map for quick lookup
+  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
+
+  // Generate date range from habit creation to today
+  const result: HabitProgressEntry[] = [];
+  let currentDate = new Date(habitStartDate);
+
+  while (currentDate <= today) {
+    const dateString = currentDate.toISOString().split("T")[0];
+
+    let status: boolean | null = null;
+
+    if (progressMap.has(dateString)) {
+      // ✅ Use recorded status (true/false)
+      status = progressMap.get(dateString)!;
+    } else {
+      // ✅ Default to false after habit creation
+      status = false;
+    }
+
+    result.push({ date: dateString, status });
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+  }
+
+  return { habitId, data: result };
+};
 
 
 

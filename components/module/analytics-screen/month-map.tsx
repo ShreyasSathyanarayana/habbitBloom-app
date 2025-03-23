@@ -1,4 +1,4 @@
-import { fetchMonthlyHabitProgress } from "@/api/api";
+import { fetchHabitProgressFromCreation } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
@@ -28,12 +28,14 @@ const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
             width: horizontalScale(36),
             height: horizontalScale(36),
             borderRadius: horizontalScale(8), // Rectangular shape
-            backgroundColor: "rgba(65, 43, 88, 1)", // Selected habit color
+            backgroundColor: "rgba(131, 191, 146, 0.3)", // Selected habit color
             justifyContent: "center",
             alignItems: "center",
+            borderWidth: horizontalScale(2),
+            borderColor: "rgba(52, 199, 89, 1)",
           },
           text: {
-            color: isToday ? "rgba(138, 43, 226, 1)" : "#FFF", // Text color
+            color: "#FFF", // Text color
             fontFamily: "PoppinsMedium",
             includeFontPadding: false,
             fontSize: getFontSize(16),
@@ -47,31 +49,39 @@ const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
             width: horizontalScale(36),
             height: horizontalScale(36),
             borderRadius: horizontalScale(8), // Rectangular shape
-            backgroundColor: "rgba(208, 188, 227, 1)", // Missed habit color
+            backgroundColor: isToday ? "transparent" : "rgba(255, 59, 48, 0.3)", // Missed habit color
             justifyContent: "center",
             alignItems: "center",
+            borderWidth: horizontalScale(2),
+            borderColor: isToday
+              ? "rgba(255, 255, 255, 1)"
+              : "rgba(255, 59, 48, 0.3)",
           },
           text: {
-            color: isToday ? "rgba(138, 43, 226, 1)" : "#000", // Text color
+            color: isToday
+              ? "rgba(255, 255, 255, 1)"
+              : "rgba(179, 179, 179, 0.7)", // Text color
             fontFamily: "PoppinsMedium",
             includeFontPadding: false,
             fontSize: getFontSize(16),
           },
         },
       };
-    } else {
+    } else if (item.status === null) {
       markedDates[item.date] = {
         customStyles: {
           container: {
             width: horizontalScale(36),
             height: horizontalScale(36),
             borderRadius: 5, // Rectangular shape
-            backgroundColor: "transparent", // No data color
+            backgroundColor: "rgba(217, 217, 217, 0.2)", // No data color
             justifyContent: "center",
             alignItems: "center",
           },
           text: {
-            color: isToday ? "rgba(138, 43, 226, 1)" : "rgba(67, 67, 67, 1)", // Text color
+            color: isToday
+              ? "rgba(138, 43, 226, 1)"
+              : "rgba(179, 179, 179, 0.7)", // Text color
             fontFamily: "PoppinsMedium",
             includeFontPadding: false,
             fontSize: getFontSize(16),
@@ -87,7 +97,7 @@ const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
 const MonthMap = ({ habitId }: Props) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["monthlyHabitProgress", habitId],
-    queryFn: () => fetchMonthlyHabitProgress(habitId),
+    queryFn: () => fetchHabitProgressFromCreation(habitId),
   });
 
   const [markedDates, setMarkedDates] = useState({});
