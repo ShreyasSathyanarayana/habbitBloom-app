@@ -1,7 +1,7 @@
 import LinerGradientContainer from "@/components/ui/liner-gradient-container";
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -13,15 +13,22 @@ import Animated, {
 type Props = {
   onChangeMenu: (item: string, index: number) => void;
   menu: string[];
+  selectedMenu?: string;
 };
 
 // const menu = ["Weekly", "Monthly", "Year"];
 const { width } = Dimensions.get("window");
 // padding(16+16) +spacing(2+2)
 
-const AnalyticsBar = ({ onChangeMenu, menu }: Props) => {
-  const [selected, setSelected] = React.useState(menu[0]);
+const AnalyticsBar = ({ onChangeMenu, menu, selectedMenu }: Props) => {
+  const [selected, setSelected] = useState(selectedMenu ?? menu[0]);
   const _selectedWidth = (width - horizontalScale(38)) / menu?.length;
+  useEffect(() => {
+    const initialIndex = menu.indexOf(selectedMenu ?? menu[0]);
+    if (initialIndex !== -1) {
+      positionX.value = initialIndex * _selectedWidth;
+    }
+  }, [selectedMenu]);
 
   const positionX = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => {

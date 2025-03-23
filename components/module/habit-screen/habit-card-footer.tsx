@@ -38,7 +38,7 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
         <TouchableHighlight
           onPress={() =>
             router.push(
-              `/(protected)/analytics?id=${habitId}&category=calender`
+              `/(protected)/analytics?id=${habitId}&category=Calendar`
             )
           }
           style={{ paddingVertical: horizontalScale(5) }}
@@ -48,7 +48,7 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
         <TouchableHighlight
           onPress={() =>
             router.push(
-              `/(protected)/analytics?id=${habitId}&category=statistics`
+              `/(protected)/analytics?id=${habitId}&category=Statistics`
             )
           }
           style={{ paddingVertical: horizontalScale(5) }}

@@ -97,20 +97,22 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
           <ActionSheetButton
-            onPress={() =>
+            onPress={() => {
+              closeSheet();
               router.push(
-                `/(protected)/analytics?id=${payload?.id}&category=calender`
-              )
-            }
+                `/(protected)/analytics?id=${payload?.id}&category=Calendar`
+              );
+            }}
             leftIcon={<CalenderIcon width={_iconSize} height={_iconSize} />}
             buttonName={"Calender"}
           />
           <ActionSheetButton
-            onPress={() =>
+            onPress={() => {
+              closeSheet();
               router.push(
-                `/(protected)/analytics?id=${payload?.id}&category=statistics`
-              )
-            }
+                `/(protected)/analytics?id=${payload?.id}&category=Statistics`
+              );
+            }}
             leftIcon={<StatsIcon width={_iconSize} height={_iconSize} />}
             buttonName="Statistics"
           />
