@@ -702,19 +702,19 @@ export interface HabitProgressResponse {
 export const fetchHabitProgressFromCreation = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
-  // Get today's date and normalize to midnight (UTC)
+  // Get today's date and normalize to UTC midnight
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  // Fetch habit's creation timestamp
+  // Fetch habit details including created_at, frequency, and archive status
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
-    .select("created_at")
+    .select("created_at, frequency, archived")
     .eq("id", habitId)
     .single();
 
   if (habitError || !habitData) {
-    console.error("Error fetching habit creation timestamp:", habitError);
+    console.error("Error fetching habit data:", habitError);
     return null;
   }
 
@@ -722,13 +722,34 @@ export const fetchHabitProgressFromCreation = async (
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setUTCHours(0, 0, 0, 0);
 
-  // Fetch habit progress from habit creation till today
+  // Get last active date (before archiving) using Supabase function
+  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
+    .rpc("get_last_active_date", { habit_id: habitId });
+
+  if (lastActiveError) {
+    console.error("Error fetching last active date:", lastActiveError);
+    return null;
+  }
+
+  // Determine the valid end date for progress tracking
+  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : today;
+  lastActiveDate.setUTCHours(0, 0, 0, 0);
+
+  // If habit is archived, do not track progress beyond lastActiveDate
+  if (habitData.archived) {
+    lastActiveDate.setUTCHours(0, 0, 0, 0);
+  }
+
+  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
+  const frequencyDays: number[] = habitData.frequency || [];
+
+  // Fetch habit progress from habit creation to last active date
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .gte("date", habitStartDate.toISOString().split("T")[0]) // Start from habit creation
-    .lte("date", today.toISOString().split("T")[0]); // Up to today
+    .lte("date", lastActiveDate.toISOString().split("T")[0]); // Up to last active date
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -738,24 +759,26 @@ export const fetchHabitProgressFromCreation = async (
   // Convert progress data into a Map for quick lookup
   const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
 
-  // Generate date range from habit creation to today
+  // Generate date range from habit creation to last active date, considering frequency
   const result: HabitProgressEntry[] = [];
   let currentDate = new Date(habitStartDate);
 
-  while (currentDate <= today) {
+  while (currentDate <= lastActiveDate) {
     const dateString = currentDate.toISOString().split("T")[0];
+    const dayOfWeek = currentDate.getUTCDay();
 
-    let status: boolean | null = null;
+    if (frequencyDays.includes(dayOfWeek)) {
+      let status: boolean | null = null;
 
-    if (progressMap.has(dateString)) {
-      // ✅ Use recorded status (true/false)
-      status = progressMap.get(dateString)!;
-    } else {
-      // ✅ Default to false after habit creation
-      status = false;
+      if (progressMap.has(dateString)) {
+        status = progressMap.get(dateString)!; // Use recorded status (true/false)
+      } else {
+        status = false; // Default to false for missing records
+      }
+
+      result.push({ date: dateString, status });
     }
 
-    result.push({ date: dateString, status });
     currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
   }
 
@@ -763,79 +786,74 @@ export const fetchHabitProgressFromCreation = async (
 };
 
 
+
+
 export const getCompletedHabitStats = async (habitId: string) => {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
     console.error("Error fetching user:", error);
-    return {
-      completed: 0,
-      notCompleted: 0,
-      streak: 0,
-      highestStreak: 0,
-      weekly: { completed: 0, notCompleted: 0 },
-      monthly: { completed: 0, notCompleted: 0 },
-      yearly: { completed: 0, notCompleted: 0 },
-    };
+    return getDefaultStats();
   }
 
-  // Fetch habit creation date
+  // Fetch habit details (created_at, frequency, archived)
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
-    .select("created_at")
+    .select("created_at, frequency, archived")
     .eq("id", habitId)
     .eq("user_id", user.id)
     .single();
 
   if (habitError || !habitData) {
-    console.error("Error fetching habit creation date:", habitError);
-    return {
-      completed: 0,
-      notCompleted: 0,
-      streak: 0,
-      highestStreak: 0,
-      weekly: { completed: 0, notCompleted: 0 },
-      monthly: { completed: 0, notCompleted: 0 },
-      yearly: { completed: 0, notCompleted: 0 },
-    };
+    console.error("Error fetching habit data:", habitError);
+    return getDefaultStats();
   }
 
-  // Convert habit creation timestamp to a proper date
+  // Convert habit creation timestamp to a Date object
   const habitCreatedAt = new Date(habitData.created_at);
-  habitCreatedAt.setUTCHours(0, 0, 0, 0); // Normalize to midnight (UTC)
+  habitCreatedAt.setUTCHours(0, 0, 0, 0);
 
-  // Fetch habit progress data
+  // Fetch last active date before archiving
+  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
+    .rpc("get_last_active_date", { habit_id: habitId });
+
+  if (lastActiveError) {
+    console.error("Error fetching last active date:", lastActiveError);
+    return getDefaultStats();
+  }
+
+  // Determine habit's last active day
+  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : new Date();
+  lastActiveDate.setUTCHours(0, 0, 0, 0);
+
+  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
+  const frequencyDays: number[] = habitData.frequency || [];
+
+  // Fetch habit progress
   const { data: progressData, error: fetchError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
+    .gte("date", habitCreatedAt.toISOString().split("T")[0])
+    .lte("date", lastActiveDate.toISOString().split("T")[0])
     .order("date", { ascending: true });
 
   if (fetchError) {
     console.error("Error fetching habit progress:", fetchError);
-    return {
-      completed: 0,
-      notCompleted: 0,
-      streak: 0,
-      highestStreak: 0,
-      weekly: { completed: 0, notCompleted: 0 },
-      monthly: { completed: 0, notCompleted: 0 },
-      yearly: { completed: 0, notCompleted: 0 },
-    };
+    return getDefaultStats();
   }
 
   // Store progress in a Map for quick lookup
   const progressMap = new Map<string, boolean>();
   progressData.forEach((entry) => {
-    const formattedDate = entry.date.split("T")[0]; // Ensure date format
-    progressMap.set(formattedDate, entry.status);
+    progressMap.set(entry.date.split("T")[0], entry.status);
   });
 
   // Initialize tracking variables
   let completedCount = 0, notCompletedCount = 0;
-  let streak = 0, highestStreak = 0, currentStreak = 0;
-  
+  let highestStreak = 0, currentStreak = 0;
+
   let weeklyCompleted = 0, weeklyNotCompleted = 0;
   let monthlyCompleted = 0, monthlyNotCompleted = 0;
   let yearlyCompleted = 0, yearlyNotCompleted = 0;
@@ -845,51 +863,55 @@ export const getCompletedHabitStats = async (habitId: string) => {
   today.setUTCHours(0, 0, 0, 0);
 
   const startOfWeek = new Date(today);
-  startOfWeek.setUTCDate(today.getUTCDate() - 6); // 7-day window
+  startOfWeek.setUTCDate(today.getUTCDate() - 6); // Last 7 days
 
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const startOfYear = new Date(today.getFullYear(), 0, 1);
 
   let currentDate = new Date(habitCreatedAt);
 
-  // Iterate from habit creation date to today
-  while (currentDate <= today) {
+  // Iterate from habit creation date to last active date
+  while (currentDate <= lastActiveDate) {
     const dateString = currentDate.toISOString().split("T")[0];
+    const dayOfWeek = currentDate.getUTCDay();
 
-    let isCompleted = false;
-    let isCounted = false;
+    // Check if the day matches the habit's scheduled frequency
+    if (frequencyDays.includes(dayOfWeek)) {
+      let isCompleted = false;
+      let isCounted = false;
 
-    if (progressMap.has(dateString)) {
-      if (progressMap.get(dateString)) {
-        completedCount++;
-        isCompleted = true;
-        currentStreak++;
-        highestStreak = Math.max(highestStreak, currentStreak);
-      } else {
-        notCompletedCount++;
+      if (progressMap.has(dateString)) {
+        if (progressMap.get(dateString)) {
+          completedCount++;
+          isCompleted = true;
+          currentStreak++;
+          highestStreak = Math.max(highestStreak, currentStreak);
+        } else {
+          notCompletedCount++;
+          currentStreak = 0;
+        }
+        isCounted = true;
+      } else if (currentDate < today) {
+        notCompletedCount++; // Default to false for missing records before today
         currentStreak = 0;
+        isCounted = true;
       }
-      isCounted = true;
-    } else if (currentDate < today) {
-      notCompletedCount++; // Default to false if no entry exists before today
-      currentStreak = 0;
-      isCounted = true;
-    }
 
-    // Check for weekly, monthly, and yearly count
-    if (currentDate >= startOfWeek && currentDate <= today) {
-      if (isCompleted) weeklyCompleted++;
-      else if (isCounted) weeklyNotCompleted++;
-    }
+      // Check for weekly, monthly, and yearly count
+      if (currentDate >= startOfWeek && currentDate <= today) {
+        if (isCompleted) weeklyCompleted++;
+        else if (isCounted) weeklyNotCompleted++;
+      }
 
-    if (currentDate >= startOfMonth && currentDate <= today) {
-      if (isCompleted) monthlyCompleted++;
-      else if (isCounted) monthlyNotCompleted++;
-    }
+      if (currentDate >= startOfMonth && currentDate <= today) {
+        if (isCompleted) monthlyCompleted++;
+        else if (isCounted) monthlyNotCompleted++;
+      }
 
-    if (currentDate >= startOfYear && currentDate <= today) {
-      if (isCompleted) yearlyCompleted++;
-      else if (isCounted) yearlyNotCompleted++;
+      if (currentDate >= startOfYear && currentDate <= today) {
+        if (isCompleted) yearlyCompleted++;
+        else if (isCounted) yearlyNotCompleted++;
+      }
     }
 
     currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
@@ -898,7 +920,7 @@ export const getCompletedHabitStats = async (habitId: string) => {
   return {
     completed: completedCount,
     notCompleted: notCompletedCount,
-    streak,
+    streak: currentStreak,
     highestStreak,
     weekly: { completed: weeklyCompleted, notCompleted: weeklyNotCompleted },
     monthly: { completed: monthlyCompleted, notCompleted: monthlyNotCompleted },
@@ -906,4 +928,291 @@ export const getCompletedHabitStats = async (habitId: string) => {
   };
 };
 
+// Helper function to return default stats
+const getDefaultStats = () => ({
+  completed: 0,
+  notCompleted: 0,
+  streak: 0,
+  highestStreak: 0,
+  weekly: { completed: 0, notCompleted: 0 },
+  monthly: { completed: 0, notCompleted: 0 },
+  yearly: { completed: 0, notCompleted: 0 },
+});
 
+
+export const fetchHabitProgressForCurrentMonth = async (
+  habitId: string
+): Promise<HabitProgressResponse | null> => {
+  // Get today's date and normalize to UTC midnight
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  // Get the first and last day of the current month
+  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const endOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0));
+
+  // Fetch habit details including created_at, frequency, and archive status
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at, frequency, archived")
+    .eq("id", habitId)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit data:", habitError);
+    return null;
+  }
+
+  // Get last active date before archiving
+  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
+    .rpc("get_last_active_date", { habit_id: habitId });
+
+  if (lastActiveError) {
+    console.error("Error fetching last active date:", lastActiveError);
+    return null;
+  }
+
+  // Determine valid end date (up to last active date or full month)
+  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : today;
+  lastActiveDate.setUTCHours(0, 0, 0, 0);
+  if (habitData.archived) {
+    lastActiveDate.setUTCHours(0, 0, 0, 0);
+  }
+
+  // Ensure tracking covers the full month up to today or last active date
+  lastActiveDate = lastActiveDate > endOfMonth ? endOfMonth : lastActiveDate;
+
+  // Fetch habit progress for the current month
+  const { data: progressData, error: progressError } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", startOfMonth.toISOString().split("T")[0]) // ✅ Always from the 1st
+    .lte("date", lastActiveDate.toISOString().split("T")[0]);
+
+  if (progressError) {
+    console.error("Error fetching progress data:", progressError);
+    return null;
+  }
+
+  // Convert progress data into a Map for quick lookup
+  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
+
+  // Generate full month's dates (from 1st to last day)
+  const result: HabitProgressEntry[] = [];
+  let currentDate = new Date(startOfMonth);
+
+  while (currentDate <= endOfMonth) {
+    const dateString = currentDate.toISOString().split("T")[0];
+
+    // Check if progress exists; otherwise, set default to `false`
+    let status: boolean = progressMap.has(dateString) ? progressMap.get(dateString)! : false;
+
+    result.push({ date: dateString, status });
+
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+  }
+
+  return { habitId, data: result };
+};
+
+
+
+export const fetchWeeklyHabitProgressForYear = async (
+  habitId: string
+): Promise<{ week: string; completed: number }[]> => {
+  const today = new Date();
+  const startOfYear = new Date(today.getUTCFullYear(), 0, 1);
+  const endOfYear = new Date(today.getUTCFullYear(), 11, 31);
+
+  // Fetch habit progress for the current year
+  const { data: progressData, error } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", startOfYear.toISOString().split("T")[0])
+    .lte("date", endOfYear.toISOString().split("T")[0]);
+
+  if (error) {
+    console.error("Error fetching habit progress:", error);
+    return [];
+  }
+
+  // Map to store weekly progress
+  const weeklyProgress: Record<string, number> = {};
+
+  // Generate weekly labels for the year (starting from Sunday)
+  let currentWeekStart = new Date(startOfYear);
+  currentWeekStart.setUTCDate(startOfYear.getUTCDate() - startOfYear.getUTCDay());
+
+  while (currentWeekStart <= endOfYear) {
+    const weekLabel = `${currentWeekStart.toLocaleString("en-US", {
+      month: "short",
+    })} ${currentWeekStart.getUTCDate()}`;
+    weeklyProgress[weekLabel] = 0;
+    currentWeekStart.setUTCDate(currentWeekStart.getUTCDate() + 7);
+  }
+
+  // Process progress data
+  for (const entry of progressData) {
+    const entryDate = new Date(entry.date);
+    entryDate.setUTCHours(0, 0, 0, 0);
+
+    // Get the Sunday of that week (week start)
+    const weekStart = new Date(entryDate);
+    weekStart.setUTCDate(entryDate.getUTCDate() - entryDate.getUTCDay());
+
+    const weekLabel = `${weekStart.toLocaleString("en-US", {
+      month: "short",
+    })} ${weekStart.getUTCDate()}`;
+
+    if (weeklyProgress[weekLabel] !== undefined) {
+      weeklyProgress[weekLabel] += entry.status ? 1 : 0;
+    }
+  }
+
+  // Convert the object to an array
+  return Object.keys(weeklyProgress).map((week) => ({
+    week,
+    completed: weeklyProgress[week],
+  }));
+};
+
+
+
+export const fetchMonthlyHabitProgressForYear = async (
+  habitId: string
+): Promise<{ month: string; completed: number }[]> => {
+  const today = new Date();
+  const startOfYear = new Date(today.getUTCFullYear(), 0, 1);
+  const endOfYear = new Date(today.getUTCFullYear(), 11, 31);
+
+  // Fetch habit progress for the current year
+  const { data: progressData, error } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", startOfYear.toISOString().split("T")[0])
+    .lte("date", endOfYear.toISOString().split("T")[0]);
+
+  if (error) {
+    console.error("Error fetching habit progress:", error);
+    return [];
+  }
+
+  // Initialize months with zero completed count
+  const monthlyProgress: Record<string, number> = {
+    Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
+    Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
+  };
+
+  // Process progress data
+  for (const entry of progressData) {
+    const entryDate = new Date(entry.date);
+    const monthLabel = entryDate.toLocaleString("en-US", { month: "short" });
+
+    if (entry.status) {
+      monthlyProgress[monthLabel] += 1;
+    }
+  }
+
+  // Convert to an array
+  return Object.keys(monthlyProgress).map((month) => ({
+    month,
+    completed: monthlyProgress[month],
+  }));
+};
+
+
+export const fetchYearlyHabitProgressForLastThreeYears = async (
+  habitId: string
+): Promise<{ year: number; completed: number }[]> => {
+  const today = new Date();
+  const startYear = today.getUTCFullYear() - 2; // Start from 3 years ago
+  const endYear = today.getUTCFullYear();
+
+  const startOfPeriod = new Date(startYear, 0, 1); // Jan 1st of 3 years ago
+  const endOfPeriod = new Date(endYear, 11, 31);  // Dec 31st of current year
+
+  // Fetch habit progress for the last 3 years
+  const { data: progressData, error } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", startOfPeriod.toISOString().split("T")[0])
+    .lte("date", endOfPeriod.toISOString().split("T")[0]);
+
+  if (error) {
+    console.error("Error fetching habit progress:", error);
+    return [];
+  }
+
+  // Initialize progress object for each year
+  const yearlyProgress: Record<number, number> = {};
+  for (let year = startYear; year <= endYear; year++) {
+    yearlyProgress[year] = 0;
+  }
+
+  // Process habit progress
+  for (const entry of progressData) {
+    const entryDate = new Date(entry.date);
+    const year = entryDate.getUTCFullYear();
+
+    if (entry.status) {
+      yearlyProgress[year] += 1;
+    }
+  }
+
+  // Convert to array format
+  return Object.keys(yearlyProgress).map((year) => ({
+    year: parseInt(year),
+    completed: yearlyProgress[parseInt(year)],
+  }));
+};
+
+
+export const fetchYearlyHabitProgressForLastFiveYears = async (
+  habitId: string
+): Promise<{ year: number; completed: number }[]> => {
+  const today = new Date();
+  const startYear = today.getUTCFullYear() - 4; // Start from 5 years ago
+  const endYear = today.getUTCFullYear(); // Current year
+
+  const startOfPeriod = new Date(startYear, 0, 1); // Jan 1st of 5 years ago
+  const endOfPeriod = new Date(endYear, 11, 31);  // Dec 31st of current year
+
+  // Fetch habit progress for the last 5 years
+  const { data: progressData, error } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .gte("date", startOfPeriod.toISOString().split("T")[0])
+    .lte("date", endOfPeriod.toISOString().split("T")[0]);
+
+  if (error) {
+    console.error("Error fetching habit progress:", error);
+    return [];
+  }
+
+  // Initialize progress object for each year
+  const yearlyProgress: Record<number, number> = {};
+  for (let year = startYear; year <= endYear; year++) {
+    yearlyProgress[year] = 0;
+  }
+
+  // Process habit progress
+  for (const entry of progressData) {
+    const entryDate = new Date(entry.date);
+    const year = entryDate.getUTCFullYear();
+
+    if (entry.status) {
+      yearlyProgress[year] += 1;
+    }
+  }
+
+  // Convert to array format
+  return Object.keys(yearlyProgress).map((year) => ({
+    year: parseInt(year),
+    completed: yearlyProgress[parseInt(year)],
+  }));
+};

@@ -35,13 +35,13 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
   const onPress = () => {
     if (status === null && isToday) {
-      toast.show("This Habit is not in active Frequency", {
+      toast.show("This habit isn't set for today.", {
         type: "warning",
       });
       return;
     }
     if (!isToday && status === null) {
-      toast.show("You can Mark only today's habit", {
+      toast.show("Only today’s tasks can be marked as done.", {
         type: "warning",
       });
     } else {

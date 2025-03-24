@@ -77,3 +77,18 @@ export const getCategoryByName = (categoryName: string) => {
     (category) => category.name === categoryName
   );
 };
+
+
+export const getCurrentMonthAndYear = () => {
+  const today = new Date();
+
+  // Get full month name
+  const monthName = today.toLocaleString("en-US", { month: "long" });
+
+  // Get year
+  const year = today.getFullYear();
+
+  return { month: monthName, year };
+};
+
+

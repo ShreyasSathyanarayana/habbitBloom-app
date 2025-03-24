@@ -21,6 +21,7 @@ const Analytics = () => {
         style={{
           paddingHorizontal: horizontalScale(16),
           gap: verticalScale(24),
+          flex: 1,
         }}
       >
         <AnalyticsBar
