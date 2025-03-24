@@ -122,6 +122,7 @@ const MonthMap = ({ habitId }: Props) => {
 
   return (
     <Animated.View
+      key={"calender-view"}
       entering={FadeInRight.springify().damping(40).stiffness(200)}
       exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
       style={{ marginBottom: verticalScale(20) }}
@@ -138,7 +139,7 @@ const MonthMap = ({ habitId }: Props) => {
           calendarBackground: "transparent",
           textSectionTitleColor: "#FFF",
           dayTextColor: "#FFF",
-          //   todayTextColor: "red",
+          todayTextColor: "rgba(138, 43, 226, 1)",
           arrowColor: "#FFF",
           monthTextColor: "#FFF",
           calenderBackground: "#0000",

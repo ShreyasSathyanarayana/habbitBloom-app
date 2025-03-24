@@ -1,11 +1,12 @@
 import { fetchLast7DaysHabitProgress } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
-import { verticalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import WeekName from "./week-name";
 import HabitDateButton from "./habit-date-button";
+import { Skeleton } from "moti/skeleton";
 
 type Props = {
   habitId: string;
@@ -19,18 +20,33 @@ const HabitDateList = ({ habitId }: Props) => {
     },
   });
   // console.log("habit dates", JSON.stringify(getHabitDatesQuery.data, null, 2));
+  if (getHabitDatesQuery?.isLoading) {
+    return (
+      <View style={styles.container}>
+        <FlatList
+          horizontal
+          contentContainerStyle={styles.flatListStyle}
+          data={[1, 2, 3, 4, 5, 6, 7]}
+          keyExtractor={(_, index) => index.toString() + "dateListkey"}
+          renderItem={({ item }) => {
+            return (
+              <Skeleton
+                width={horizontalScale(32)}
+                height={horizontalScale(50)}
+              />
+            );
+          }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <FlatList
         scrollEnabled={false}
         horizontal
-        contentContainerStyle={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flex: 1,
-        }}
+        contentContainerStyle={styles.flatListStyle}
         data={getHabitDatesQuery.data?.data}
         renderItem={({ item }) => {
           return (
@@ -52,6 +68,12 @@ const HabitDateList = ({ habitId }: Props) => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: verticalScale(16),
+  },
+  flatListStyle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flex: 1,
   },
 });
 

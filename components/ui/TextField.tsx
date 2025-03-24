@@ -2,7 +2,6 @@ import { StyleSheet, TextInput, View } from "react-native";
 import React, { forwardRef } from "react";
 import Label from "./Label";
 import { horizontalScale } from "@/metric";
-import { Rect } from "react-native-svg";
 import { getFontSize } from "@/font";
 
 interface TextFieldRawProps extends React.ComponentProps<typeof TextInput> {
@@ -15,29 +14,31 @@ interface TextFieldRawProps extends React.ComponentProps<typeof TextInput> {
 
 export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
   ({ rightIcon, leftIcon, disabled, value, error, success, ...rest }, ref) => {
-    // console.log("value", value);
-    // console.log(success);
+    const safeValue = value ?? "";
 
     return (
       <View
         style={[
           styles.container,
-          disabled ? { backgroundColor: "#f3f3f3" } : null,
-          typeof value === "string" &&
-            value.length > 0 && { borderColor: "white" },
-          error && { borderColor: "rgba(255, 0, 0, 1)" },
-          success && { borderColor: "green" },
+          disabled && { backgroundColor: "#f3f3f3" },
+          typeof safeValue === "string" &&
+            safeValue.length > 0 && { borderColor: "white" },
+          error
+            ? { borderColor: "rgba(255, 0, 0, 1)" }
+            : success
+            ? { borderColor: "green" }
+            : {},
         ]}
       >
         {leftIcon &&
-          React.cloneElement(leftIcon as React.ReactElement, {
-            width: 24,
-            height: 24,
-            opacity: typeof value === "string" && value.length > 0 ? 1 : 0.5,
+          React.isValidElement(leftIcon) &&
+          React.cloneElement(leftIcon, {
+            width: horizontalScale(24),
+            height: horizontalScale(24),
+            opacity: safeValue.length > 0 ? 1 : 0.5,
           })}
         <TextInput
           ref={ref}
-          // numberOfLines={1}
           allowFontScaling={false}
           style={[
             styles.textField,
@@ -50,7 +51,7 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
               textShadowRadius: 0,
             },
           ]}
-          value={value}
+          value={safeValue}
           {...rest}
           placeholderTextColor={"rgba(81, 85, 98, 1)"}
           editable={!disabled}
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "rgba(205, 205, 205, 0.09)",
     backgroundColor: "rgba(60, 60, 67, 0.6)",
-    paddingHorizontal: horizontalScale(16),
+    paddingHorizontal: horizontalScale(16) || 16, // Fallback to 16 if undefined
   },
   textField: {
     flex: 1,

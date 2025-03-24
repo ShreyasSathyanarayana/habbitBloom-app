@@ -28,10 +28,14 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.column}>
-        <HabitStreak streakValue={getHabitStatsQuery.data?.streak} />
+        <HabitStreak
+          streakValue={getHabitStatsQuery.data?.streak}
+          isLoading={getHabitStatsQuery?.isLoading}
+        />
         <HabitComplete
           completedValue={getHabitStatsQuery.data?.completed}
           notCompletedValue={getHabitStatsQuery.data?.notCompleted}
+          isLoading={getHabitStatsQuery?.isLoading}
         />
       </View>
       <View style={styles.column}>

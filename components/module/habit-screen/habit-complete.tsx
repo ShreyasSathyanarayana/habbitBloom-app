@@ -4,10 +4,12 @@ import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { getProgressIcon } from "@/assets/progress-icons/get-progress-icon";
+import { Skeleton } from "moti/skeleton";
 
 type Props = {
   completedValue?: number;
   notCompletedValue?: number;
+  isLoading: boolean;
 };
 
 const convertToPercentage = (value: number, total: number) => {
@@ -17,6 +19,7 @@ const convertToPercentage = (value: number, total: number) => {
 const HabitComplete = ({
   completedValue = 0,
   notCompletedValue = 0,
+  isLoading,
 }: Props) => {
   const [percentage, setPercentage] = useState(0);
 
@@ -40,7 +43,9 @@ const HabitComplete = ({
   return (
     <View style={styles.container}>
       {ProgressIcon}
-      <ThemedText style={styles.text}>{percentage}%</ThemedText>
+      <Skeleton show={isLoading}>
+        <ThemedText style={styles.text}>{percentage}%</ThemedText>
+      </Skeleton>
     </View>
   );
 };
