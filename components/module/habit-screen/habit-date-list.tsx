@@ -23,6 +23,7 @@ const HabitDateList = ({ habitId }: Props) => {
   return (
     <View style={styles.container}>
       <FlatList
+        scrollEnabled={false}
         horizontal
         contentContainerStyle={{
           flexDirection: "row",
@@ -35,7 +36,11 @@ const HabitDateList = ({ habitId }: Props) => {
           return (
             <View style={{ alignItems: "center", gap: verticalScale(6) }}>
               <WeekName date={item.date} />
-              <HabitDateButton date={item.date} status={item.status} habitId={habitId} />
+              <HabitDateButton
+                date={item.date}
+                status={item.status}
+                habitId={habitId}
+              />
             </View>
           );
         }}

@@ -20,6 +20,7 @@ import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import {
+  LogBox,
   Platform,
   Text,
   TextInput,
@@ -72,7 +73,7 @@ const RootLayout = () => {
           // isTokenExpiered(token)
           logout();
         } else {
-          router.replace('/(protected)/(tabs)');
+          router.replace("/(protected)/(tabs)");
         }
       } else {
         router.replace("/onboarding"); // /onboarding
@@ -91,41 +92,41 @@ export const RootLayoutWrapper = () => {
   return (
     <KeyboardProvider>
       <Providers>
-        <SheetProvider>
-          <ToastProvider
-            placement="top"
-            duration={5000}
-            animationType="slide-in"
-            animationDuration={400}
-            successColor="green"
-            dangerColor="red"
-            warningColor="orange"
-            normalColor="gray"
-            // icon={<Icon />}
-            successIcon={
-              <AntDesign size={24} color={"white"} name="checkcircle" />
-            }
-            dangerIcon={
-              <AntDesign size={24} color={"white"} name="closecircle" />
-            }
-            // warningIcon={<WarningIcon />}
-            textStyle={{ fontSize: getFontSize(16) }}
-            offset={10} // offset for both top and bottom toasts
-            offsetTop={10}
-            offsetBottom={40}
-            swipeEnabled={true}
-            renderToast={(toast) => (
-              <CustomToast
-                message={toast.message}
-                type={toast.type as unknown as ToastType}
-                id={toast.id}
-              />
-            )}
-          >
+        <ToastProvider
+          placement="top"
+          duration={5000}
+          animationType="slide-in"
+          animationDuration={400}
+          successColor="green"
+          dangerColor="red"
+          warningColor="orange"
+          normalColor="gray"
+          // icon={<Icon />}
+          successIcon={
+            <AntDesign size={24} color={"white"} name="checkcircle" />
+          }
+          dangerIcon={
+            <AntDesign size={24} color={"white"} name="closecircle" />
+          }
+          // warningIcon={<WarningIcon />}
+          textStyle={{ fontSize: getFontSize(16) }}
+          offset={10} // offset for both top and bottom toasts
+          offsetTop={10}
+          offsetBottom={40}
+          swipeEnabled={true}
+          renderToast={(toast) => (
+            <CustomToast
+              message={toast.message}
+              type={toast.type as unknown as ToastType}
+              id={toast.id}
+            />
+          )}
+        >
+          <SheetProvider>
             {/* <StatusBar hidden={true} /> */}
             <RootLayout />
-          </ToastProvider>
-        </SheetProvider>
+          </SheetProvider>
+        </ToastProvider>
       </Providers>
     </KeyboardProvider>
   );

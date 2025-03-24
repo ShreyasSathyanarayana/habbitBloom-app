@@ -64,7 +64,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
           paddingVertical: verticalScale(24),
         }}
       >
-        If you delete this habit, your streaks will be lost.Instead, you can
+        If you delete this habit, your streaks will be lost. Instead, you can
         archive it to keep your progress.
       </ThemedText>
       <View
