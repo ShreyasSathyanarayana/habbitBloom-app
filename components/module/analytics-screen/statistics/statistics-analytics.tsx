@@ -7,6 +7,7 @@ import TimesCompleted from "./times-completed";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import StatisticsMonth from "./statistics-month";
 import StatisticsYearly from "./statistics-yearly";
+import StreakChallenge from "./streak-challenge";
 
 type Props = {
   habitId: string;
@@ -21,7 +22,10 @@ const StatisticsAnalytics = ({ habitId }: Props) => {
       exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
       style={{ gap: verticalScale(17), flex: 1 }}
     >
-      <ScrollView contentContainerStyle={{ gap: verticalScale(17) }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ gap: verticalScale(17) }}
+      >
         <Divider style={styles.dividerStyle} />
         <StreakDetails habitId={habitId} />
         <Divider style={styles.dividerStyle} />
@@ -31,6 +35,7 @@ const StatisticsAnalytics = ({ habitId }: Props) => {
         <Divider style={styles.dividerStyle} />
         <StatisticsYearly habitId={habitId} />
         <Divider style={styles.dividerStyle} />
+        <StreakChallenge habitId={habitId} />
       </ScrollView>
     </Animated.View>
   );

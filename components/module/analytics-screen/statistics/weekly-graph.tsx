@@ -29,6 +29,7 @@ const WeeklyGraph = ({ habitId }: Props) => {
 
   return (
     <Animated.View
+      key={"weekly-graph"}
       entering={FadeInRight.springify().damping(40).stiffness(200)}
       exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
       style={{ paddingVertical: verticalScale(16) }}
