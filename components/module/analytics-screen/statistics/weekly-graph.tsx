@@ -11,6 +11,7 @@ import Animated, {
   FadeInRight,
   FadeOutLeft,
   FadeOutRight,
+  LayoutAnimationConfig,
 } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
 type Props = {
@@ -29,16 +30,11 @@ const WeeklyGraph = ({ habitId }: Props) => {
   // console.log("weekly", JSON.stringify(getWeeklyQuery.data, null, 2));
 
   if (getWeeklyQuery?.isLoading) {
-    <Skeleton width={"100%"} height={verticalScale(54)} />;
+    return <Skeleton width={"100%"} height={verticalScale(54)} />;
   }
 
   return (
-    <Animated.View
-      key={"weekly-graph"}
-      entering={FadeInRight.springify().damping(40).stiffness(200)}
-      exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
-      style={{ paddingVertical: verticalScale(16) }}
-    >
+    <View key={"weekly-graph"} style={{ paddingVertical: verticalScale(16) }}>
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >
@@ -58,7 +54,7 @@ const WeeklyGraph = ({ habitId }: Props) => {
           );
         }}
       />
-    </Animated.View>
+    </View>
   );
 };
 

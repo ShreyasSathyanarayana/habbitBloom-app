@@ -6,13 +6,16 @@ import Header from "@/components/ui/header";
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import PagerView from "react-native-pager-view";
+import { LayoutAnimationConfig } from "react-native-reanimated";
 
 const Analytics = () => {
   const { id, category } = useLocalSearchParams();
   const [selectedOption, setSelectedOption] = useState(category);
   const menu = ["Calendar", "Statistics"];
+  const pagerRef = useRef<PagerView>(null);
 
   return (
     <Container>
@@ -27,14 +30,25 @@ const Analytics = () => {
         <AnalyticsBar
           menu={menu}
           selectedMenu={category as string}
-          onChangeMenu={(item, index) => setSelectedOption(item)}
+          onChangeMenu={(item, index) => {
+            pagerRef.current?.setPage(index);
+            setSelectedOption(item);
+          }}
         />
-        {selectedOption === "Calendar" && (
-          <CalenderAnalytics habitId={id as string} />
-        )}
-        {selectedOption === "Statistics" && (
-          <StatisticsAnalytics habitId={id as string} />
-        )}
+
+        <PagerView
+          ref={pagerRef}
+          scrollEnabled={false}
+          initialPage={category === "Calendar" ? 0 : 1}
+          style={{ flex: 1 }}
+        >
+          <View key="1">
+            <CalenderAnalytics habitId={id as string} />
+          </View>
+          <View key="2">
+            <StatisticsAnalytics habitId={id as string} />
+          </View>
+        </PagerView>
       </View>
     </Container>
   );

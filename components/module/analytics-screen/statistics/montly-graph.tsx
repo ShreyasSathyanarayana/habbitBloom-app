@@ -18,14 +18,10 @@ const MontlyGraph = ({ habitId }: Props) => {
     queryKey: ["monthly", habitId],
     queryFn: () => fetchMonthlyHabitProgressForYear(habitId),
   });
-//   console.log("monthly", JSON.stringify(getMonthlyGraphQuery.data, null, 2));
+  //   console.log("monthly", JSON.stringify(getMonthlyGraphQuery.data, null, 2));
 
   return (
-    <Animated.View
-      entering={FadeInRight.springify().damping(40).stiffness(200)}
-      exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
-      style={{ paddingVertical: verticalScale(16) }}
-    >
+    <View style={{ paddingVertical: verticalScale(16) }}>
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >
@@ -49,7 +45,7 @@ const MontlyGraph = ({ habitId }: Props) => {
           );
         }}
       />
-    </Animated.View>
+    </View>
   );
 };
 

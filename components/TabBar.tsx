@@ -18,17 +18,14 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   const primaryColor = "rgba(138, 43, 226, 1)";
   const greyColor = "rgba(157, 178, 206, 1)";
   const { isTabBarVisible } = useTabBar();
-
-  // Shared value for animating tab bar visibility
+  const { bottom: paddingBottom } = useSafeAreaInsets();
   const translateY = useSharedValue(0);
-  // console.log(isTabBarVisible);
-
-  // React to visibility changes
   useEffect(() => {
     translateY.value = withSpring(isTabBarVisible ? 0 : 100, {
       damping: 40,
@@ -134,7 +131,10 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
         style={[
           styles.tabbar,
           {
-            paddingBottom: verticalScale(10),
+            paddingBottom:
+              Platform.OS === "ios"
+                ? verticalScale(paddingBottom)
+                : verticalScale(10),
             borderTopWidth: 0.5,
             borderColor: "rgba(138, 43, 226, 1)",
           },

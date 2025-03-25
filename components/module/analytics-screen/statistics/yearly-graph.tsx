@@ -23,10 +23,8 @@ const YearlyGraph = ({ habitId }: Props) => {
     enabled: !!habitId,
   });
   return (
-    <Animated.View
+    <View
       key={"yearly-graph"}
-      entering={FadeInRight.springify().damping(40).stiffness(200)}
-      exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
       style={{ paddingVertical: verticalScale(16) }}
     >
       <ThemedText
@@ -52,7 +50,7 @@ const YearlyGraph = ({ habitId }: Props) => {
           );
         }}
       />
-    </Animated.View>
+    </View>
   );
 };
 
