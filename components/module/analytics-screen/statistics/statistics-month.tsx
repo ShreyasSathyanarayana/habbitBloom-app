@@ -7,6 +7,7 @@ import React, { useEffect, useRef } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import MonthGraph from "./month-graph";
 import { verticalScale } from "@/metric";
+import { Skeleton } from "moti/skeleton";
 
 type Props = {
   habitId: string;
@@ -38,6 +39,15 @@ const StatisticsMonth = ({ habitId }: Props) => {
       });
     }
   }, [todayIndex, data]);
+
+  if (getCurrentMonthStatsQuery?.isLoading) {
+    return (
+      <View style={{ gap: verticalScale(15) }}>
+        <Skeleton width={"30%"} height={verticalScale(25)} />
+        <Skeleton width={"100%"} height={verticalScale(54)} />
+      </View>
+    );
+  }
 
   return (
     <View>

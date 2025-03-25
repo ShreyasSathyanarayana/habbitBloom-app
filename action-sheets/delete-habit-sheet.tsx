@@ -64,8 +64,9 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
           paddingVertical: verticalScale(24),
         }}
       >
-        If you delete this habit, your streaks will be lost. Instead, you can
-        archive it to keep your progress.
+        {!payload?.archived
+          ? "If you delete this habit, your streaks will be lost. Instead, you can archive it to keep your progress."
+          : "This habit is already archived. Deleting it will remove it permanently. Proceed?"}
       </ThemedText>
       <View
         style={{
@@ -80,6 +81,14 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
             style={{ flex: 1 }}
             outline
             label="Archive"
+          />
+        )}
+        {payload?.archived && (
+          <Button
+            style={{ flex: 1 }}
+            outline
+            label="Cancel"
+            onPress={closeSheet}
           />
         )}
         <Button
