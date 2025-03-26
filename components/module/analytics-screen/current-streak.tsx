@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
+import StreakValue from "./streak-value";
 type Props = {
   habitId: string;
 };
@@ -34,7 +35,7 @@ const CurrentStreak = ({ habitId }: Props) => {
           Current Streak
         </ThemedText>
       </View>
-      <ThemedText style={{ fontSize: getFontSize(14) }}>
+      {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
         <ThemedText
           style={{ fontSize: getFontSize(24), fontFamily: "PoppinsSemiBold" }}
         >
@@ -42,7 +43,8 @@ const CurrentStreak = ({ habitId }: Props) => {
         </ThemedText>
         {"  "}
         Days
-      </ThemedText>
+      </ThemedText> */}
+      <StreakValue streakDays={getHabitStatsQuery.data?.streak ?? 0} />
     </View>
   );
 };

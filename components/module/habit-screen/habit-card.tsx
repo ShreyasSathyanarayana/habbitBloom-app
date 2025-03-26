@@ -13,7 +13,7 @@ import Animated, {
   LayoutAnimationConfig,
   LinearTransition,
 } from "react-native-reanimated";
-type Props = {
+export type HabitProp = {
   id: string;
   habit_name: string;
   category: string;
@@ -26,7 +26,7 @@ type Props = {
 
 const AnimatedBtn = Animated.createAnimatedComponent(Pressable);
 
-const HabitCard = (props: Props) => {
+const HabitCard = (props: HabitProp) => {
   const { habit_name, category, archived } = props;
 
   const onPressThreeDot = () => {

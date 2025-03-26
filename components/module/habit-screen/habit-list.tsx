@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import HabitCard from "./habit-card";
+import HabitCard, { HabitProp } from "./habit-card";
 import { verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
@@ -12,15 +12,13 @@ import { Skeleton } from "moti/skeleton";
 
 type Props = {
   scrollY: SharedValue<number>;
+  habitList?: HabitProp[];
+  isLoading: boolean;
 };
 
-const HabitList = ({ scrollY }: Props) => {
-  const gethabitQuery = useQuery({
-    queryKey: ["habitList"],
-    queryFn: getAllHabits,
-  });
+const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
   // console.log("habit list", JSON.stringify(gethabitQuery.data, null, 2));
-  if (gethabitQuery?.isLoading) {
+  if (isLoading) {
     return (
       <View style={styles.container}>
         <FlatList
@@ -48,7 +46,7 @@ const HabitList = ({ scrollY }: Props) => {
           gap: verticalScale(16),
           paddingBottom: verticalScale(150),
         }}
-        data={gethabitQuery.data}
+        data={habitList}
         renderItem={({ item }) => <HabitCard {...item} />}
       />
     </View>

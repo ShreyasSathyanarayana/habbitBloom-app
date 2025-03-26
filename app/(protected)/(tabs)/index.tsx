@@ -25,6 +25,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HabitCard from "@/components/module/habit-screen/habit-card";
 import { Card } from "react-native-ui-lib";
 import HabitList from "@/components/module/habit-screen/habit-list";
+import HabitEmpty from "@/components/module/habit-screen/habit-empty";
+import { useQuery } from "@tanstack/react-query";
+import { getAllHabits } from "@/api/api";
 const SCROLL_HIDE_THRESHOLD = 10; // Minimum scroll distance before hiding
 const SCROLL_SHOW_THRESHOLD = -5; // Threshold for showing the tab bar
 
@@ -35,6 +38,10 @@ export default function HabitsScreen() {
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
+  const gethabitQuery = useQuery({
+    queryKey: ["habitList"],
+    queryFn: getAllHabits,
+  });
 
   useDerivedValue(() => {
     const diffY = scrollY.value - prevScrollY.value;
@@ -66,6 +73,10 @@ export default function HabitsScreen() {
     transform: [{ translateX: buttonTranslation.value }],
   }));
 
+  if (gethabitQuery?.data?.length === 0) {
+    return <HabitEmpty />;
+  }
+
   return (
     <View
       style={{
@@ -76,7 +87,11 @@ export default function HabitsScreen() {
       }}
     >
       <HabitHead onPressArchive={() => router.push("/(protected)/archive")} />
-      <HabitList scrollY={scrollY} />
+      <HabitList
+        scrollY={scrollY}
+        isLoading={gethabitQuery.isLoading}
+        habitList={gethabitQuery?.data}
+      />
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>

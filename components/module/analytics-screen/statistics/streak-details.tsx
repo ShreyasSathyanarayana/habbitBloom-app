@@ -7,6 +7,7 @@ import { getFontSize } from "@/font";
 import Divider from "@/components/ui/divider";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
+import StreakValue from "../streak-value";
 type Props = {
   habitId: string;
 };
@@ -43,12 +44,13 @@ const StreakDetails = ({ habitId }: Props) => {
       >
         <View style={styles.column}>
           <ThemedText style={styles.title}>Current</ThemedText>
-          <ThemedText style={{ fontSize: getFontSize(14) }}>
+          {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
             <ThemedText style={styles.numberStyle}>
               {getHabitStatsQuery?.data?.streak}
             </ThemedText>{" "}
             Days
-          </ThemedText>
+          </ThemedText> */}
+          <StreakValue streakDays={getHabitStatsQuery?.data?.streak ?? 0} />
         </View>
         <Divider
           style={{
@@ -58,12 +60,15 @@ const StreakDetails = ({ habitId }: Props) => {
         />
         <View style={styles.column}>
           <ThemedText style={styles.title}>Best</ThemedText>
-          <ThemedText style={{ fontSize: getFontSize(14) }}>
+          {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
             <ThemedText style={styles.numberStyle}>
               {getHabitStatsQuery?.data?.highestStreak}
             </ThemedText>{" "}
             Days
-          </ThemedText>
+          </ThemedText> */}
+          <StreakValue
+            streakDays={getHabitStatsQuery?.data?.highestStreak ?? 0}
+          />
         </View>
       </View>
     </View>

@@ -3,6 +3,7 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "moti/skeleton";
 import React from "react";
 import { StyleSheet, TouchableHighlight, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
@@ -50,32 +51,34 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   };
 
   return (
-    <TouchableHighlight
-      onPress={onPress}
-      // disabled={!isToday && (status === null || status == false)}
-      style={[
-        styles.container,
-        isTodayStatus
-          ? styles.todayBtn
-          : status === null
-          ? styles.disableBtn
-          : status === true
-          ? styles.completed
-          : styles.notCompleted,
-        status == null && styles.disableBtn,
-      ]}
-    >
-      <ThemedText
+    <Skeleton show={mutation.isPending}>
+      <TouchableHighlight
+        onPress={onPress}
+        // disabled={!isToday && (status === null || status == false)}
         style={[
-          { fontSize: getFontSize(13), fontFamily: "PoppinsSemiBold" },
-          (status === null || (status == false && !isToday)) && {
-            color: "rgba(179, 179, 179, 0.7)",
-          },
+          styles.container,
+          isTodayStatus
+            ? styles.todayBtn
+            : status === null
+            ? styles.disableBtn
+            : status === true
+            ? styles.completed
+            : styles.notCompleted,
+          status == null && styles.disableBtn,
         ]}
       >
-        {day}
-      </ThemedText>
-    </TouchableHighlight>
+        <ThemedText
+          style={[
+            { fontSize: getFontSize(13), fontFamily: "PoppinsSemiBold" },
+            (status === null || (status == false && !isToday)) && {
+              color: "rgba(179, 179, 179, 0.7)",
+            },
+          ]}
+        >
+          {day}
+        </ThemedText>
+      </TouchableHighlight>
+    </Skeleton>
   );
 };
 
