@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -34,6 +35,10 @@ import HabitNameIcon from "@/assets/svg/hadit-name.svg";
 import { useRoute } from "@react-navigation/native";
 import NotificationIcon from "@/assets/svg/notification.svg";
 import GoogleCalenderIcon from "@/assets/svg/google-calender.svg";
+import CalenderIcon from "@/assets/svg/calendar-active-icon.svg";
+import CalenderInactiveIcon from "@/assets/svg/calendar-inactive-icon.svg";
+import UpdownInactiveIcon from "@/assets/svg/up-down-inactive.svg";
+import DateInputV2 from "@/components/ui/date-picker";
 
 const days = ["S", "M", "T", "W", "T", "F", "S"];
 const colors = [
@@ -56,10 +61,11 @@ const CreateHabit = () => {
       habitName: "",
       category: goodHabitsCategories?.[0]?.name,
       reminderTime: "12:00:00",
-      frequency: [0] as number[],
+      frequency: [0, 1, 2, 3, 4, 5, 6] as number[],
       notificationEnable: false,
       habitColor: "rgba(255, 59, 48, 1)",
       googleNotificationEnable: false,
+      end_date: null,
     },
   });
   const toast = useToast();
@@ -498,6 +504,57 @@ const CreateHabit = () => {
               })}
             </View>
           </Label> */}
+          <Controller
+            control={control}
+            name="end_date"
+            render={({
+              field: { onChange, onBlur, value },
+              formState: { errors },
+            }) => {
+              return (
+                <DateInputV2
+                  leftIcon={
+                    <CalenderIcon
+                      width={horizontalScale(24)}
+                      height={horizontalScale(24)}
+                    />
+                  }
+                  inActiveLeftIcon={
+                    <CalenderInactiveIcon
+                      width={horizontalScale(24)}
+                      height={horizontalScale(24)}
+                    />
+                  }
+                  rightIcon={
+                    <Pressable onPress={() => setValue("end_date", null)}>
+                      <ThemedText
+                        style={{
+                          fontSize: getFontSize(12),
+                          fontFamily: "PoppinsSemiBold",
+                          color: "rgba(138, 43, 226, 1)",
+                        }}
+                      >
+                        Reset
+                      </ThemedText>
+                    </Pressable>
+                  }
+                  inActiveRightIcon={
+                    <UpdownInactiveIcon
+                      width={horizontalScale(24)}
+                      height={horizontalScale(24)}
+                    />
+                  }
+                  minimumDate={
+                    new Date(new Date().setDate(new Date().getDate() + 1))
+                  }
+                  placeholder="Select the date"
+                  value={value ?? ""}
+                  label="End Date (Optional)"
+                  onChange={onChange}
+                />
+              );
+            }}
+          />
         </View>
       </ScrollView>
       <GradientButton
