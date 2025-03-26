@@ -22,6 +22,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
     mutationKey: ["deleteHabit"],
     mutationFn: () => {
       closeSheet();
+      SheetManager.hide("habit-details");
       return deleteHabit(payload?.id ?? "");
     },
     onSuccess: () => {
@@ -77,7 +78,10 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       >
         {!payload?.archived && (
           <Button
-            onPress={() => archiveHabitMutation.mutateAsync()}
+            onPress={() => {
+              archiveHabitMutation.mutateAsync();
+              SheetManager.hide("habit-details");
+            }}
             style={{ flex: 1 }}
             outline
             label="Archive"
@@ -88,11 +92,15 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
             style={{ flex: 1 }}
             outline
             label="Cancel"
-            onPress={closeSheet}
+            onPress={() => {
+              closeSheet();
+            }}
           />
         )}
         <Button
-          onPress={() => deleteHabitMutation.mutateAsync()}
+          onPress={() => {
+            deleteHabitMutation.mutateAsync();
+          }}
           style={{ flex: 1 }}
           label="Delete"
         />

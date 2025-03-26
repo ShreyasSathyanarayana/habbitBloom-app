@@ -8,13 +8,16 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import StatisticsMonth from "./statistics-month";
 import StatisticsYearly from "./statistics-yearly";
 import StreakChallenge from "./streak-challenge";
+import SuccessFailAnalytics from "./success-fail-analytics";
+import HabitScore from "./habit-score";
 
 type Props = {
   habitId: string;
+  habitHasEndDate: boolean;
 };
 const _dividerColor = "rgba(38, 50, 56, 0.7)";
 
-const StatisticsAnalytics = ({ habitId }: Props) => {
+const StatisticsAnalytics = ({ habitId, habitHasEndDate = false }: Props) => {
   return (
     <Animated.View
       key={"statistics-analytics"}
@@ -26,7 +29,12 @@ const StatisticsAnalytics = ({ habitId }: Props) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: verticalScale(17) }}
       >
-        <Divider style={styles.dividerStyle} />
+        {habitHasEndDate && (
+          <>
+            <HabitScore habitId={habitId} />
+            <Divider style={styles.dividerStyle} />
+          </>
+        )}
         <StreakDetails habitId={habitId} />
         <Divider style={styles.dividerStyle} />
         <TimesCompleted habitId={habitId} />
@@ -34,6 +42,12 @@ const StatisticsAnalytics = ({ habitId }: Props) => {
         <StatisticsMonth habitId={habitId} />
         <Divider style={styles.dividerStyle} />
         <StatisticsYearly habitId={habitId} />
+        {habitHasEndDate && (
+          <>
+            <Divider style={styles.dividerStyle} />
+            <SuccessFailAnalytics habitId={habitId} />
+          </>
+        )}
         <Divider style={styles.dividerStyle} />
         <StreakChallenge habitId={habitId} />
       </ScrollView>

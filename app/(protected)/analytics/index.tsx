@@ -14,6 +14,7 @@ import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { LayoutAnimationConfig } from "react-native-reanimated";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const Analytics = () => {
   const { id, category } = useLocalSearchParams();
@@ -29,14 +30,14 @@ const Analytics = () => {
     getHabitDetailsQuery?.data?.category ?? ""
   )?.icon;
 
-  // console.log(JSON.stringify(getHabitDetailsQuery.data, null, 2));
+  // console.log(JSON.stringify(getHabitDetailsQuery?.data, null, 2));
 
   return (
     <Container>
       {/* <Header isLoading={true} title="Analytics" /> */}
       <AnalyticsHeader
         headerIcon={CategoryIcon}
-        isLoading={getHabitDetailsQuery?.isFetching}
+        isLoading={getHabitDetailsQuery?.isLoading}
         title={getHabitDetailsQuery.data?.habit_name}
       />
       <View
@@ -65,7 +66,12 @@ const Analytics = () => {
             <CalenderAnalytics habitId={id as string} />
           </View>
           <View key="2" style={{ flex: 1 }}>
-            <StatisticsAnalytics habitId={id as string} />
+            <StatisticsAnalytics
+              habitId={id as string}
+              habitHasEndDate={
+                getHabitDetailsQuery?.data?.end_date ? true : false
+              }
+            />
           </View>
         </PagerView>
       </View>

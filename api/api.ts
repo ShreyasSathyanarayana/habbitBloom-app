@@ -1216,3 +1216,157 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
     completed: yearlyProgress[parseInt(year)],
   }));
 };
+
+export const getHabitCompletionStats = async (habitId: string) => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    console.error("Error fetching user:", error);
+    return { completed: 0, pending: 0 };
+  }
+
+  // Fetch habit details
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at, end_date, frequency")
+    .eq("id", habitId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit data:", habitError);
+    return { completed: 0, pending: 0 };
+  }
+
+  // Parse dates
+  const habitCreatedAt = new Date(habitData.created_at);
+  habitCreatedAt.setUTCHours(0, 0, 0, 0);
+
+  let habitEndDate = habitData.end_date ? new Date(habitData.end_date) : new Date();
+  habitEndDate.setUTCHours(0, 0, 0, 0);
+
+  // Fetch habit progress
+  const { data: progressData, error: fetchError } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .eq("user_id", user.id)
+    .gte("date", habitCreatedAt.toISOString().split("T")[0])
+    .lte("date", habitEndDate.toISOString().split("T")[0]);
+
+  if (fetchError) {
+    console.error("Error fetching habit progress:", fetchError);
+    return { completed: 0, pending: 0 };
+  }
+
+  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
+  const frequencyDays: number[] = habitData.frequency || [];
+
+  // Store progress in a Map
+  const progressMap = new Map<string, boolean>();
+  progressData.forEach((entry) => {
+    progressMap.set(entry.date.split("T")[0], entry.status);
+  });
+
+  let completedCount = 0, pendingCount = 0;
+  let currentDate = new Date(habitCreatedAt);
+
+  // Iterate from habit creation date to end date
+  while (currentDate <= habitEndDate) {
+    const dateString = currentDate.toISOString().split("T")[0];
+    const dayOfWeek = currentDate.getUTCDay();
+
+    // Count only if the day matches the habit's scheduled frequency
+    if (frequencyDays.includes(dayOfWeek)) {
+      if (progressMap.has(dateString)) {
+        if (progressMap.get(dateString)) completedCount++;
+        else pendingCount++;
+      } else if (currentDate < new Date()) {
+        pendingCount++; // Mark as pending if no record exists for past days
+      }
+    }
+
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+  }
+
+  return { completed: completedCount, pending: pendingCount };
+};
+
+
+export const getCompletedAndPendingDays = async (habitId: string) => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    console.error("Error fetching user:", error);
+    return { completedDays: 0, pendingDays: 0 };
+  }
+
+  // Fetch habit details
+  const { data: habitData, error: habitError } = await supabase
+    .from("habit")
+    .select("created_at, end_date, frequency")
+    .eq("id", habitId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (habitError || !habitData) {
+    console.error("Error fetching habit data:", habitError);
+    return { completedDays: 0, pendingDays: 0 };
+  }
+
+  // Parse dates
+  const habitCreatedAt = new Date(habitData.created_at);
+  habitCreatedAt.setUTCHours(0, 0, 0, 0);
+
+  let habitEndDate = habitData.end_date ? new Date(habitData.end_date) : new Date();
+  habitEndDate.setUTCHours(0, 0, 0, 0);
+
+  // Fetch completed habit progress
+  const { data: progressData, error: fetchError } = await supabase
+    .from("habit_progress")
+    .select("date, status")
+    .eq("habit_id", habitId)
+    .eq("user_id", user.id)
+    .gte("date", habitCreatedAt.toISOString().split("T")[0])
+    .lte("date", habitEndDate.toISOString().split("T")[0]);
+
+  if (fetchError) {
+    console.error("Error fetching habit progress:", fetchError);
+    return { completedDays: 0, pendingDays: 0 };
+  }
+
+  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
+  const frequencyDays: number[] = habitData.frequency || [];
+
+  // Store progress in a Map for quick lookup
+  const completedDaysSet = new Set<string>();
+  progressData.forEach((entry) => {
+    if (entry.status) {
+      completedDaysSet.add(entry.date.split("T")[0]);
+    }
+  });
+
+  let completedDays = 0;
+  let pendingDays = 0;
+  let currentDate = new Date(habitCreatedAt);
+
+  // Iterate from start date to end date
+  while (currentDate <= habitEndDate) {
+    const dateString = currentDate.toISOString().split("T")[0];
+    const dayOfWeek = currentDate.getUTCDay();
+
+    // Check if the day matches the habit's scheduled frequency
+    if (frequencyDays.includes(dayOfWeek)) {
+      if (completedDaysSet.has(dateString)) {
+        completedDays++; // Count as completed
+      } else {
+        pendingDays++; // Count as pending
+      }
+    }
+
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+  }
+
+  return { completedDays, pendingDays };
+};
+

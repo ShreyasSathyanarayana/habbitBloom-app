@@ -144,12 +144,16 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
 
           <ActionSheetButton
             onPress={() => {
-              closeSheet(); // Close the current sheet
-              setTimeout(() => {
-                SheetManager.show("delete-habit", {
-                  payload: { data: payload },
-                }); // Open the delete confirmation sheet after a small delay
-              }, 200); // Delay to ensure the first sheet is fully closed
+              // setTimeout(() => {
+              //   SheetManager.show("delete-habit", {
+              //     payload: { data: payload },
+              //   }); // Open the delete confirmation sheet after a small delay
+              // }, 400); // Delay to ensure the first sheet is fully closed
+              SheetManager.show("delete-habit", {
+                payload: { data: payload },
+              });
+
+              // closeSheet(); // Close the current sheet
             }}
             // onPress={() => deleteHabitMutation.mutateAsync()}
             leftIcon={<DeleteIcon width={_iconSize} height={_iconSize} />}
