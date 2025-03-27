@@ -264,10 +264,8 @@ export const getHabitStats = async (habitId: string) => {
   // 🔹 Initialize tracking variables
   let completedCount = 0;
   let notCompletedCount = 0;
-  let streak = 0;
-  let highestStreak = 0;
   let currentStreak = 0;
-  let lastCompletedDate: string | null = null;
+  let highestStreak = 0;
 
   // Normalize today's date to UTC midnight
   const today = new Date();
@@ -276,12 +274,12 @@ export const getHabitStats = async (habitId: string) => {
   const lastDate = endDate && endDate < today ? endDate : today; // Use `end_date` if it's earlier
 
   let currentDate = new Date(habitCreatedAt);
+  let lastCompletedDate: Date | null = null;
 
   while (currentDate <= lastDate) {
     const dateString = currentDate.toISOString().split("T")[0];
     const dayOfWeek = currentDate.getUTCDay();
 
-    // Skip if not a habit day
     if (!frequencyDays.includes(dayOfWeek)) {
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       continue;
@@ -290,47 +288,33 @@ export const getHabitStats = async (habitId: string) => {
     if (progressMap.has(dateString)) {
       if (progressMap.get(dateString)) {
         completedCount++;
-        currentStreak++;
+        
+        // If lastCompletedDate is the previous day, increment streak
+        if (lastCompletedDate && (currentDate.getTime() - lastCompletedDate.getTime() === 86400000)) {
+          currentStreak++;
+        } else {
+          currentStreak = 1; // Reset to 1 for a new streak
+        }
+        
         highestStreak = Math.max(highestStreak, currentStreak);
-        lastCompletedDate = dateString; // Update last completed day
+        lastCompletedDate = new Date(currentDate);
       } else {
         notCompletedCount++;
-        currentStreak = 0; // Reset streak if a day is explicitly marked not completed
+        currentStreak = 0; // Streak breaks on an explicitly marked failure
       }
     } else {
       if (currentDate < today) {
         notCompletedCount++;
-        currentStreak = 0; // Reset streak
+        currentStreak = 0; // Streak breaks on an uncompleted past day
       }
     }
 
     currentDate.setUTCDate(currentDate.getUTCDate() + 1);
   }
 
-  // ✅ Fix: Don't double count today's completion
-  const todayString = today.toISOString().split("T")[0];
-  const todayDayOfWeek = today.getUTCDay();
-
-  if (frequencyDays.includes(todayDayOfWeek)) {
-    if (progressMap.has(todayString)) {
-      if (progressMap.get(todayString)) {
-        completedCount++;
-        // Streak should **only** increase if yesterday was also completed
-        if (!lastCompletedDate || lastCompletedDate === todayString) {
-          currentStreak = 1; // Ensure streak starts at 1 for first-time habits
-        } else {
-          currentStreak++;
-        }
-        highestStreak = Math.max(highestStreak, currentStreak);
-      } else {
-        notCompletedCount++;
-        currentStreak = 0;
-      }
-    }
-  }
-
   return { completed: completedCount, notCompleted: notCompletedCount, streak: currentStreak, highestStreak };
 };
+
 
 
 

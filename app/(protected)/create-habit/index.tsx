@@ -66,6 +66,7 @@ const CreateHabit = () => {
       habitColor: "rgba(255, 59, 48, 1)",
       googleNotificationEnable: false,
       end_date: null,
+      description: "",
     },
   });
   const toast = useToast();
@@ -319,6 +320,38 @@ const CreateHabit = () => {
           </Label>
           <Controller
             control={control}
+            rules={{
+              // required: "Habit Name is required",
+              validate: (val) =>
+                val?.length < 200 || "can contain only 200 character",
+            }}
+            render={({
+              field: { onChange, onBlur, value },
+              formState: { errors },
+            }) => (
+              <TextField
+                // key={"habitName"}
+                textarea={true}
+                label="Description (Optional)"
+                placeholder="Description here"
+                numberOfLines={4}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                leftIcon={
+                  <HabitNameIcon
+                    width={horizontalScale(24)}
+                    height={horizontalScale(24)}
+                  />
+                }
+                helperText={errors.description?.message}
+                error={!!errors.description}
+              />
+            )}
+            name="description"
+          />
+          <Controller
+            control={control}
             name="reminderTime"
             render={({
               field: { onChange, onBlur, value },
@@ -382,6 +415,7 @@ const CreateHabit = () => {
               }}
             />
           </Label>
+
           <View
             style={{
               flexDirection: "row",
