@@ -1,6 +1,7 @@
 import { useRouter, useSegments } from "expo-router";
 import React, { createContext, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
+import NetInfo from "@react-native-community/netinfo";
 // import { isTokenExpired } from "../utils/helpers";
 
 interface Login {
@@ -12,6 +13,7 @@ interface AuthContext {
   login: (arg: Login) => Promise<void>;
   logout: () => Promise<void>;
   user_id: string;
+  isConnected: boolean;
 }
 
 const AuthContext = createContext<AuthContext | null>(null);
@@ -19,6 +21,7 @@ const AuthContext = createContext<AuthContext | null>(null);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [userid, setUserId] = React.useState<string>("");
+  const [isConnected, setIsConnected] = React.useState<boolean>(true);
   const login = async (arg: Login) => {
     const { accessToken, refreshToken } = arg;
     setUserId(accessToken);
@@ -45,7 +48,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     user_id: userid,
+    isConnected,
   };
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
+      setIsConnected(state.isConnected ?? false);
+    });
+
+    // To unsubscribe to these update, just use:
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -28,6 +28,9 @@ import HabitList from "@/components/module/habit-screen/habit-list";
 import HabitEmpty from "@/components/module/habit-screen/habit-empty";
 import { useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
+import ServerError from "@/components/module/errors/server-error";
+import { useAuth } from "@/context/AuthProvider";
+import NoInternet from "@/components/module/errors/no-internet";
 const SCROLL_HIDE_THRESHOLD = 10; // Minimum scroll distance before hiding
 const SCROLL_SHOW_THRESHOLD = -5; // Threshold for showing the tab bar
 
@@ -35,6 +38,7 @@ export default function HabitsScreen() {
   const { isTabBarVisible, showTabBar, hideTabBar } = useTabBar();
   const buttonOpacity = useSharedValue(isTabBarVisible ? 1 : 0);
   const buttonTranslation = useSharedValue(isTabBarVisible ? 0 : 50);
+  const { isConnected } = useAuth();
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
@@ -72,6 +76,16 @@ export default function HabitsScreen() {
     opacity: buttonOpacity.value,
     transform: [{ translateX: buttonTranslation.value }],
   }));
+
+  if (!isConnected) {
+    return <NoInternet onRefresh={() => gethabitQuery?.refetch()} />;
+  }
+
+  if (gethabitQuery?.status === "error") {
+    console.log(gethabitQuery?.isError);
+
+    return <ServerError onRefresh={() => gethabitQuery?.refetch()} />;
+  }
 
   if (gethabitQuery?.data?.length === 0) {
     return <HabitEmpty />;

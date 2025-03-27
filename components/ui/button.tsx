@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(14),
     fontFamily: "PoppinsMedium",
     color: "white",
+    includeFontPadding: false,
   },
 });
 

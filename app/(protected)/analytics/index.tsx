@@ -3,9 +3,11 @@ import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";
 import AnalyticsHeader from "@/components/module/analytics-screen/analytics-header";
 import CalenderAnalytics from "@/components/module/analytics-screen/calender-analytics";
 import StatisticsAnalytics from "@/components/module/analytics-screen/statistics/statistics-analytics";
+import NoInternet from "@/components/module/errors/no-internet";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { ThemedText } from "@/components/ui/theme-text";
+import { useAuth } from "@/context/AuthProvider";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +21,7 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 const Analytics = () => {
   const { id, category } = useLocalSearchParams();
   const [selectedOption, setSelectedOption] = useState(category);
+  const { isConnected } = useAuth();
   const menu = ["Calendar", "Statistics"];
   const pagerRef = useRef<PagerView>(null);
   const getHabitDetailsQuery = useQuery({
@@ -29,6 +32,10 @@ const Analytics = () => {
   const CategoryIcon = getCategoryByName(
     getHabitDetailsQuery?.data?.category ?? ""
   )?.icon;
+
+  if (!isConnected) {
+    return <NoInternet onRefresh={() => getHabitDetailsQuery?.refetch()} />;
+  }
 
   // console.log(JSON.stringify(getHabitDetailsQuery?.data, null, 2));
 

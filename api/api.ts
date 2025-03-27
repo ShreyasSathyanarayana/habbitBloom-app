@@ -387,7 +387,8 @@ export const getAllHabits = async () => {
 
   if (userIdError || !userData?.user) {
     console.error("Error fetching user:", userIdError);
-    return [];
+    
+     throw new Error("Failed to fetch User Details"+userIdError);
   }
 
   const userId = userData.user.id;
@@ -406,7 +407,7 @@ export const getAllHabits = async () => {
 
   if (error) {
     console.error("Error fetching habits:", error);
-    return [];
+    throw new Error("Error fetching habits"+error)
   }
 
   return data;
