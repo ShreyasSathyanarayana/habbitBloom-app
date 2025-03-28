@@ -25,31 +25,37 @@ const YearlyGraph = ({ habitId }: Props) => {
   return (
     <View
       key={"yearly-graph"}
-      style={{ paddingVertical: verticalScale(16) }}
+      style={{
+        paddingVertical: verticalScale(16),
+        flex: 1,
+        justifyContent: "space-between",
+      }}
     >
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >
         {month} {year}
       </ThemedText>
-      <FlatList
-        horizontal
-        contentContainerStyle={{
-          paddingTop: verticalScale(16),
-        }}
-        scrollEventThrottle={16}
-        data={getYearlyGraphQuery.data}
-        keyExtractor={(_, index) => index.toString() + "weekDetails"}
-        renderItem={({ item, index }) => {
-          return (
-            <YearGraph
-              date={item.year}
-              completed={item.completed}
-              total={365}
-            />
-          );
-        }}
-      />
+      <View style={{ justifyContent: "flex-end" }}>
+        <FlatList
+          horizontal
+          contentContainerStyle={{
+            paddingTop: verticalScale(16),
+          }}
+          scrollEventThrottle={16}
+          data={getYearlyGraphQuery.data}
+          keyExtractor={(_, index) => index.toString() + "weekDetails"}
+          renderItem={({ item, index }) => {
+            return (
+              <YearGraph
+                date={item.year}
+                completed={item.completed}
+                total={365}
+              />
+            );
+          }}
+        />
+      </View>
     </View>
   );
 };

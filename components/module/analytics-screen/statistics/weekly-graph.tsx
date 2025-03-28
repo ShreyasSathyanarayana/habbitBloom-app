@@ -34,7 +34,14 @@ const WeeklyGraph = ({ habitId }: Props) => {
   }
 
   return (
-    <View key={"weekly-graph"} style={{ paddingVertical: verticalScale(16) }}>
+    <View
+      key={"weekly-graph"}
+      style={{
+        paddingVertical: verticalScale(16),
+        justifyContent: "space-between",
+        flex: 1,
+      }}
+    >
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >

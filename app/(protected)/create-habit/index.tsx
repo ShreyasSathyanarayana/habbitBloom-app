@@ -39,6 +39,7 @@ import CalenderIcon from "@/assets/svg/calendar-active-icon.svg";
 import CalenderInactiveIcon from "@/assets/svg/calendar-inactive-icon.svg";
 import UpdownInactiveIcon from "@/assets/svg/up-down-inactive.svg";
 import DateInputV2 from "@/components/ui/date-picker";
+import DescriptionIcon from "@/assets/svg/description-icon.svg";
 
 const days = ["S", "M", "T", "W", "T", "F", "S"];
 const colors = [
@@ -331,15 +332,17 @@ const CreateHabit = () => {
             }) => (
               <TextField
                 // key={"habitName"}
-                textarea={true}
                 label="Description (Optional)"
                 placeholder="Description here"
-                numberOfLines={4}
+                numberOfLines={5}
+                textarea={true}
+                maxLength={200}
+                multiline
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
                 leftIcon={
-                  <HabitNameIcon
+                  <DescriptionIcon
                     width={horizontalScale(24)}
                     height={horizontalScale(24)}
                   />

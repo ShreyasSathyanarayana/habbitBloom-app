@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, View } from "react-native";
 import React, { forwardRef } from "react";
 import Label from "./Label";
-import { horizontalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
 
 interface TextFieldRawProps extends React.ComponentProps<typeof TextInput> {
@@ -10,10 +10,14 @@ interface TextFieldRawProps extends React.ComponentProps<typeof TextInput> {
   disabled?: boolean;
   error?: boolean;
   success?: boolean;
+  textarea?: boolean;
 }
 
 export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
-  ({ rightIcon, leftIcon, disabled, value, error, success, ...rest }, ref) => {
+  (
+    { rightIcon, leftIcon, disabled, value, error, success, textarea, ...rest },
+    ref
+  ) => {
     const safeValue = value ?? "";
 
     return (
@@ -28,6 +32,11 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
             : success
             ? { borderColor: "green" }
             : {},
+          textarea && {
+            height: verticalScale(150),
+            alignItems: "flex-start",
+            paddingVertical: verticalScale(16),
+          },
         ]}
       >
         {leftIcon &&
@@ -50,6 +59,7 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
               textShadowOffset: { width: 0, height: 0 },
               textShadowRadius: 0,
             },
+            textarea && { paddingVertical: 0 },
           ]}
           value={safeValue}
           {...rest}

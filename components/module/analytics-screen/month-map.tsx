@@ -125,7 +125,7 @@ const MonthMap = ({ habitId }: Props) => {
       key={"calender-view"}
       entering={FadeInRight.springify().damping(40).stiffness(200)}
       exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
-      style={{ marginBottom: verticalScale(20) }}
+      // style={{ marginBottom: verticalScale(20) }}
     >
       <Calendar
         markedDates={markedDates}

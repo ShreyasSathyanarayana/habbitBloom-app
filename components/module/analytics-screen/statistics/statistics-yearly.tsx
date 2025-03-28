@@ -24,9 +24,13 @@ const StatisticsYearly = ({ habitId }: Props) => {
         menu={menu}
         onChangeMenu={(item, index) => setSeletedMenu(item)}
       />
-      {selectedMenu === "Week" && <WeeklyGraph habitId={habitId} />}
-      {selectedMenu === "Month" && <MontlyGraph habitId={habitId} />}
-      {selectedMenu === "Year" && <YearlyGraph habitId={habitId} />}
+      <View
+        style={{ minHeight: verticalScale(200), justifyContent: "flex-end" }}
+      >
+        {selectedMenu === "Week" && <WeeklyGraph habitId={habitId} />}
+        {selectedMenu === "Month" && <MontlyGraph habitId={habitId} />}
+        {selectedMenu === "Year" && <YearlyGraph habitId={habitId} />}
+      </View>
     </View>
   );
 };

@@ -20,7 +20,7 @@ const YearGraph = ({ date, completed, total }: Props) => {
         width: _width,
         // height: verticalScale(100),
         justifyContent: "flex-end",
-        height: verticalScale(123),
+        // height: verticalScale(123),
       }}
     >
       <ThemedText
@@ -33,7 +33,7 @@ const YearGraph = ({ date, completed, total }: Props) => {
           style={[
             styles.circle,
             completed != 0 && {
-              height: horizontalScale((total / (total - completed)) * 10),
+              height: horizontalScale((total / (total - completed)) * 20),
             },
           ]}
         />

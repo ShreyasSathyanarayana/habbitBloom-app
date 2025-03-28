@@ -21,7 +21,13 @@ const MontlyGraph = ({ habitId }: Props) => {
   //   console.log("monthly", JSON.stringify(getMonthlyGraphQuery.data, null, 2));
 
   return (
-    <View style={{ paddingVertical: verticalScale(16) }}>
+    <View
+      style={{
+        paddingVertical: verticalScale(16),
+        justifyContent: "space-between",
+        flex: 1,
+      }}
+    >
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >

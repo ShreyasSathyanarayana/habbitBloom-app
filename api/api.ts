@@ -11,6 +11,7 @@ type CreateHabitSchema = {
   habitColor: string;
   googleNotificationEnable:boolean;
   end_date: string | null;
+  description:string
 };
 
 
@@ -39,7 +40,8 @@ export const createOrUpdateHabit = async (
     habit_color: formData.habitColor,
     google_notification_enable: formData.googleNotificationEnable,
     updated_at: new Date().toISOString(), // Always update timestamp
-    end_date: formData.end_date
+    end_date: formData.end_date,
+    habit_description: formData.description?.length?formData.description:null
   };
 
   // Include 'id' only if updating an existing habit
