@@ -187,7 +187,8 @@ const SignIn = () => {
               </TouchableOpacity>
             </View>
             <GradientButton
-              disable={!watch("email") && !watch("password")}
+              isLoading={mutation?.isPending}
+              disable={mutation?.isPending}
               onPress={handleSubmit(onSubmit)}
               title="LOG IN"
               style={{ marginVertical: verticalScale(32) }}

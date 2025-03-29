@@ -31,17 +31,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       router.dismissAll();
     }
     // router.replace("/(protected)/(tabs)/home");
+    router.dismissAll();
     router.replace("/(protected)/(tabs)");
   };
 
   const logout = async () => {
     await SecureStore.deleteItemAsync("accessToken");
     await SecureStore.deleteItemAsync("refreshToken");
-    if (router.canDismiss()) {
-      router.dismissAll();
-    }
-    router.replace("/");
-    router.push("/(not-auth)/(auth)/weclome-screen");
+    router.dismissAll();
+    router.replace("/(not-auth)/(auth)/weclome-screen");
   };
 
   const value = {

@@ -23,7 +23,6 @@ import { router } from "expo-router";
 import HabitHead from "@/components/module/habit-screen/habit-head";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HabitCard from "@/components/module/habit-screen/habit-card";
-import { Card } from "react-native-ui-lib";
 import HabitList from "@/components/module/habit-screen/habit-list";
 import HabitEmpty from "@/components/module/habit-screen/habit-empty";
 import { useQuery } from "@tanstack/react-query";

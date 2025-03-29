@@ -5,6 +5,7 @@ import { verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
 import Animated, {
+  LayoutAnimationConfig,
   LinearTransition,
   SharedValue,
 } from "react-native-reanimated";
@@ -35,20 +36,22 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Animated.FlatList
-        layout={LinearTransition.springify().damping(40).stiffness(200)}
-        onScroll={(e) => {
-          scrollY.value = e.nativeEvent.contentOffset.y;
-          // console.log("scroll", e.nativeEvent.contentOffset.y);
-        }}
-        // scrollEnabled={false}
-        contentContainerStyle={{
-          gap: verticalScale(16),
-          paddingBottom: verticalScale(150),
-        }}
-        data={habitList}
-        renderItem={({ item }) => <HabitCard {...item} />}
-      />
+      <LayoutAnimationConfig skipEntering>
+        <Animated.FlatList
+          layout={LinearTransition.springify().damping(40).stiffness(200)}
+          onScroll={(e) => {
+            scrollY.value = e.nativeEvent.contentOffset.y;
+            // console.log("scroll", e.nativeEvent.contentOffset.y);
+          }}
+          // scrollEnabled={false}
+          contentContainerStyle={{
+            gap: verticalScale(16),
+            paddingBottom: verticalScale(150),
+          }}
+          data={habitList}
+          renderItem={({ item }) => <HabitCard {...item} />}
+        />
+      </LayoutAnimationConfig>
     </View>
   );
 };

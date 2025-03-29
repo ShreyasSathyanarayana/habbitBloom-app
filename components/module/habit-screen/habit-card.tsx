@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, View } from "react-native";
 import HabitCardHead from "./habit-card-head";
 import HabitFrequencyList from "./habit-frequency-list";
 import HabitCardFooter from "./habit-card-footer";
-import { Dash } from "react-native-ui-lib";
 import Divider from "@/components/ui/divider";
 import { SheetManager } from "react-native-actions-sheet";
 import HabitDateList from "./habit-date-list";

@@ -398,7 +398,7 @@ export const getAllHabits = async () => {
     )
     .eq("user_id", userId)
     .eq("archived", false)
-    .order("reminder_time", { ascending: true });
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching habits:", error);
