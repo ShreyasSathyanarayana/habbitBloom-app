@@ -28,7 +28,7 @@ const AnalyticsBar = ({ onChangeMenu, menu, selectedMenu }: Props) => {
     if (initialIndex !== -1) {
       positionX.value = initialIndex * _selectedWidth;
     }
-  }, [selectedMenu]);
+  }, []);
 
   const positionX = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => {

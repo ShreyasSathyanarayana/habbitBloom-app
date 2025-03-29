@@ -43,8 +43,9 @@ export default function HabitsScreen() {
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
   const gethabitQuery = useQuery({
-    queryKey: ["habitList"],
+    queryKey: ["habitList", isConnected],
     queryFn: getAllHabits,
+    enabled: isConnected,
   });
 
   useDerivedValue(() => {
@@ -87,9 +88,9 @@ export default function HabitsScreen() {
     return <ServerError onRefresh={() => gethabitQuery?.refetch()} />;
   }
 
-  if (gethabitQuery?.data?.length === 0) {
-    return <HabitEmpty />;
-  }
+  // if (gethabitQuery?.data?.length === 0) {
+  //   return <HabitEmpty />;
+  // }
 
   return (
     <View
@@ -101,11 +102,14 @@ export default function HabitsScreen() {
       }}
     >
       <HabitHead onPressArchive={() => router.push("/(protected)/archive")} />
-      <HabitList
-        scrollY={scrollY}
-        isLoading={gethabitQuery.isLoading}
-        habitList={gethabitQuery?.data}
-      />
+      {gethabitQuery?.data?.length === 0 && <HabitEmpty />}
+      {gethabitQuery?.data?.length !== 0 && (
+        <HabitList
+          scrollY={scrollY}
+          isLoading={gethabitQuery.isLoading}
+          habitList={gethabitQuery?.data}
+        />
+      )}
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>

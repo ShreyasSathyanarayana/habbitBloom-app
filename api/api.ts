@@ -103,22 +103,18 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
 
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split("T")[0];
-
-  // 🔹 Validate that habitDate is either today or yesterday
-  if (habitDate !== todayStr ) {
+  // 🔹 Validate that habitDate is today
+  if (habitDate !== todayStr) {
     throw {
       message: "You can only update today's habit status",
       type: "warning",
     };
   }
 
-  // 🔹 Fetch existing habit progress record
+  // 🔹 Fetch existing habit progress record for today
   const { data: existingRecord, error: fetchError } = await supabase
     .from("habit_progress")
-    .select("id")
+    .select("id, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
     .eq("date", habitDate)
@@ -129,18 +125,32 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
     throw { message: "Error fetching habit progress. Try again later.", type: "danger" };
   }
 
-  // 🔹 Update if record exists, else insert
   if (existingRecord) {
-    const { error: updateError } = await supabase
-      .from("habit_progress")
-      .update({ status })
-      .eq("id", existingRecord.id);
+    // 🔹 If today's status is true → DELETE the record
+    if (existingRecord.status === true) {
+      const { error: deleteError } = await supabase
+        .from("habit_progress")
+        .delete()
+        .eq("id", existingRecord.id);
 
-    if (updateError) {
-      console.error("Error updating habit status:", updateError);
-      throw { message: "Failed to update habit. Try again later.", type: "danger" };
+      if (deleteError) {
+        console.error("Error deleting habit progress:", deleteError);
+        throw { message: "Failed to delete habit progress. Try again later.", type: "danger" };
+      }
+    } else {
+      // 🔹 If today's status is false → UPDATE it to true
+      const { error: updateError } = await supabase
+        .from("habit_progress")
+        .update({ status: true })
+        .eq("id", existingRecord.id);
+
+      if (updateError) {
+        console.error("Error updating habit status:", updateError);
+        throw { message: "Failed to update habit. Try again later.", type: "danger" };
+      }
     }
   } else {
+    // 🔹 If no record exists for today → INSERT a new record with the given status
     const { error: insertError } = await supabase
       .from("habit_progress")
       .insert([
@@ -160,7 +170,6 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
   return { success: true };
 };
-
 
 
 
@@ -590,18 +599,16 @@ export const fetchLast7DaysHabitProgress = async (
     .single();
 
   if (habitError || !habitData) {
-    console.error("Error fetching habit creation timestamp:", habitError);
+    console.error("Error fetching habit details:", habitError);
     return null;
   }
 
-  // Convert `created_at` (already in ISO format) to Date object
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setUTCHours(0, 0, 0, 0);
 
-  // Parse frequency (array like [0, 2, 4])
   const frequencyDays: number[] = habitData.frequency || [];
 
-  // 🔹 Fetch last active date using stored procedure
+  // Fetch last active date using stored procedure
   const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
     .rpc("get_last_active_date", { habit_id: habitId });
 
@@ -613,9 +620,48 @@ export const fetchLast7DaysHabitProgress = async (
   let lastActiveDate: Date | null = fetchedLastActiveDate
     ? new Date(fetchedLastActiveDate)
     : null;
+  if (lastActiveDate) lastActiveDate.setUTCHours(0, 0, 0, 0);
 
-  if (lastActiveDate) {
-    lastActiveDate.setUTCHours(0, 0, 0, 0);
+  // 🔹 Fetch archive & restore history
+  const { data: archiveLog, error: archiveError } = await supabase
+    .from("habit_archive_log")
+    .select("action, action_date")
+    .eq("habit_id", habitId)
+    .order("action_date", { ascending: true }); // Get actions in order
+
+  if (archiveError) {
+    console.error("Error fetching habit archive log:", archiveError);
+    return null;
+  }
+
+  let isArchived = false;
+  let validActivePeriods: { start: Date; end: Date | null }[] = [];
+  let currentStart: Date | null = habitStartDate;
+
+  for (const entry of archiveLog) {
+    const actionDate = new Date(entry.action_date);
+    actionDate.setUTCHours(0, 0, 0, 0);
+
+    if (entry.action === "archived") {
+      if (!isArchived) {
+        // Close current active period
+        if (currentStart) {
+          validActivePeriods.push({ start: currentStart, end: actionDate });
+        }
+        isArchived = true;
+      }
+    } else if (entry.action === "restored") {
+      if (isArchived) {
+        // Start a new active period
+        currentStart = actionDate;
+        isArchived = false;
+      }
+    }
+  }
+
+  // If still active, keep tracking
+  if (!isArchived && currentStart) {
+    validActivePeriods.push({ start: currentStart, end: null }); // End is null = active till today
   }
 
   // Fetch habit progress
@@ -643,21 +689,19 @@ export const fetchLast7DaysHabitProgress = async (
 
     let status: boolean | null = null;
 
-    // 1️⃣ Ensure date is **after or equal to habit creation date**
-    if (dateString < habitData.created_at.split("T")[0]) {
-      status = null;
-    }
-    // 2️⃣ Check if within last active range
-    else if (lastActiveDate && dateString > lastActiveDate.toISOString().split("T")[0]) {
-      status = null; // Ignore progress after last active date
-    }
-    // 3️⃣ Ensure 'false' is assigned only if it's a habit day
+    // Check if the date is within any valid active period
+    const isWithinActivePeriod = validActivePeriods.some(({ start, end }) => {
+      return dateString >= start.toISOString().split("T")[0] && (!end || dateString <= end.toISOString().split("T")[0]);
+    });
+
+    if (!isWithinActivePeriod) {
+      status = null; // Ignore if outside active period
+    } 
     else if (!frequencyDays.includes(dayOfWeek)) {
       status = null; // Not a habit day
     } 
-    // 4️⃣ Use progress data or default to false
     else {
-      status = progressMap.get(dateString) ?? false;
+      status = progressMap.get(dateString) ?? false; // Use progress data or default to false
     }
 
     result.push({ date: dateString, status });
@@ -666,6 +710,9 @@ export const fetchLast7DaysHabitProgress = async (
 
   return { habitId, data: result };
 };
+
+
+
 
 
 
@@ -695,10 +742,10 @@ export const fetchHabitProgressFromCreation = async (
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  // Fetch habit details including created_at, frequency, and archive status
+  // Fetch habit details including created_at and frequency
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
-    .select("created_at, frequency, archived")
+    .select("created_at, frequency")
     .eq("id", habitId)
     .single();
 
@@ -707,38 +754,53 @@ export const fetchHabitProgressFromCreation = async (
     return null;
   }
 
-  // Convert the habit creation timestamp to a Date object and normalize to midnight (UTC)
+  // Convert habit creation date to midnight UTC
   const habitStartDate = new Date(habitData.created_at);
   habitStartDate.setUTCHours(0, 0, 0, 0);
 
-  // Get last active date (before archiving) using Supabase function
-  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
-    .rpc("get_last_active_date", { habit_id: habitId });
+  // Parse frequency days (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
+  const frequencyDays: number[] = habitData.frequency || [];
 
-  if (lastActiveError) {
-    console.error("Error fetching last active date:", lastActiveError);
+  // Fetch all archive/unarchive events for this habit
+  const { data: archiveLogs, error: archiveError } = await supabase
+    .from("habit_archive_log")
+    .select("action, action_date")
+    .eq("habit_id", habitId)
+    .order("action_date", { ascending: true });
+
+  if (archiveError) {
+    console.error("Error fetching archive logs:", archiveError);
     return null;
   }
 
-  // Determine the valid end date for progress tracking
-  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : today;
-  lastActiveDate.setUTCHours(0, 0, 0, 0);
+  // Convert logs into structured archive periods
+  let archivePeriods: { start: Date; end: Date | null }[] = [];
+  let lastArchiveStart: Date | null = null;
 
-  // If habit is archived, do not track progress beyond lastActiveDate
-  if (habitData.archived) {
-    lastActiveDate.setUTCHours(0, 0, 0, 0);
+  archiveLogs.forEach((log) => {
+    const actionDate = new Date(log.action_date);
+    actionDate.setUTCHours(0, 0, 0, 0);
+
+    if (log.action === "archived") {
+      lastArchiveStart = actionDate;
+    } else if (log.action === "restored" && lastArchiveStart) {
+      archivePeriods.push({ start: lastArchiveStart, end: actionDate });
+      lastArchiveStart = null;
+    }
+  });
+
+  // If the last action was "archived" but never restored, mark as still archived
+  if (lastArchiveStart) {
+    archivePeriods.push({ start: lastArchiveStart, end: null });
   }
 
-  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
-  const frequencyDays: number[] = habitData.frequency || [];
-
-  // Fetch habit progress from habit creation to last active date
+  // Fetch habit progress
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .gte("date", habitStartDate.toISOString().split("T")[0]) // Start from habit creation
-    .lte("date", lastActiveDate.toISOString().split("T")[0]); // Up to last active date
+    .gte("date", habitStartDate.toISOString().split("T")[0])
+    .lte("date", today.toISOString().split("T")[0]); // Track up to today
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -748,21 +810,40 @@ export const fetchHabitProgressFromCreation = async (
   // Convert progress data into a Map for quick lookup
   const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
 
-  // Generate date range from habit creation to last active date, considering frequency
+  // Generate progress list, excluding archived periods
   const result: HabitProgressEntry[] = [];
   let currentDate = new Date(habitStartDate);
 
-  while (currentDate <= lastActiveDate) {
+  while (currentDate <= today) {
     const dateString = currentDate.toISOString().split("T")[0];
     const dayOfWeek = currentDate.getUTCDay();
 
-    if (frequencyDays.includes(dayOfWeek)) {
-      let status: boolean | null = null;
+    // Check if the date falls within an archived period
+    const archiveRecord = archivePeriods.find(
+      ({ start, end }) => currentDate >= start && (end === null || currentDate < end)
+    );
 
+    let status: boolean | null = null;
+    let completed = false;
+
+    if (frequencyDays.includes(dayOfWeek)) {
       if (progressMap.has(dateString)) {
-        status = progressMap.get(dateString)!; // Use recorded status (true/false)
+        status = progressMap.get(dateString)!;
+        completed = status === true;
       } else {
         status = false; // Default to false for missing records
+      }
+
+      // Check if archived **after** completion
+      if (archiveRecord) {
+        const archiveStart = archiveRecord.start.toISOString().split("T")[0];
+
+        if (dateString === archiveStart) {
+          // If the habit was **completed** before archive, keep the completed status
+          completed = progressMap.has(dateString) && progressMap.get(dateString) === true;
+        } else {
+          status = null; // Mark as archived
+        }
       }
 
       result.push({ date: dateString, status });
@@ -777,6 +858,8 @@ export const fetchHabitProgressFromCreation = async (
 
 
 
+
+
 export const getCompletedHabitStats = async (habitId: string) => {
   const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -785,51 +868,20 @@ export const getCompletedHabitStats = async (habitId: string) => {
     return getDefaultStats();
   }
 
-  // Fetch habit details (created_at, frequency, archived)
-  const { data: habitData, error: habitError } = await supabase
-    .from("habit")
-    .select("created_at, frequency, archived")
-    .eq("id", habitId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (habitError || !habitData) {
-    console.error("Error fetching habit data:", habitError);
-    return getDefaultStats();
-  }
-
-  // Convert habit creation timestamp to a Date object
-  const habitCreatedAt = new Date(habitData.created_at);
-  habitCreatedAt.setUTCHours(0, 0, 0, 0);
-
-  // Fetch last active date before archiving
-  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
-    .rpc("get_last_active_date", { habit_id: habitId });
-
-  if (lastActiveError) {
-    console.error("Error fetching last active date:", lastActiveError);
-    return getDefaultStats();
-  }
-
-  // Determine habit's last active day
-  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : new Date();
-  lastActiveDate.setUTCHours(0, 0, 0, 0);
-
-  // Parse frequency (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
-  const frequencyDays: number[] = habitData.frequency || [];
-
-  // Fetch habit progress
+  // Fetch habit progress directly from habit_progress table
   const { data: progressData, error: fetchError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
-    .gte("date", habitCreatedAt.toISOString().split("T")[0])
-    .lte("date", lastActiveDate.toISOString().split("T")[0])
     .order("date", { ascending: true });
 
   if (fetchError) {
     console.error("Error fetching habit progress:", fetchError);
+    return getDefaultStats();
+  }
+
+  if (!progressData || progressData.length === 0) {
     return getDefaultStats();
   }
 
@@ -842,7 +894,6 @@ export const getCompletedHabitStats = async (habitId: string) => {
   // Initialize tracking variables
   let completedCount = 0, notCompletedCount = 0;
   let highestStreak = 0, currentStreak = 0;
-
   let weeklyCompleted = 0, weeklyNotCompleted = 0;
   let monthlyCompleted = 0, monthlyNotCompleted = 0;
   let yearlyCompleted = 0, yearlyNotCompleted = 0;
@@ -857,53 +908,34 @@ export const getCompletedHabitStats = async (habitId: string) => {
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const startOfYear = new Date(today.getFullYear(), 0, 1);
 
-  let currentDate = new Date(habitCreatedAt);
+  // Iterate over fetched habit progress
+  for (const { date, status } of progressData) {
+    const entryDate = new Date(date);
+    entryDate.setUTCHours(0, 0, 0, 0);
 
-  // Iterate from habit creation date to last active date
-  while (currentDate <= lastActiveDate) {
-    const dateString = currentDate.toISOString().split("T")[0];
-    const dayOfWeek = currentDate.getUTCDay();
+    const isCompleted = !!status;
 
-    // Check if the day matches the habit's scheduled frequency
-    if (frequencyDays.includes(dayOfWeek)) {
-      let isCompleted = false;
-      let isCounted = false;
-
-      if (progressMap.has(dateString)) {
-        if (progressMap.get(dateString)) {
-          completedCount++;
-          isCompleted = true;
-          currentStreak++;
-          highestStreak = Math.max(highestStreak, currentStreak);
-        } else {
-          notCompletedCount++;
-          currentStreak = 0;
-        }
-        isCounted = true;
-      } else if (currentDate < today) {
-        notCompletedCount++; // Default to false for missing records before today
-        currentStreak = 0;
-        isCounted = true;
-      }
-
-      // Check for weekly, monthly, and yearly count
-      if (currentDate >= startOfWeek && currentDate <= today) {
-        if (isCompleted) weeklyCompleted++;
-        else if (isCounted) weeklyNotCompleted++;
-      }
-
-      if (currentDate >= startOfMonth && currentDate <= today) {
-        if (isCompleted) monthlyCompleted++;
-        else if (isCounted) monthlyNotCompleted++;
-      }
-
-      if (currentDate >= startOfYear && currentDate <= today) {
-        if (isCompleted) yearlyCompleted++;
-        else if (isCounted) yearlyNotCompleted++;
-      }
+    if (isCompleted) {
+      completedCount++;
+      currentStreak++;
+      highestStreak = Math.max(highestStreak, currentStreak);
+    } else {
+      notCompletedCount++;
+      currentStreak = 0;
     }
 
-    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+    // Check for weekly, monthly, and yearly counts
+    if (entryDate >= startOfWeek) {
+      isCompleted ? weeklyCompleted++ : weeklyNotCompleted++;
+    }
+
+    if (entryDate >= startOfMonth) {
+      isCompleted ? monthlyCompleted++ : monthlyNotCompleted++;
+    }
+
+    if (entryDate >= startOfYear) {
+      isCompleted ? yearlyCompleted++ : yearlyNotCompleted++;
+    }
   }
 
   return {
@@ -916,6 +948,7 @@ export const getCompletedHabitStats = async (habitId: string) => {
     yearly: { completed: yearlyCompleted, notCompleted: yearlyNotCompleted },
   };
 };
+
 
 // Helper function to return default stats
 const getDefaultStats = () => ({
@@ -940,44 +973,13 @@ export const fetchHabitProgressForCurrentMonth = async (
   const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
   const endOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0));
 
-  // Fetch habit details including created_at, frequency, and archive status
-  const { data: habitData, error: habitError } = await supabase
-    .from("habit")
-    .select("created_at, frequency, archived")
-    .eq("id", habitId)
-    .single();
-
-  if (habitError || !habitData) {
-    console.error("Error fetching habit data:", habitError);
-    return null;
-  }
-
-  // Get last active date before archiving
-  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
-    .rpc("get_last_active_date", { habit_id: habitId });
-
-  if (lastActiveError) {
-    console.error("Error fetching last active date:", lastActiveError);
-    return null;
-  }
-
-  // Determine valid end date (up to last active date or full month)
-  let lastActiveDate = fetchedLastActiveDate ? new Date(fetchedLastActiveDate) : today;
-  lastActiveDate.setUTCHours(0, 0, 0, 0);
-  if (habitData.archived) {
-    lastActiveDate.setUTCHours(0, 0, 0, 0);
-  }
-
-  // Ensure tracking covers the full month up to today or last active date
-  lastActiveDate = lastActiveDate > endOfMonth ? endOfMonth : lastActiveDate;
-
   // Fetch habit progress for the current month
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .gte("date", startOfMonth.toISOString().split("T")[0]) // ✅ Always from the 1st
-    .lte("date", lastActiveDate.toISOString().split("T")[0]);
+    .lte("date", endOfMonth.toISOString().split("T")[0]);
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -995,7 +997,7 @@ export const fetchHabitProgressForCurrentMonth = async (
     const dateString = currentDate.toISOString().split("T")[0];
 
     // Check if progress exists; otherwise, set default to `false`
-    let status: boolean = progressMap.has(dateString) ? progressMap.get(dateString)! : false;
+    let status: boolean = progressMap.get(dateString) ?? false;
 
     result.push({ date: dateString, status });
 
@@ -1004,6 +1006,7 @@ export const fetchHabitProgressForCurrentMonth = async (
 
   return { habitId, data: result };
 };
+
 
 
 

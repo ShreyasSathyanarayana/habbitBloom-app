@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon.png"
       },
-      "package": "com.shreyas8747.habitBloom"
+      "package": "com.shreyas8747.habitBloom",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "bundler": "metro",

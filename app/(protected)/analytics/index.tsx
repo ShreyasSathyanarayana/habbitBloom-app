@@ -58,8 +58,8 @@ const Analytics = () => {
           menu={menu}
           selectedMenu={category as string}
           onChangeMenu={(item, index) => {
-            pagerRef.current?.setPage(index);
             setSelectedOption(item);
+            pagerRef.current?.setPage(index);
           }}
         />
 

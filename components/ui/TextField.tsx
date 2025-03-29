@@ -47,8 +47,9 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
             opacity: safeValue.length > 0 ? 1 : 0.5,
           })}
         <TextInput
-          ref={ref}
+          ref={ref as React.RefObject<TextInput>}
           allowFontScaling={false}
+          textAlignVertical="top"
           style={[
             styles.textField,
             error && { color: "rgba(255, 0, 0, 1)" },

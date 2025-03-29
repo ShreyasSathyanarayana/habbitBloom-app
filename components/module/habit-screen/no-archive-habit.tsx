@@ -10,7 +10,7 @@ const NoArchiveHabit = () => {
   return (
     <View style={styles.container}>
       <NoArchiveHabitIcon width={_iconSize} height={_iconSize} />
-      <ThemedText style={{ textAlign: "center" }}>
+      <ThemedText style={{ textAlign: "center", fontFamily: "PoppinsMedium" }}>
         No habits archived yet! Move habits here to hide them and bring them
         back anytime.
       </ThemedText>

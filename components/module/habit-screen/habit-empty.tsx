@@ -11,7 +11,7 @@ const HabitEmpty = () => {
       <View style={{ gap: verticalScale(16) }}>
         <EmptyHabit width={_iconSize} height={_iconSize} />
         <ThemedText
-          style={{ textAlign: "center", fontFamily: "PoppinSemiBold" }}
+          style={{ textAlign: "center", fontFamily: "PoppinsMedium" }}
         >
           No habits yet! Begin your journey by adding one.
         </ThemedText>
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "black",
     paddingHorizontal: horizontalScale(16),
+    // justifyContent: "space-evenly",
   },
 });
 
