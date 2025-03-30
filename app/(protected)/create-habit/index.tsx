@@ -204,7 +204,11 @@ const CreateHabit = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        style={{ flex: 1, paddingHorizontal: horizontalScale(16) }}
+        style={{
+          flex: 1,
+          paddingHorizontal: horizontalScale(16),
+          paddingTop: verticalScale(16),
+        }}
       >
         <View
           style={{
@@ -214,9 +218,13 @@ const CreateHabit = () => {
           }}
         >
           <InfoIcon width={horizontalScale(24)} height={horizontalScale(24)} />
+
           <ThemedText style={{ fontSize: getFontSize(13) }}>
             Learn how to track habits effectively!{" "}
             <ThemedText
+              onPress={() =>
+                router.push("/(protected)/create-habit/habit-instruction")
+              }
               style={{
                 color: "rgba(138, 43, 226, 1)",
                 fontSize: getFontSize(13),

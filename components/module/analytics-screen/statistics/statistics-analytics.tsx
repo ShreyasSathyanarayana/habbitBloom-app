@@ -29,12 +29,12 @@ const StatisticsAnalytics = ({ habitId, habitHasEndDate = false }: Props) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: verticalScale(17) }}
       >
-        {habitHasEndDate && (
+        {/* {habitHasEndDate && (
           <>
             <HabitScore habitId={habitId} />
             <Divider style={styles.dividerStyle} />
           </>
-        )}
+        )} */}
         <StreakDetails habitId={habitId} />
         <Divider style={styles.dividerStyle} />
         <TimesCompleted habitId={habitId} />

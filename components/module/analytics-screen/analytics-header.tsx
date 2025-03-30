@@ -40,6 +40,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: verticalScale(16),
     paddingHorizontal: horizontalScale(16),
+    borderBottomWidth: horizontalScale(1),
+    // borderColor: "rgba(255, 255, 255, 0.15)",
+    // marginBottom: verticalScale(10),
   },
   backButton: {
     marginBottom: 0,

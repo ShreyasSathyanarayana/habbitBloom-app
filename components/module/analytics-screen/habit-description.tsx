@@ -19,13 +19,13 @@ const HabitDescription = ({ habitId }: Props) => {
     },
     enabled: !!habitId,
   });
-//   console.log(
-//     "getHabitDetailsQuery",
-//     JSON.stringify(getHabitDetailsQuery?.data, null, 2)
-//   );
+  //   console.log(
+  //     "getHabitDetailsQuery",
+  //     JSON.stringify(getHabitDetailsQuery?.data, null, 2)
+  //   );
 
   return (
-    <View>
+    <View style={{ paddingBottom: verticalScale(16) }}>
       <Label label="Description">
         <Skeleton show={getHabitDetailsQuery?.isLoading}>
           <View
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(31, 34, 42, 1)",
     borderRadius: horizontalScale(12),
     borderWidth: horizontalScale(2),
-    borderColor: "white",
+    borderColor: "rgba(142, 142, 147, 1)",
     padding: horizontalScale(16),
   },
 });

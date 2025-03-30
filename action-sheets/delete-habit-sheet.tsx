@@ -9,6 +9,7 @@ import { useToast } from "react-native-toast-notifications";
 import SheetHeader from "./sheet-header";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
+import Button from "@/components/ui/button";
 // import Button from "@/components/ui/button";
 const closeSheet = () => {
   SheetManager.hide("delete-habit");
@@ -76,7 +77,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
           gap: horizontalScale(8),
         }}
       >
-        {/* {!payload?.archived && (
+        {!payload?.archived && (
           <Button
             onPress={() => {
               archiveHabitMutation.mutateAsync();
@@ -103,7 +104,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
           }}
           style={{ flex: 1 }}
           label="Delete"
-        /> */}
+        />
       </View>
     </ActionSheetContainer>
   );

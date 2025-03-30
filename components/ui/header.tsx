@@ -40,6 +40,9 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(16),
     paddingHorizontal: horizontalScale(16),
     width: "100%",
+    borderBottomWidth: horizontalScale(1),
+    borderBottomColor: "rgba(255, 255, 255, 0.15)",
+    // marginBottom: verticalScale(10),
     // maxWidth: screenWidth - horizontalScale(20),
   },
   backButton: {

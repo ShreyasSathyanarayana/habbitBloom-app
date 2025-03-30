@@ -252,16 +252,16 @@ export const getHabitStats = async (habitId: string) => {
   // Parse frequency (e.g., [0,1,2] for Sunday, Monday, Tuesday)
   const frequencyDays: number[] = habitData.frequency || [];
 
-  // Fetch progress data
-  const { data: progressData, error: fetchError } = await supabase
+  // Fetch habit progress
+  const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", user.id)
     .order("date", { ascending: true });
 
-  if (fetchError) {
-    console.error("Error fetching habit progress:", fetchError);
+  if (progressError) {
+    console.error("Error fetching habit progress:", progressError);
     return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
   }
 
@@ -272,6 +272,26 @@ export const getHabitStats = async (habitId: string) => {
     progressMap.set(formattedDate, entry.status);
   });
 
+  // 🔹 Fetch Archive Logs to determine active periods
+  const { data: archiveLogs, error: archiveError } = await supabase
+    .from("habit_archive_log")
+    .select("action, action_date")
+    .eq("habit_id", habitId)
+    .eq("user_id", user.id)
+    .order("action_date", { ascending: true });
+
+  if (archiveError) {
+    console.error("Error fetching archive logs:", archiveError);
+    return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
+  }
+
+  // Convert archive log dates to a sorted list of events
+  let isActive = true; // By default, habit is active
+  let archiveEvents: { date: Date; action: string }[] = archiveLogs.map((log) => ({
+    date: new Date(log.action_date),
+    action: log.action
+  }));
+
   // 🔹 Initialize tracking variables
   let completedCount = 0;
   let notCompletedCount = 0;
@@ -281,15 +301,31 @@ export const getHabitStats = async (habitId: string) => {
   // Normalize today's date to UTC midnight
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
-  
+
   const lastDate = endDate && endDate < today ? endDate : today; // Use `end_date` if it's earlier
 
   let currentDate = new Date(habitCreatedAt);
   let lastCompletedDate: Date | null = null;
+  let lastScheduledCompleted = false; // Tracks if the last scheduled habit day was completed
+
+  // Process archive events sequentially while iterating
+  let archiveIndex = 0;
 
   while (currentDate <= lastDate) {
     const dateString = currentDate.toISOString().split("T")[0];
     const dayOfWeek = currentDate.getUTCDay();
+
+    // Process archive/unarchive logs dynamically
+    while (archiveIndex < archiveEvents.length && archiveEvents[archiveIndex].date <= currentDate) {
+      isActive = archiveEvents[archiveIndex].action === "restored";
+      archiveIndex++;
+    }
+
+    // Skip days when habit was archived
+    if (!isActive) {
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+      continue;
+    }
 
     if (!frequencyDays.includes(dayOfWeek)) {
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
@@ -299,9 +335,10 @@ export const getHabitStats = async (habitId: string) => {
     if (progressMap.has(dateString)) {
       if (progressMap.get(dateString)) {
         completedCount++;
+        lastScheduledCompleted = true; // ✅ Mark last scheduled day as completed
         
-        // If lastCompletedDate is the previous day, increment streak
-        if (lastCompletedDate && (currentDate.getTime() - lastCompletedDate.getTime() === 86400000)) {
+        // If lastCompletedDate is the previous scheduled habit day, increment streak
+        if (lastCompletedDate && lastScheduledCompleted) {
           currentStreak++;
         } else {
           currentStreak = 1; // Reset to 1 for a new streak
@@ -311,11 +348,13 @@ export const getHabitStats = async (habitId: string) => {
         lastCompletedDate = new Date(currentDate);
       } else {
         notCompletedCount++;
+        lastScheduledCompleted = false; // ❌ No completion on a past scheduled day
         currentStreak = 0; // Streak breaks on an explicitly marked failure
       }
     } else {
       if (currentDate < today) {
         notCompletedCount++;
+        lastScheduledCompleted = false; // ❌ Last scheduled day was not completed
         currentStreak = 0; // Streak breaks on an uncompleted past day
       }
     }
@@ -325,8 +364,6 @@ export const getHabitStats = async (habitId: string) => {
 
   return { completed: completedCount, notCompleted: notCompletedCount, streak: currentStreak, highestStreak };
 };
-
-
 
 
 
