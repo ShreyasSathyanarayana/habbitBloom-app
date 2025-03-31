@@ -23,8 +23,6 @@ export type HabitProp = {
   archived: boolean;
 };
 
-const AnimatedBtn = Animated.createAnimatedComponent(Pressable);
-
 const HabitCard = (props: HabitProp) => {
   const { habit_name, category, archived } = props;
 
@@ -35,9 +33,9 @@ const HabitCard = (props: HabitProp) => {
   };
 
   return (
-    <AnimatedBtn
+    <Pressable
       key={"habit-card-" + props.id}
-      layout={LinearTransition.springify().damping(40).stiffness(200)}
+      // layout={LinearTransition.springify().damping(40).stiffness(200)}
       onPress={() =>
         SheetManager.show("habit-details", { payload: { data: props } })
       }
@@ -48,7 +46,7 @@ const HabitCard = (props: HabitProp) => {
       {!archived && <HabitDateList habitId={props.id} />}
       <Divider style={{ marginVertical: verticalScale(12) }} />
       <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
-    </AnimatedBtn>
+    </Pressable>
   );
 };
 
