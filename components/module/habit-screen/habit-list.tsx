@@ -23,10 +23,15 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <FlatList
+        <FlashList
+          estimatedItemSize={7}
+          showsVerticalScrollIndicator={false}
           data={[1, 2, 3]}
           keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={{ gap: verticalScale(16) }}
+          // contentContainerStyle={{ gap: verticalScale(16) }}
+          ItemSeparatorComponent={() => (
+            <View style={{ height: verticalScale(16) }} />
+          )}
           renderItem={() => {
             return <Skeleton width={"100%"} height={verticalScale(250)} />;
           }}
@@ -53,6 +58,8 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
       /> */}
       <FlashList
         data={habitList}
+        
+        getItemType={(item) => item.id}
         onScroll={(e) => {
           scrollY.value = e.nativeEvent.contentOffset.y;
         }}

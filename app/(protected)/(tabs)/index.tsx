@@ -37,6 +37,7 @@ export default function HabitsScreen() {
     queryKey: ["habitList", isConnected],
     queryFn: getAllHabits,
     enabled: isConnected,
+    staleTime: 10000,
   });
 
   useDerivedValue(() => {

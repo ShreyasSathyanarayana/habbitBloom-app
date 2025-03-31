@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { verticalScale } from "@/metric";
+import { FlashList } from "@shopify/flash-list";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -13,7 +14,7 @@ type Props = {
 const HabitFrequencyList = ({ frequency }: Props) => {
   return (
     <View style={styles.container}>
-      {frequency.map((day, index) => {
+      {/* {frequency.map((day, index) => {
         return (
           <ThemedText
             key={"day-" + day}
@@ -23,7 +24,28 @@ const HabitFrequencyList = ({ frequency }: Props) => {
             {weekList[day]}
           </ThemedText>
         );
-      })}
+      })} */}
+      <FlashList
+        data={frequency}
+        estimatedItemSize={7}
+        
+        horizontal
+        keyExtractor={(_, index) => "day-" + index.toString()}
+        renderItem={({ index, item: day }) => {
+          return (
+            <ThemedText
+              key={"day-" + day}
+              style={{
+                fontSize: getFontSize(12),
+                color: "rgba(52, 199, 89, 1)",
+              }}
+            >
+              {index !== 0 && index !== frequency?.length ? ", " : ""}
+              {weekList[day]}
+            </ThemedText>
+          );
+        }}
+      />
     </View>
   );
 };
