@@ -54,13 +54,13 @@ const SignIn = () => {
         id: string;
       };
     }) => {
-      toast.show("Login Succesful", {
-        type: "success",
-      });
       login({
         accessToken: data?.user.id, // Replace with actual access token
         refreshToken: data?.user.id,
       });
+      // toast.show("Login Succesful", {
+      //   type: "success",
+      // });
     },
   });
   const toast = useToast();

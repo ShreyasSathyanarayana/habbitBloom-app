@@ -38,7 +38,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
     },
     onSuccess: (isSuccess: boolean) => {
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
-      toast.show(`${payload?.habit_name} Archived`, {
+      toast.show(`${payload?.habit_name?.trim()} Archived`, {
         type: "success",
       });
     },
@@ -60,7 +60,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
 
-      toast.show(`${payload?.habit_name} Unarchived`, {
+      toast.show(`${payload?.habit_name?.trim()} Unarchived`, {
         type: "success",
       });
     },

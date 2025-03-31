@@ -204,10 +204,12 @@ const CreateHabit = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingTop: verticalScale(16) }}
         style={{
           flex: 1,
           paddingHorizontal: horizontalScale(16),
-          paddingTop: verticalScale(16),
+          // marginTop: verticalScale(16),
+          // paddingTop: verticalScale(16),
         }}
       >
         <View

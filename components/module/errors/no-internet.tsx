@@ -16,7 +16,11 @@ const NoInternet = ({ onRefresh }: Props) => {
       <ThemedText style={{ fontFamily: "PoppinsMedium", textAlign: "center" }}>
         No Internet Connection. Please check your network and try again.
       </ThemedText>
-      <Button label="RETRY" onPress={onRefresh} />
+      <Button
+        label="RETRY"
+        onPress={onRefresh}
+        labelStyle={{ fontFamily: "PoppinsBold" }}
+      />
     </View>
   );
 };

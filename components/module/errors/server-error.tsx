@@ -17,7 +17,11 @@ const ServerError = ({ onRefresh }: Props) => {
       <ThemedText style={{ fontFamily: "PoppinsMedium", textAlign: "center" }}>
         Oops! Our servers are currently down. Please try again later.
       </ThemedText>
-      <Button label="RETRY" onPress={onRefresh} />
+      <Button
+        label="RETRY"
+        onPress={onRefresh}
+        labelStyle={{ fontFamily: "PoppinsBold" }}
+      />
     </View>
   );
 };

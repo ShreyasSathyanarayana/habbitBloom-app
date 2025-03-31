@@ -38,12 +38,11 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
     <View style={styles.container}>
       <LayoutAnimationConfig skipEntering>
         <Animated.FlatList
+          initialNumToRender={4}
           layout={LinearTransition.springify().damping(40).stiffness(200)}
           onScroll={(e) => {
             scrollY.value = e.nativeEvent.contentOffset.y;
-            // console.log("scroll", e.nativeEvent.contentOffset.y);
           }}
-          // scrollEnabled={false}
           contentContainerStyle={{
             gap: verticalScale(16),
             paddingBottom: verticalScale(150),

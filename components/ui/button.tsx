@@ -31,6 +31,7 @@ const Button = ({ outline, labelStyle, label, style, ...rest }: Props) => {
 
 const styles = StyleSheet.create({
   btnStyle: {
+    flexDirection: "row",
     paddingVertical: verticalScale(13),
     alignItems: "center",
     justifyContent: "center",
@@ -38,7 +39,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(138, 43, 226, 1)",
     borderWidth: horizontalScale(1),
     borderColor: "rgba(138, 43, 226, 1)",
-    flex: 1,
+    width: "100%",
+    // flex: 1,
     // backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   outLineBtnStyle: {

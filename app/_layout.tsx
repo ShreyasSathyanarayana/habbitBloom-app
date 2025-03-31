@@ -10,7 +10,7 @@ import {
 // import {
 //   useFonts,
 // } from "@expo-google-fonts/poppins";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useAuth } from "@/context/AuthProvider";
 import Providers from "@/components/Provider";
 
@@ -114,13 +114,15 @@ export const RootLayoutWrapper = () => {
           offsetTop={10}
           offsetBottom={40}
           swipeEnabled={true}
-          renderToast={(toast) => (
-            <CustomToast
-              message={toast.message}
-              type={toast.type as unknown as ToastType}
-              id={toast.id}
-            />
-          )}
+          renderToast={(toast) =>
+            useMemo(() => (
+              <CustomToast
+                message={toast.message}
+                type={toast.type as unknown as ToastType}
+                id={toast.id}
+              />
+            ),[])
+          }
         >
           <SheetProvider>
             {/* <StatusBar hidden={true} /> */}

@@ -1,6 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/utils/SupaLegend";
+import { getUserId } from "@/utils/persist-storage";
 
 type CreateHabitSchema = {
   habitName: string;
@@ -20,14 +19,7 @@ export const createOrUpdateHabit = async (
   formData: CreateHabitSchema,
   habitId?: string // Optional: If provided, update instead of insert
 ) => {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !userData?.user) {
-    console.error("Error fetching user:", userError);
-    throw new Error("Failed to fetch user: " + userError?.message);
-  }
-
-  const userId = userData.user.id;
+  const userId = await getUserId();
 
   // Build habit data object dynamically
   const habitData: any = {
@@ -67,14 +59,8 @@ export const createOrUpdateHabit = async (
 
 
 export const deleteHabit = async (habitId: string) => {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  if (userError || !userData?.user) {
-    console.error("Error fetching user:", userError);
-    throw new Error("Failed to fetch user: " + userError?.message);
-  }
-
-  const userId = userData.user.id;
+  const userId = await getUserId();
 
   const { error: deleteError } = await supabase
     .from("habit")
@@ -93,12 +79,7 @@ export const deleteHabit = async (habitId: string) => {
 
 
 export const markHabitStatus = async (habitId: string, status: boolean, habitDate: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    throw { message: "Authentication error. Please log in again.", type: "danger" };
-  }
+  const userId = await getUserId();
 
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
@@ -116,7 +97,7 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
     .from("habit_progress")
     .select("id, status")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("date", habitDate)
     .single();
 
@@ -156,7 +137,7 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
       .insert([
         {
           habit_id: habitId,
-          user_id: user.id,
+          user_id: userId,
           date: habitDate,
           status,
         },
@@ -175,18 +156,14 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
 
 export const getHabitStreak = async (habitId: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    return 0;
-  }
+ 
+  const userId = await getUserId();
 
   const { data, error: fetchError } = await supabase
     .from("habit_progress")
     .select("date")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", true) // Ensure only completed habits are considered
     .order("date", { ascending: false });
 
@@ -222,19 +199,14 @@ export const getHabitStreak = async (habitId: string) => {
 
 
 export const getHabitStats = async (habitId: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    return { completed: 0, notCompleted: 0, streak: 0, highestStreak: 0 };
-  }
+  const userId = await getUserId();
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at, frequency, end_date")
     .eq("id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
 
   if (habitError || !habitData) {
@@ -257,7 +229,7 @@ export const getHabitStats = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("date", { ascending: true });
 
   if (progressError) {
@@ -277,7 +249,7 @@ export const getHabitStats = async (habitId: string) => {
     .from("habit_archive_log")
     .select("action, action_date")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("action_date", { ascending: true });
 
   if (archiveError) {
@@ -373,15 +345,8 @@ export const getHabitStats = async (habitId: string) => {
 
 
 export const getHabitsByDate = async (date: string) => {
-  // Get the currently authenticated user
-  const { data: userData, error: userIdError } = await supabase.auth.getUser();
 
-  if (userIdError || !userData?.user) {
-    console.error("Error fetching user:", userIdError);
-    return [];
-  }
-
-  const userId = userData.user.id;
+  const userId = await getUserId();
 
   // Convert the given date into a timestamp range for the full day
   const endOfDay = `${date}T23:59:59.999Z`; // End of the given date
@@ -414,16 +379,9 @@ export const getHabitsByDate = async (date: string) => {
 
 
 export const getAllHabits = async () => {
-  // Get the currently authenticated user
-  const { data: userData, error: userIdError } = await supabase.auth.getUser();
 
-  if (userIdError || !userData?.user) {
-    console.error("Error fetching user:", userIdError);
-    
-     throw new Error("Failed to fetch User Details"+userIdError);
-  }
 
-  const userId = userData.user.id;
+  const userId = await getUserId();
 
   // Fetch all habits for the user
   const { data, error } = await supabase
@@ -446,15 +404,8 @@ export const getAllHabits = async () => {
 };
 
   export const getAllHabitsArchived = async () => {
-    // Get the currently authenticated user
-    const { data: userData, error: userIdError } = await supabase.auth.getUser();
 
-    if (userIdError || !userData?.user) {
-      console.error("Error fetching user:", userIdError);
-      return [];
-    }
-
-    const userId = userData.user.id;
+    const userId = await getUserId();
 
     // Fetch all habits for the user
     const { data, error } = await supabase
@@ -479,13 +430,7 @@ export const getAllHabits = async () => {
 export const archiveHabit = async (habitId: string): Promise<boolean> => {
   const archiveDate = new Date().toISOString();
 
-  // 1️⃣ Fetch user ID
-  const { data, error: userIdError } = await supabase.auth.getUser();
-  if (userIdError || !data?.user?.id) {
-    console.error("Error fetching user ID:", userIdError);
-    return false;
-  }
-  const userId = data.user.id;
+  const userId = await getUserId();
 
   // 2️⃣ Fetch last active date using RPC
   let lastActiveDate: string | null = null;
@@ -541,14 +486,7 @@ export const archiveHabit = async (habitId: string): Promise<boolean> => {
 
 export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
   const restoreDate = new Date().toISOString();
-
-  // 1️⃣ Fetch user ID
-  const { data, error: userIdError } = await supabase.auth.getUser();
-  if (userIdError || !data?.user?.id) {
-    console.error("Error fetching user ID:", userIdError);
-    return false;
-  }
-  const userId = data.user.id;
+  const userId = await getUserId();
 
   // 2️⃣ Update the habit table to mark as active again
   const { error: habitError } = await supabase
@@ -590,14 +528,8 @@ export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
 
 
 export const getHabitById = async (habitId: string) => {
-  const { data: userData, error: userIdError } = await supabase.auth.getUser();
 
-  if (userIdError || !userData?.user) {
-    console.error("Error fetching user:", userIdError?.message || "User not found");
-    return null; // Return `null` instead of an empty array when there's an error
-  }
-
-  const userId = userData.user.id;
+  const userId = await getUserId();
   const { data, error } = await supabase
     .from("habit")
     .select("*")
@@ -898,19 +830,14 @@ export const fetchHabitProgressFromCreation = async (
 
 
 export const getCompletedHabitStats = async (habitId: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    return getDefaultStats();
-  }
+  const userId = await getUserId();
 
   // Fetch habit progress directly from habit_progress table
   const { data: progressData, error: fetchError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("date", { ascending: true });
 
   if (fetchError) {
@@ -1247,19 +1174,15 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
 };
 
 export const getHabitCompletionStats = async (habitId: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    return { completed: 0, pending: 0 };
-  }
+ 
+  const userId = await getUserId()
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at, end_date, frequency")
     .eq("id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
 
   if (habitError || !habitData) {
@@ -1279,7 +1202,7 @@ export const getHabitCompletionStats = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .gte("date", habitCreatedAt.toISOString().split("T")[0])
     .lte("date", habitEndDate.toISOString().split("T")[0]);
 
@@ -1323,19 +1246,15 @@ export const getHabitCompletionStats = async (habitId: string) => {
 
 
 export const getCompletedAndPendingDays = async (habitId: string) => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    console.error("Error fetching user:", error);
-    return { completedDays: 0, pendingDays: 0 };
-  }
+ 
+  const userId = await getUserId()
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at, end_date, frequency")
     .eq("id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
 
   if (habitError || !habitData) {
@@ -1355,7 +1274,7 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", user.id)
+    .eq("user_id",userId)
     .gte("date", habitCreatedAt.toISOString().split("T")[0])
     .lte("date", habitEndDate.toISOString().split("T")[0]);
 
