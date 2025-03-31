@@ -41,7 +41,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
       });
       return;
     }
-    if (!isToday && status === null) {
+    if (!isToday) {
       toast.show("Only today’s tasks can be marked as done.", {
         type: "warning",
       });

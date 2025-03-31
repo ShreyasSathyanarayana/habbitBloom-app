@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "black",
     gap: verticalScale(20),
+    paddingHorizontal: horizontalScale(16),
   },
 });
 

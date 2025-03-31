@@ -69,15 +69,11 @@ export default function HabitsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <HabitHead onPressArchive={() => router.push("/(protected)/archive")} />
 
-      {getHabitQuery.data?.length || getHabitQuery?.isLoading ? (
-        <HabitList
-          scrollY={scrollY}
-          isLoading={getHabitQuery.isLoading}
-          habitList={getHabitQuery.data}
-        />
-      ) : (
-        <HabitEmpty />
-      )}
+      <HabitList
+        scrollY={scrollY}
+        isLoading={getHabitQuery.isLoading}
+        habitList={getHabitQuery.data}
+      />
 
       {/* Floating Button with Animation */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>

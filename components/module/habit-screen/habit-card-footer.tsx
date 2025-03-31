@@ -1,5 +1,5 @@
 import { horizontalScale } from "@/metric";
-import React from "react";
+import React, { useCallback } from "react";
 import { StyleSheet, TouchableHighlight, View } from "react-native";
 import CalenderIcon from "@/assets/svg/calender-icon.svg";
 import StatsIcon from "@/assets/svg/stats-icon.svg";
@@ -9,66 +9,70 @@ import { getHabitStats } from "@/api/api";
 import HabitStreak from "./habit-streak";
 import HabitComplete from "./habit-complete";
 import { router } from "expo-router";
+
 type Props = {
   habitId: string;
   onPressThreeDot: () => void;
 };
-const _iconWidth = horizontalScale(20);
-const _iconHeight = horizontalScale(20);
-const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
-  const getHabitStatsQuery = useQuery({
+
+const _iconSize = horizontalScale(20);
+
+const HabitCardFooter = React.memo(({ habitId, onPressThreeDot }: Props) => {
+  // Optimize API query with caching and data selection
+  const { data, isLoading } = useQuery({
     queryKey: ["habit-stats", habitId],
-    queryFn: () => {
-      return getHabitStats(habitId);
-    },
+    queryFn: () => getHabitStats(habitId),
     enabled: !!habitId,
+    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
+    select: (data) => ({
+      streak: data.streak,
+      completed: data.completed,
+      notCompleted: data.notCompleted,
+    }),
   });
-  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+
+  // Optimize handlers using useCallback to avoid re-renders
+  const navigateToCalendar = useCallback(() => {
+    router.push(`/(protected)/analytics?id=${habitId}&category=Calendar`);
+  }, [habitId]);
+
+  const navigateToStatistics = useCallback(() => {
+    router.push(`/(protected)/analytics?id=${habitId}&category=Statistics`);
+  }, [habitId]);
 
   return (
     <View style={styles.container}>
       <View style={styles.column}>
-        <HabitStreak
-          streakValue={getHabitStatsQuery.data?.streak}
-          isLoading={getHabitStatsQuery?.isLoading}
-        />
+        <HabitStreak streakValue={data?.streak} isLoading={isLoading} />
         <HabitComplete
-          completedValue={getHabitStatsQuery.data?.completed}
-          notCompletedValue={getHabitStatsQuery.data?.notCompleted}
-          isLoading={getHabitStatsQuery?.isLoading}
+          completedValue={data?.completed}
+          notCompletedValue={data?.notCompleted}
+          isLoading={isLoading}
         />
       </View>
       <View style={styles.column}>
         <TouchableHighlight
-          onPress={() =>
-            router.push(
-              `/(protected)/analytics?id=${habitId}&category=Calendar`
-            )
-          }
-          style={{ paddingVertical: horizontalScale(5) }}
+          onPress={navigateToCalendar}
+          style={styles.iconWrapper}
         >
-          <CalenderIcon width={_iconWidth} height={_iconHeight} />
+          <CalenderIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
         <TouchableHighlight
-          onPress={() =>
-            router.push(
-              `/(protected)/analytics?id=${habitId}&category=Statistics`
-            )
-          }
-          style={{ paddingVertical: horizontalScale(5) }}
+          onPress={navigateToStatistics}
+          style={styles.iconWrapper}
         >
-          <StatsIcon width={_iconWidth} height={_iconHeight} />
+          <StatsIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
         <TouchableHighlight
-          style={{ paddingVertical: horizontalScale(5) }}
           onPress={onPressThreeDot}
+          style={styles.iconWrapper}
         >
-          <ThreeDotIcon width={_iconWidth} height={_iconHeight} />
+          <ThreeDotIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -80,6 +84,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: horizontalScale(16),
+  },
+  iconWrapper: {
+    paddingVertical: horizontalScale(5),
   },
 });
 
