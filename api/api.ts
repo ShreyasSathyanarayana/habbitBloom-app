@@ -379,8 +379,6 @@ export const getHabitsByDate = async (date: string) => {
 
 
 export const getAllHabits = async () => {
-
-
   const userId = await getUserId();
 
   // Fetch all habits for the user
@@ -388,8 +386,8 @@ export const getAllHabits = async () => {
     .from("habit")
     .select(
       `
-      id, habit_name, category, reminder_time, frequency, habit_color, created_at,archived
-    `
+      id, habit_name, category, reminder_time, frequency, habit_color, created_at, archived
+      `
     )
     .eq("user_id", userId)
     .eq("archived", false)
@@ -397,13 +395,36 @@ export const getAllHabits = async () => {
 
   if (error) {
     console.error("Error fetching habits:", error);
-    throw new Error("Error fetching habits"+error)
+    throw new Error("Error fetching habits" + error);
   }
 
-  return data;
+  // 🔹 For each habit, fetch the last 7 days' progress and combine the data
+  const habitsWithProgress = await Promise.all(
+    data.map(async (habit) => {
+      // Fetch last 7 days' progress for the habit
+      const progressData = await fetchLast7DaysHabitProgress(habit.id);
+
+      if (progressData) {
+        // Add the progress data to the habit object
+        return {
+          ...habit,
+          progress: progressData.data, // Attach the progress data
+        };
+      } else {
+        // If no progress data is available, return the habit without progress
+        return {
+          ...habit,
+          progress: [],
+        };
+      }
+    })
+  );
+
+  return habitsWithProgress;
 };
 
-  export const getAllHabitsArchived = async () => {
+
+export const getAllHabitsArchived = async () => {
 
     const userId = await getUserId();
 
@@ -617,13 +638,13 @@ export const fetchLast7DaysHabitProgress = async (
         if (currentStart) {
           validActivePeriods.push({ start: currentStart, end: actionDate });
         }
-        isArchived = true;
+      isArchived = true;
       }
     } else if (entry.action === "restored") {
       if (isArchived) {
         // Start a new active period
         currentStart = actionDate;
-        isArchived = false;
+      isArchived = false;
       }
     }
   }

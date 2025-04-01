@@ -14,7 +14,7 @@ type Props = {
 const HabitFrequencyList = ({ frequency }: Props) => {
   return (
     <View style={styles.container}>
-      {/* {frequency.map((day, index) => {
+      {frequency.map((day, index) => {
         return (
           <ThemedText
             key={"day-" + day}
@@ -24,8 +24,8 @@ const HabitFrequencyList = ({ frequency }: Props) => {
             {weekList[day]}
           </ThemedText>
         );
-      })} */}
-      <FlashList
+      })}
+      {/* <FlashList
         data={frequency}
         estimatedItemSize={7}
         
@@ -45,7 +45,7 @@ const HabitFrequencyList = ({ frequency }: Props) => {
             </ThemedText>
           );
         }}
-      />
+      /> */}
     </View>
   );
 };

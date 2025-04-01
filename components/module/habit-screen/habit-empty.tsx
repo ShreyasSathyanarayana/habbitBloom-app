@@ -24,11 +24,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "black",
+    // justifyContent: "center",
+    // backgroundColor: "red",
     paddingHorizontal: horizontalScale(16),
-    // marginTop: verticalScale(80),
-    // justifyContent: "space-evenly",
+    marginVertical: verticalScale(80),
+
+    // backgrounColor: "black",
   },
 });
 

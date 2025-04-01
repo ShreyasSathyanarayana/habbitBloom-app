@@ -145,7 +145,12 @@ const SignUp = () => {
           contentContainerStyle={styles.contentContainer}
         >
           {/* Back Button */}
-          <View>
+          <View
+            style={{
+              marginLeft: horizontalScale(8),
+              marginTop: verticalScale(8),
+            }}
+          >
             <BackButton />
           </View>
 

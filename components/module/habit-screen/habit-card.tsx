@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import HabitCardHead from "./habit-card-head";
 import HabitFrequencyList from "./habit-frequency-list";
@@ -8,10 +8,7 @@ import HabitCardFooter from "./habit-card-footer";
 import Divider from "@/components/ui/divider";
 import { SheetManager } from "react-native-actions-sheet";
 import HabitDateList from "./habit-date-list";
-import Animated, {
-  LayoutAnimationConfig,
-  LinearTransition,
-} from "react-native-reanimated";
+import { HabitProgressEntry } from "@/api/api";
 export type HabitProp = {
   id: string;
   habit_name: string;
@@ -21,10 +18,11 @@ export type HabitProp = {
   habit_color: string;
   created_at: string;
   archived: boolean;
+  progress: HabitProgressEntry[];
 };
 
-const HabitCard = (props: HabitProp) => {
-  const { habit_name, category, archived } = props;
+const HabitCard = memo((props: HabitProp) => {
+  const { habit_name, category, archived, progress } = props;
 
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
@@ -43,12 +41,14 @@ const HabitCard = (props: HabitProp) => {
     >
       <HabitCardHead habitName={habit_name} category={category} />
       <HabitFrequencyList frequency={props.frequency} />
-      {!archived && <HabitDateList habitId={props.id} />}
+      {!archived && (
+        <HabitDateList habitId={props.id} habitProgress={progress} />
+      )}
       <Divider style={{ marginVertical: verticalScale(12) }} />
       <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HabitCard;
+export default memo(HabitCard);

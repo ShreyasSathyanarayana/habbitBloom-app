@@ -4,9 +4,10 @@ import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "moti/skeleton";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableHighlight, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
+import { HabitProp } from "./habit-card";
 type Props = {
   date: string;
   status: boolean | null;
@@ -14,28 +15,37 @@ type Props = {
 };
 
 const HabitDateButton = ({ date, status, habitId }: Props) => {
+  const [localStatus, setLocalStatus] = useState<boolean | null>(status);
   const day = new Date(date).getDate();
   const todayDate = new Date().getDate();
   const isToday = day === todayDate;
-  const isTodayStatus = isToday && status !== true;
+  const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();
   const queryClient = useQueryClient();
+  useEffect(() => {
+    setLocalStatus(status);
+  }, [status]);
   const mutation = useMutation({
     mutationKey: ["markHabitStatus"],
     mutationFn: () => {
-      return markHabitStatus(habitId, !status, date);
+      return markHabitStatus(habitId, !localStatus, date); // Toggle the habit status (true/false)
     },
     onSuccess: () => {
-      toast.show(!status ? "Marked Successfully" : "Unmarked Successfully", {
-        type: "success",
-      });
-      queryClient.invalidateQueries({ queryKey: ["habitDates", habitId] });
+      // Invalidate the query to refresh the stats data
       queryClient.invalidateQueries({ queryKey: ["habit-stats", habitId] });
+      setLocalStatus((prev) => !prev);
+      // Show a toast notification based on the new status
+      toast.show(
+        !localStatus ? "Marked Successfully" : "Unmarked Successfully",
+        {
+          type: "success",
+        }
+      );
     },
   });
 
   const onPress = () => {
-    if (status === null && isToday) {
+    if (localStatus === null && isToday) {
       toast.show("This habit isn't set for today.", {
         type: "warning",
       });
@@ -59,18 +69,18 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
           styles.container,
           isTodayStatus
             ? styles.todayBtn
-            : status === null
+            : localStatus === null
             ? styles.disableBtn
-            : status === true
+            : localStatus === true
             ? styles.completed
             : styles.notCompleted,
-          status == null && styles.disableBtn,
+          localStatus == null && styles.disableBtn,
         ]}
       >
         <ThemedText
           style={[
             { fontSize: getFontSize(13), fontFamily: "PoppinsSemiBold" },
-            (status === null || (status == false && !isToday)) && {
+            (localStatus === null || (localStatus == false && !isToday)) && {
               color: "rgba(179, 179, 179, 0.7)",
             },
           ]}

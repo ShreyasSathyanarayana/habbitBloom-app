@@ -15,7 +15,7 @@ interface GradientButtonProps extends TouchableOpacityProps {
   title?: string;
   type?: string;
   disable?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   color?: [string, string, ...string[]]; // Custom gradient colors
 }
 

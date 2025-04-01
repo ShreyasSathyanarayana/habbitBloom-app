@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
-import ScrollableContainer from "@/components/ui/scrollable-container";
 import PlusIcon from "@/assets/svg/plus-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useTabBar } from "@/context/TabBarContext";
@@ -11,12 +10,10 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { SheetManager } from "react-native-actions-sheet";
 import { router } from "expo-router";
 import HabitHead from "@/components/module/habit-screen/habit-head";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HabitList from "@/components/module/habit-screen/habit-list";
-import HabitEmpty from "@/components/module/habit-screen/habit-empty";
 import { useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
 import ServerError from "@/components/module/errors/server-error";
@@ -39,6 +36,7 @@ export default function HabitsScreen() {
     enabled: isConnected,
     staleTime: 10000,
   });
+  // console.log("habit list", JSON.stringify(getHabitQuery.data, null, 2));
 
   useDerivedValue(() => {
     const diffY = scrollY.value - prevScrollY.value;

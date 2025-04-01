@@ -24,7 +24,15 @@ const WeclomeScreen = () => {
         // paddingVertical: verticalScale(10),
       }}
     >
-      <View style={globalStyles.header}>
+      <View
+        style={[
+          globalStyles.header,
+          {
+            marginLeft: horizontalScale(8),
+            marginTop: verticalScale(8),
+          },
+        ]}
+      >
         <BackButton />
       </View>
       <View style={[globalStyles.heroSection, { alignItems: "center" }]}>
@@ -93,10 +101,7 @@ const WeclomeScreen = () => {
             Terms of Service{" "}
           </ThemedText>
           and{" "}
-          <ThemedText style={{ color: "#8A2BE2" }}>
-            Privacy Policy
-          </ThemedText>
-          .
+          <ThemedText style={{ color: "#8A2BE2" }}>Privacy Policy</ThemedText>.
         </ThemedText>
       </View>
     </Container>
