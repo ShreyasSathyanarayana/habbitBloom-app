@@ -10,7 +10,7 @@ type Props = {
   habitProgress: HabitProgressEntry[];
 };
 
-const HabitDateList = memo(({ habitId, habitProgress }: Props) => {
+const HabitDateList = ({ habitId, habitProgress }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.flatListStyle}>
@@ -32,7 +32,7 @@ const HabitDateList = memo(({ habitId, habitProgress }: Props) => {
       </View>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

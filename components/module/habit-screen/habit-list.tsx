@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo } from "react";
+import React, { memo, useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import HabitCard, { HabitProp } from "./habit-card";
 import { verticalScale } from "@/metric";
 import { SharedValue } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, useBlankAreaTracker } from "@shopify/flash-list";
 import HabitEmpty from "./habit-empty";
 
 type Props = {
@@ -15,9 +15,12 @@ type Props = {
 
 const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
   const memoizedHabits = useMemo(() => habitList, [habitList]);
+  const MemoizedHabitCard = memo(HabitCard);
+  const ref = useRef(null);
+  const [blankAreaTrackerResult, onBlankArea] = useBlankAreaTracker(ref);
 
   const renderItem = useCallback(({ item }: { item: HabitProp }) => {
-    return <HabitCard {...item} />;
+    return <MemoizedHabitCard {...item} />;
   }, []);
 
   const handleScroll = useCallback(
@@ -51,6 +54,7 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
     <View style={styles.container}>
       {memoizedHabits && memoizedHabits.length > 0 && (
         <FlashList
+          ref={ref}
           data={memoizedHabits}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
@@ -62,6 +66,7 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
           contentContainerStyle={{ paddingBottom: verticalScale(80) }}
           scrollEventThrottle={16}
           onScroll={handleScroll}
+          onBlankArea={onBlankArea}
           // ListEmptyComponent={HabitEmpty}
         />
       )}

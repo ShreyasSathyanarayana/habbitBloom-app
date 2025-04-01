@@ -21,8 +21,10 @@ export type HabitProp = {
   progress: HabitProgressEntry[];
 };
 
-const HabitCard = memo((props: HabitProp) => {
+const HabitCard = (props: HabitProp) => {
   const { habit_name, category, archived, progress } = props;
+  const MemoizedHabitDateList = memo(HabitDateList);
+  const MemoizedFrequencyList = memo(HabitFrequencyList);
 
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
@@ -40,15 +42,15 @@ const HabitCard = memo((props: HabitProp) => {
       style={styles.container}
     >
       <HabitCardHead habitName={habit_name} category={category} />
-      <HabitFrequencyList frequency={props.frequency} />
+      <MemoizedFrequencyList frequency={props.frequency} />
       {!archived && (
-        <HabitDateList habitId={props.id} habitProgress={progress} />
+        <MemoizedHabitDateList habitId={props.id} habitProgress={progress} />
       )}
       <Divider style={{ marginVertical: verticalScale(12) }} />
       <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
     </Pressable>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -11,7 +11,7 @@ type Props = {
   frequency: number[];
 };
 
-const HabitFrequencyList = memo(({ frequency }: Props) => {
+const HabitFrequencyList = ({ frequency }: Props) => {
   return (
     <View style={styles.container}>
       {frequency.map((day, index) => {
@@ -48,7 +48,7 @@ const HabitFrequencyList = memo(({ frequency }: Props) => {
       /> */}
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {
