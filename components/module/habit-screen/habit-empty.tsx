@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    // justifyContent: "center",
+    justifyContent: "center",
     backgroundColor: "black",
     paddingHorizontal: horizontalScale(16),
-    marginTop: verticalScale(80),
+    // marginTop: verticalScale(80),
     // justifyContent: "space-evenly",
   },
 });
