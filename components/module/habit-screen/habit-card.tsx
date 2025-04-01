@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(HabitCard);
+export default HabitCard;

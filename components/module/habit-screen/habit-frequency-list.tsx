@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { verticalScale } from "@/metric";
 import { FlashList } from "@shopify/flash-list";
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
 
 export const weekList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -11,7 +11,7 @@ type Props = {
   frequency: number[];
 };
 
-const HabitFrequencyList = ({ frequency }: Props) => {
+const HabitFrequencyList = memo(({ frequency }: Props) => {
   return (
     <View style={styles.container}>
       {frequency.map((day, index) => {
@@ -48,7 +48,7 @@ const HabitFrequencyList = ({ frequency }: Props) => {
       /> */}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

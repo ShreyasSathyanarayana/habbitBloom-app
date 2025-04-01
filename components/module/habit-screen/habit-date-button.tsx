@@ -4,7 +4,7 @@ import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "moti/skeleton";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, TouchableHighlight, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 import { HabitProp } from "./habit-card";
@@ -22,7 +22,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();
   const queryClient = useQueryClient();
-  useEffect(() => {
+  useCallback(() => {
     setLocalStatus(status);
   }, [status]);
   const mutation = useMutation({

@@ -33,8 +33,8 @@ export default function HabitsScreen() {
   const getHabitQuery = useQuery({
     queryKey: ["habitList", isConnected],
     queryFn: getAllHabits,
-    enabled: isConnected,
     staleTime: 10000,
+    refetchOnReconnect: true,
   });
   // console.log("habit list", JSON.stringify(getHabitQuery.data, null, 2));
 

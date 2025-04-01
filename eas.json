@@ -13,6 +13,7 @@
     },
     "preview": {
       "distribution": "internal",
+      "plugins": ["transform-remove-console"],
       "android": {
         "buildType": "apk"
       }
@@ -20,6 +21,7 @@
     "production": {
       "autoIncrement": true,
       "distribution": "store",
+      "plugins": ["transform-remove-console"],
       "android": {
         "buildType": "app-bundle"
       }

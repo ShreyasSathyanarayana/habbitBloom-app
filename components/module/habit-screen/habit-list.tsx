@@ -31,16 +31,17 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
     return (
       <View style={styles.container}>
         <FlashList
-          estimatedItemSize={250}
+          estimatedItemSize={50}
           showsVerticalScrollIndicator={false}
           data={[1, 2, 3]}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(item, index) => "AllHabitList" + index.toString()}
           ItemSeparatorComponent={() => (
             <View style={{ height: verticalScale(16) }} />
           )}
           renderItem={() => (
             <Skeleton width={"100%"} height={verticalScale(250)} />
           )}
+          scrollEventThrottle={16}
         />
       </View>
     );
@@ -51,17 +52,17 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
       {memoizedHabits && memoizedHabits.length > 0 && (
         <FlashList
           data={memoizedHabits}
-          getItemType={(item) => item.id}
-          onScroll={handleScroll}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
+          estimatedItemSize={80} // Adjust based on UI
+          // windowSize={5} // Increase for better scrolling performance
+          // maxToRenderPerBatch={5} // Adjust this based on testing
+          // updateCellsBatchingPeriod={50}
+          removeClippedSubviews={true}
           contentContainerStyle={{ paddingBottom: verticalScale(80) }}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => (
-            <View style={{ height: verticalScale(16) }} />
-          )}
-          estimatedItemSize={250}
-
-          // ListEmptyComponent={()=><HabitEmpty/>}
+          scrollEventThrottle={16}
+          onScroll={handleScroll}
+          // ListEmptyComponent={HabitEmpty}
         />
       )}
       {!isLoading && memoizedHabits?.length === 0 && <HabitEmpty />}

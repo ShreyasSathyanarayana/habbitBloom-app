@@ -1,6 +1,6 @@
 import { HabitProgressEntry } from "@/api/api";
 import { verticalScale } from "@/metric";
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
 import WeekName from "./week-name";
 import HabitDateButton from "./habit-date-button";
@@ -10,7 +10,7 @@ type Props = {
   habitProgress: HabitProgressEntry[];
 };
 
-const HabitDateList = ({ habitId, habitProgress }: Props) => {
+const HabitDateList = memo(({ habitId, habitProgress }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.flatListStyle}>
@@ -32,7 +32,7 @@ const HabitDateList = ({ habitId, habitProgress }: Props) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
