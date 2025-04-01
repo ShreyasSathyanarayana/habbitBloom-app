@@ -17,7 +17,7 @@ type Props = {
 
 const _iconSize = horizontalScale(20);
 
-const HabitCardFooter = React.memo(({ habitId, onPressThreeDot }: Props) => {
+const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
   // Optimize API query with caching and data selection
   const { data, isLoading } = useQuery({
     queryKey: ["habit-stats", habitId],
@@ -72,7 +72,7 @@ const HabitCardFooter = React.memo(({ habitId, onPressThreeDot }: Props) => {
       </View>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

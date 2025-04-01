@@ -67,6 +67,9 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
           scrollEventThrottle={16}
           onScroll={handleScroll}
           onBlankArea={onBlankArea}
+          ItemSeparatorComponent={() => {
+            return <View style={{ height: verticalScale(16) }} />;
+          }}
           // ListEmptyComponent={HabitEmpty}
         />
       )}

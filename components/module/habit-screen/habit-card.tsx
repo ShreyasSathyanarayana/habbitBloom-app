@@ -25,6 +25,7 @@ const HabitCard = (props: HabitProp) => {
   const { habit_name, category, archived, progress } = props;
   const MemoizedHabitDateList = memo(HabitDateList);
   const MemoizedFrequencyList = memo(HabitFrequencyList);
+  const MemoizedHabitFooter = memo(HabitCardFooter);
 
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
@@ -47,7 +48,10 @@ const HabitCard = (props: HabitProp) => {
         <MemoizedHabitDateList habitId={props.id} habitProgress={progress} />
       )}
       <Divider style={{ marginVertical: verticalScale(12) }} />
-      <HabitCardFooter onPressThreeDot={onPressThreeDot} habitId={props.id} />
+      <MemoizedHabitFooter
+        onPressThreeDot={onPressThreeDot}
+        habitId={props.id}
+      />
     </Pressable>
   );
 };
