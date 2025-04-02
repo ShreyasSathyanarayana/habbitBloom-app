@@ -71,7 +71,7 @@ export default function HabitsScreen() {
 
       <HabitList
         scrollY={scrollY}
-        isLoading={getHabitQuery.isLoading}
+        isLoading={getHabitQuery.isFetching}
         habitList={getHabitQuery.data}
       />
 
