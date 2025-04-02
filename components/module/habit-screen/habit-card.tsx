@@ -9,6 +9,7 @@ import Divider from "@/components/ui/divider";
 import { SheetManager } from "react-native-actions-sheet";
 import HabitDateList from "./habit-date-list";
 import { HabitProgressEntry } from "@/api/api";
+import { LinearGradient } from "expo-linear-gradient";
 export type HabitProp = {
   id: string;
   habit_name: string;
@@ -40,27 +41,36 @@ const HabitCard = (props: HabitProp) => {
       onPress={() =>
         SheetManager.show("habit-details", { payload: { data: props } })
       }
-      style={styles.container}
+      // style={styles.container}
     >
-      <HabitCardHead habitName={habit_name} category={category} />
-      <MemoizedFrequencyList frequency={props.frequency} />
-      {!archived && (
-        <MemoizedHabitDateList habitId={props.id} habitProgress={progress} />
-      )}
-      <Divider style={{ marginVertical: verticalScale(12) }} />
-      <MemoizedHabitFooter
-        onPressThreeDot={onPressThreeDot}
-        habitId={props.id}
-      />
+      <LinearGradient
+        colors={["#000000", "#2B0053"]}
+        start={{ x: 0.111, y: 0.0147 }} // Approximation of 111.3deg
+        end={{ x: 1, y: 1 }}
+        style={styles.container}
+      >
+        <HabitCardHead habitName={habit_name} category={category} />
+        <MemoizedFrequencyList frequency={props.frequency} />
+        {!archived && (
+          <MemoizedHabitDateList habitId={props.id} habitProgress={progress} />
+        )}
+        <Divider style={{ marginVertical: verticalScale(12) }} />
+        <MemoizedHabitFooter
+          onPressThreeDot={onPressThreeDot}
+          habitId={props.id}
+        />
+      </LinearGradient>
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgba(18, 2, 33, 1)",
-    borderRadius: horizontalScale(8),
+    // backgroundColor: "rgba(18, 2, 33, 1)",
+    borderRadius: horizontalScale(16),
     padding: horizontalScale(16),
+    borderWidth: horizontalScale(1),
+    borderColor: "rgba(138, 43, 226, 1)",
   },
 });
 

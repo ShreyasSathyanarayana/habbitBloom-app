@@ -19,6 +19,7 @@ import { getAllHabits } from "@/api/api";
 import ServerError from "@/components/module/errors/server-error";
 import { useAuth } from "@/context/AuthProvider";
 import NoInternet from "@/components/module/errors/no-internet";
+import { LinearGradient } from "expo-linear-gradient";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
@@ -78,9 +79,23 @@ export default function HabitsScreen() {
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
         <TouchableOpacity
           onPress={() => router.push("/(protected)/create-habit")}
-          style={styles.floatingBtn}
+          // style={styles.floatingBtn}
         >
-          <PlusIcon />
+          <LinearGradient
+            colors={["#8A2BE2", "#34127E"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            //   style={styles.card}
+            style={{
+              width: horizontalScale(56),
+              height: horizontalScale(56),
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: horizontalScale(50),
+            }}
+          >
+            <PlusIcon />
+          </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -99,8 +114,8 @@ const styles = StyleSheet.create({
     right: horizontalScale(15),
   },
   floatingBtn: {
-    padding: horizontalScale(12),
-    backgroundColor: "rgba(138, 43, 226, 1)",
+    // padding: horizontalScale(12),
+    // backgroundColor: "rgba(138, 43, 226, 1)",
     borderRadius: 150,
   },
 });

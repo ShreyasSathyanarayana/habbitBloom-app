@@ -56,6 +56,7 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
         <FlashList
           ref={ref}
           data={memoizedHabits}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           estimatedItemSize={80} // Adjust based on UI
