@@ -38,7 +38,7 @@ export const scheduleNotification = async (habit: Habit): Promise<void> => {
 
   // Schedule new notification
   const notificationId = await Notifications.scheduleNotificationAsync({
-    content: { title: 'Habit Reminder', body: `Time for: ${habit.habit_name}` },
+    content: { title: 'Progress Reminder', body: `Stay consistent! Your streak for ${habit.habit_name} is at ${habit.reminder_time} ` },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: parseInt(habit.reminder_time.split(':')[0], 10), 
