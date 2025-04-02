@@ -10,9 +10,11 @@ import {
 // import {
 //   useFonts,
 // } from "@expo-google-fonts/poppins";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthProvider";
 import Providers from "@/components/Provider";
+import Constants from "expo-constants";
+import * as Device from "expo-device";
 
 import { Slot, SplashScreen, useRouter } from "expo-router";
 
@@ -41,13 +43,30 @@ import "@/action-sheets/sheet";
 import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
+import * as Notifications from "expo-notifications";
 
 SplashScreen.preventAutoHideAsync();
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 const RootLayout = () => {
   const router = useRouter();
   const { logout } = useAuth();
   const toast = useToast();
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [channels, setChannels] = useState<Notifications.NotificationChannel[]>(
+    []
+  );
+  const [notification, setNotification] = useState<
+    Notifications.Notification | undefined
+  >(undefined);
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
 
   const [load, error] = useFonts({
     PoppinsRegular: require("@/assets/fonts/Poppins-Regular.ttf"),
@@ -56,8 +75,37 @@ const RootLayout = () => {
     PoppinsMedium: require("@/assets/fonts/Poppins-Medium.ttf"),
   });
 
+  // useEffect(() => {
+  //   setupDatabase(); // Ensure database is set up
+  // }, []);
   useEffect(() => {
-    setupDatabase(); // Ensure database is set up
+    // registerForPushNotificationsAsync().then(
+    //   (token) => token && setExpoPushToken(token)
+    // );
+
+    if (Platform.OS === "android") {
+      Notifications.getNotificationChannelsAsync().then((value) =>
+        setChannels(value ?? [])
+      );
+    }
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -115,13 +163,16 @@ export const RootLayoutWrapper = () => {
           offsetBottom={40}
           swipeEnabled={true}
           renderToast={(toast) =>
-            useMemo(() => (
-              <CustomToast
-                message={toast.message}
-                type={toast.type as unknown as ToastType}
-                id={toast.id}
-              />
-            ),[])
+            useMemo(
+              () => (
+                <CustomToast
+                  message={toast.message}
+                  type={toast.type as unknown as ToastType}
+                  id={toast.id}
+                />
+              ),
+              []
+            )
           }
         >
           <SheetProvider>
@@ -349,3 +400,54 @@ const styles = StyleSheet.create({
 });
 
 // export default App;
+
+
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("myNotificationChannel", {
+      name: "A channel is needed for the permissions prompt to appear",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    // Learn more about projectId:
+    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+    // EAS projectId is used here.
+    try {
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+      if (!projectId) {
+        throw new Error("Project ID not found");
+      }
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(token);
+    } catch (e) {
+      token = `${e}`;
+    }
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token;
+}

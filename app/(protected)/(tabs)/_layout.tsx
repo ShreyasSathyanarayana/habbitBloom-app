@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs } from "expo-router";
 import TabBar from "@/components/TabBar";
 import { TabBarProvider } from "@/context/TabBarContext";
+import { syncHabits } from "@/services/habitService";
+
 
 const _layout = () => {
+  useEffect(() => {
+    syncHabits();
+  }, []);
   return (
     <TabBarProvider>
       <Tabs
