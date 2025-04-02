@@ -4,11 +4,14 @@ import { StyleSheet, TouchableHighlight, View } from "react-native";
 import CalenderIcon from "@/assets/svg/calender-icon.svg";
 import StatsIcon from "@/assets/svg/stats-icon.svg";
 import ThreeDotIcon from "@/assets/svg/three-dots.svg";
+import CloseEye from "@/assets/svg/close-eye.svg";
+import OpenEye from "@/assets/svg/open-eye.svg";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
 import HabitStreak from "./habit-streak";
 import HabitComplete from "./habit-complete";
 import { router } from "expo-router";
+import { SheetManager } from "react-native-actions-sheet";
 
 type Props = {
   habitId: string;
@@ -52,6 +55,14 @@ const HabitCardFooter = ({ habitId, onPressThreeDot }: Props) => {
       </View>
       <View style={styles.column}>
         <TouchableHighlight
+          onPress={() =>
+            SheetManager.show("hide-habit", { payload: { habitId: habitId } })
+          }
+          style={styles.iconWrapper}
+        >
+          <OpenEye width={_iconSize} height={_iconSize} />
+        </TouchableHighlight>
+        <TouchableHighlight
           onPress={navigateToCalendar}
           style={styles.iconWrapper}
         >
@@ -87,6 +98,7 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     paddingVertical: horizontalScale(5),
+    paddingHorizontal: horizontalScale(1),
   },
 });
 

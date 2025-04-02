@@ -2,6 +2,7 @@ import { registerSheet, SheetDefinition } from "react-native-actions-sheet";
 import CreateHabit from "./create-habit";
 import HabitDetailsSheet from "./habit-details-sheet";
 import DeleteHabitSheet from "./delete-habit-sheet";
+import HideHabitSheet from "./hide-habit-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -17,6 +18,7 @@ type HabitDetailsProp = {
 registerSheet("create-habit", CreateHabit);
 registerSheet("habit-details", HabitDetailsSheet);
 registerSheet("delete-habit", DeleteHabitSheet);
+registerSheet("hide-habit", HideHabitSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -28,6 +30,9 @@ declare module "react-native-actions-sheet" {
     }>;
     "delete-habit": SheetDefinition<{
       payload: { data: HabitDetailsProp };
+    }>;
+    "hide-habit": SheetDefinition<{
+      payload: { habitId: string };
     }>;
   }
 }
