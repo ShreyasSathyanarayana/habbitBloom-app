@@ -26,7 +26,7 @@ export const scheduleNotification = async (habit: Habit): Promise<void> => {
   const scheduledNotifications = await getStoredNotifications();
 
   // Prevent duplicate notifications
-  if (scheduledNotifications[habit.id] === habit.reminder_time) {
+  if (scheduledNotifications[habit.id]) {
     console.log(`Notification for "${habit.habit_name}" is already scheduled.`);
     return;
   }

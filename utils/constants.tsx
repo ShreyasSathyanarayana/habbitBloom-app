@@ -97,4 +97,10 @@ export const DateUtils = {
     moment.utc().format(format),
   convertUtcToLocal: (utcTimestamp:string, format = "YYYY-MM-DD HH:mm:ss") =>
     moment.utc(utcTimestamp).local().format(format),
+  getCurrentUtcDate: (format = "YYYY-MM-DD") =>
+    moment.utc().format(format),
+  convertUtcToLocalDate: (utcTimestamp:string, format = "YYYY-MM-DD") =>
+    moment.utc(utcTimestamp).local().format(format),
+  getCurrentLocalDate: (format = "YYYY-MM-DD") =>
+    moment().local().format(format),
 };

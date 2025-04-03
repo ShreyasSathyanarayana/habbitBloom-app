@@ -32,11 +32,13 @@
     "expo-constants": "~17.0.5",
     "expo-crypto": "~14.0.2",
     "expo-dev-client": "~5.0.12",
+    "expo-device": "~7.0.3",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.5",
     "expo-navigation-bar": "~4.0.8",
+    "expo-notifications": "~0.29.14",
     "expo-router": "~4.0.17",
     "expo-secure-store": "~14.0.1",
     "expo-splash-screen": "~0.29.22",
@@ -61,6 +63,7 @@
     "react-native-get-random-values": "~1.11.0",
     "react-native-international-phone-number": "^0.9.0",
     "react-native-keyboard-controller": "^1.16.3",
+    "react-native-mmkv": "^3.2.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-otp-entry": "^1.8.2",
     "react-native-otp-verify": "^1.1.8",
@@ -76,9 +79,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5",
-    "expo-notifications": "~0.29.14",
-    "expo-device": "~7.0.3"
+    "react-native-webview": "13.12.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

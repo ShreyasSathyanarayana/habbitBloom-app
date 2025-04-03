@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
 import { useQueryClient } from "@tanstack/react-query";
+import { storage } from "@/utils/storage";
 
 interface Login {
   accessToken: string;
@@ -16,8 +17,8 @@ interface AuthContext {
   isConnected: boolean;
 }
 export const tokenKeys = {
-  accessToken: "accessToken",
-  refreshToken: "refreshToken",
+  accessToken: "user.accessToken",
+  refreshToken: "user.refreshToken",
 };
 
 const AuthContext = createContext<AuthContext | null>(null);
@@ -31,11 +32,14 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { accessToken, refreshToken } = arg;
 
+      storage.set(tokenKeys.accessToken, accessToken);
+      storage.set(tokenKeys.refreshToken, refreshToken);
+
       // Store tokens in SecureStore (Offload to background)
-      await Promise.all([
-        SecureStore.setItemAsync("accessToken", accessToken),
-        SecureStore.setItemAsync("refreshToken", refreshToken),
-      ]);
+      // await Promise.all([
+      //   // SecureStore.setItemAsync("accessToken", accessToken),
+      //   // SecureStore.setItemAsync("refreshToken", refreshToken),
+      // ]);
 
       // Update user ID after SecureStore operation completes
       // setUserId(accessToken);
@@ -53,10 +57,12 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       // Delete tokens
-      await Promise.all([
-        SecureStore.deleteItemAsync("accessToken"),
-        SecureStore.deleteItemAsync("refreshToken"),
-      ]);
+      // await Promise.all([
+      //   SecureStore.deleteItemAsync("accessToken"),
+      //   SecureStore.deleteItemAsync("refreshToken"),
+      // ]);
+      storage.delete(tokenKeys.accessToken);
+      storage.delete(tokenKeys.refreshToken);
 
       // setUserId("");
 

@@ -11,7 +11,7 @@ import {
 //   useFonts,
 // } from "@expo-google-fonts/poppins";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useAuth } from "@/context/AuthProvider";
+import { tokenKeys, useAuth } from "@/context/AuthProvider";
 import Providers from "@/components/Provider";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -44,6 +44,7 @@ import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
+import { storage } from "@/utils/storage";
 
 SplashScreen.preventAutoHideAsync();
 Notifications.setNotificationHandler({
@@ -113,7 +114,7 @@ const RootLayout = () => {
       await SplashScreen.hideAsync();
       // toast.show("Testing");
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const token = await SecureStore.getItemAsync("refreshToken");
+      const token = storage.getString(tokenKeys.accessToken);
       // const otp = sendOTP('shreyas24s2001@gmail.com')
       const isAuthenticated = !!token;
       if (isAuthenticated) {
@@ -400,7 +401,6 @@ const styles = StyleSheet.create({
 });
 
 // export default App;
-
 
 async function registerForPushNotificationsAsync() {
   let token;

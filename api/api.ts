@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/SupaLegend";
+import { DateUtils } from "@/utils/constants";
 import { getUserId } from "@/utils/persist-storage";
 import moment from "moment";
 
@@ -32,7 +33,7 @@ export const createOrUpdateHabit = async (
     notification_enable: formData.notificationEnable,
     habit_color: formData.habitColor,
     google_notification_enable: formData.googleNotificationEnable,
-    updated_at: moment.utc().format(), // Always update timestamp
+    updated_at: DateUtils.getCurrentUtcTimestamp(), // Always update timestamp
     end_date: formData.end_date,
     habit_description: formData.description?.length?formData.description:null
   };
@@ -42,7 +43,7 @@ export const createOrUpdateHabit = async (
     habitData.id = habitId;
   }
   else{
-    habitData.created_at = moment.utc().format();
+    habitData.created_at = DateUtils.getCurrentUtcTimestamp();
   }
 
   const { data, error: upsertError } = await supabase
@@ -382,6 +383,9 @@ export const getHabitsByDate = async (date: string) => {
 export const getAllHabits = async () => {
   const userId = await getUserId();
 
+  
+  const todayUtc = DateUtils.getCurrentUtcDate()
+
   // Fetch all habits for the user
   const { data, error } = await supabase
     .from("habit")
@@ -392,6 +396,7 @@ export const getAllHabits = async () => {
     )
     .eq("user_id", userId)
     .eq("archived", false)
+    .or(`end_date.gte.${todayUtc},end_date.is.null`)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -426,7 +431,7 @@ export const getAllHabits = async () => {
 
 
 export const getAllHabitsArchived = async () => {
-
+    const todayUtc = DateUtils.getCurrentUtcDate()
     const userId = await getUserId();
 
     // Fetch all habits for the user
@@ -439,6 +444,7 @@ export const getAllHabitsArchived = async () => {
       )
       .eq("user_id", userId)
       .eq("archived", true)
+      .or(`end_date.gte.${todayUtc},end_date.is.null`)
       .order("reminder_time", { ascending: true });
 
     if (error) {
@@ -450,7 +456,7 @@ export const getAllHabitsArchived = async () => {
   }
 
 export const archiveHabit = async (habitId: string): Promise<boolean> => {
-  const archiveDate = new Date().toISOString();
+  const archiveDate = DateUtils.getCurrentUtcTimestamp();
 
   const userId = await getUserId();
 
@@ -507,7 +513,7 @@ export const archiveHabit = async (habitId: string): Promise<boolean> => {
 
 
 export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
-  const restoreDate = new Date().toISOString();
+  const restoreDate = DateUtils.getCurrentUtcTimestamp();
   const userId = await getUserId();
 
   // 2️⃣ Update the habit table to mark as active again
@@ -572,15 +578,15 @@ export interface HabitProgressResponse {
   data: HabitProgressEntry[];
 }
 
+
 export const fetchLast7DaysHabitProgress = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-
+  // Get today's local date (start of the day)
+  const todayLocal = DateUtils.getCurrentLocalDate()
+  
   // Calculate the start date (6 days before today)
-  const startOfRange = new Date(today);
-  startOfRange.setUTCDate(today.getUTCDate() - 6);
+  const startOfRange = moment().subtract(6, "days").format("YYYY-MM-DD");
 
   // Fetch habit creation date & frequency
   const { data: habitData, error: habitError } = await supabase
@@ -594,8 +600,7 @@ export const fetchLast7DaysHabitProgress = async (
     return null;
   }
 
-  const habitStartDate = new Date(habitData.created_at);
-  habitStartDate.setUTCHours(0, 0, 0, 0);
+  const habitStartDate = DateUtils.convertUtcToLocalDate(habitData.created_at);
 
   const frequencyDays: number[] = habitData.frequency || [];
 
@@ -608,10 +613,9 @@ export const fetchLast7DaysHabitProgress = async (
     return null;
   }
 
-  let lastActiveDate: Date | null = fetchedLastActiveDate
-    ? new Date(fetchedLastActiveDate)
+  let lastActiveDate: string | null = fetchedLastActiveDate
+    ? DateUtils.convertUtcToLocalDate(fetchedLastActiveDate)
     : null;
-  if (lastActiveDate) lastActiveDate.setUTCHours(0, 0, 0, 0);
 
   // 🔹 Fetch archive & restore history
   const { data: archiveLog, error: archiveError } = await supabase
@@ -626,26 +630,23 @@ export const fetchLast7DaysHabitProgress = async (
   }
 
   let isArchived = false;
-  let validActivePeriods: { start: Date; end: Date | null }[] = [];
-  let currentStart: Date | null = habitStartDate;
+  let validActivePeriods: { start: string; end: string | null }[] = [];
+  let currentStart: string | null = habitStartDate;
 
   for (const entry of archiveLog) {
-    const actionDate = new Date(entry.action_date);
-    actionDate.setUTCHours(0, 0, 0, 0);
+    const actionDate = DateUtils.convertUtcToLocalDate(entry.action_date);
 
     if (entry.action === "archived") {
       if (!isArchived) {
-        // Close current active period
         if (currentStart) {
           validActivePeriods.push({ start: currentStart, end: actionDate });
         }
-      isArchived = true;
+        isArchived = true;
       }
     } else if (entry.action === "restored") {
       if (isArchived) {
-        // Start a new active period
         currentStart = actionDate;
-      isArchived = false;
+        isArchived = false;
       }
     }
   }
@@ -660,47 +661,51 @@ export const fetchLast7DaysHabitProgress = async (
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .gte("date", startOfRange.toISOString().split("T")[0])
-    .lte("date", today.toISOString().split("T")[0]);
+    .gte("date", startOfRange)
+    .lte("date", todayLocal);
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
     return null;
   }
 
-  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
+  const progressMap = new Map(
+    progressData.map(entry => [
+      DateUtils.convertUtcToLocalDate(entry.date), 
+      entry.status
+    ])
+  );
 
   // Generate last 7 days list
   const result: HabitProgressEntry[] = [];
-  let currentDate = new Date(startOfRange);
+  let currentDate = moment(startOfRange);
 
-  while (currentDate <= today) {
-    const dateString = currentDate.toISOString().split("T")[0];
-    const dayOfWeek = currentDate.getUTCDay(); // 0 = Sunday, 6 = Saturday
+  while (currentDate.isSameOrBefore(todayLocal)) {
+    const dateString = currentDate.format("YYYY-MM-DD");
+    const dayOfWeek = currentDate.day(); // 0 = Sunday, 6 = Saturday
 
     let status: boolean | null = null;
 
     // Check if the date is within any valid active period
     const isWithinActivePeriod = validActivePeriods.some(({ start, end }) => {
-      return dateString >= start.toISOString().split("T")[0] && (!end || dateString <= end.toISOString().split("T")[0]);
+      return dateString >= start && (!end || dateString <= end);
     });
 
     if (!isWithinActivePeriod) {
       status = null; // Ignore if outside active period
-    } 
-    else if (!frequencyDays.includes(dayOfWeek)) {
+    } else if (!frequencyDays.includes(dayOfWeek)) {
       status = null; // Not a habit day
-    } 
-    else {
+    } else {
       status = progressMap.get(dateString) ?? false; // Use progress data or default to false
     }
 
     result.push({ date: dateString, status });
-    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    currentDate.add(1, "day"); // Move to next day
   }
 
   return { habitId, data: result };
 };
+
 
 
 
@@ -852,7 +857,7 @@ export const fetchHabitProgressFromCreation = async (
 
 
 export const getCompletedHabitStats = async (habitId: string) => {
-  const userId = await getUserId();
+  const userId = getUserId();
 
   // Fetch habit progress directly from habit_progress table
   const { data: progressData, error: fetchError } = await supabase
@@ -1197,7 +1202,7 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
 
 export const getHabitCompletionStats = async (habitId: string) => {
  
-  const userId = await getUserId()
+  const userId =  getUserId()
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
