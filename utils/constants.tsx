@@ -6,6 +6,7 @@ import SleepIcon from "@/assets/svg/sleep-schedule.svg";
 import JournalingIcon from "@/assets/svg/journal.svg";
 import OthersIcon from "@/assets/svg/others.svg";
 import { horizontalScale } from "@/metric";
+import moment from "moment";
 
 export const goodHabitsCategories = [
   {
@@ -78,7 +79,6 @@ export const getCategoryByName = (categoryName: string) => {
   );
 };
 
-
 export const getCurrentMonthAndYear = () => {
   const today = new Date();
 
@@ -91,4 +91,10 @@ export const getCurrentMonthAndYear = () => {
   return { month: monthName, year };
 };
 
-
+// Function to get the current UTC timestamp
+export const DateUtils = {
+  getCurrentUtcTimestamp: (format = "YYYY-MM-DDTHH:mm:ss[Z]") =>
+    moment.utc().format(format),
+  convertUtcToLocal: (utcTimestamp:string, format = "YYYY-MM-DD HH:mm:ss") =>
+    moment.utc(utcTimestamp).local().format(format),
+};

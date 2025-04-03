@@ -1,5 +1,6 @@
 import { supabase } from "@/utils/SupaLegend";
 import { getUserId } from "@/utils/persist-storage";
+import moment from "moment";
 
 type CreateHabitSchema = {
   habitName: string;
@@ -31,7 +32,7 @@ export const createOrUpdateHabit = async (
     notification_enable: formData.notificationEnable,
     habit_color: formData.habitColor,
     google_notification_enable: formData.googleNotificationEnable,
-    updated_at: new Date().toISOString(), // Always update timestamp
+    updated_at: moment.utc().format(), // Always update timestamp
     end_date: formData.end_date,
     habit_description: formData.description?.length?formData.description:null
   };
@@ -41,7 +42,7 @@ export const createOrUpdateHabit = async (
     habitData.id = habitId;
   }
   else{
-    habitData.created_at = new Date().toISOString();
+    habitData.created_at = moment.utc().format();
   }
 
   const { data, error: upsertError } = await supabase

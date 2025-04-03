@@ -7,10 +7,14 @@ PODS:
     - AppAuth/Core
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
+  - EXApplication (6.0.2):
+    - ExpoModulesCore
   - EXConstants (17.0.8):
     - ExpoModulesCore
   - EXJSONUtils (0.14.0)
   - EXManifests (0.15.7):
+    - ExpoModulesCore
+  - EXNotifications (0.29.14):
     - ExpoModulesCore
   - Expo (52.0.41):
     - ExpoModulesCore
@@ -230,6 +234,8 @@ PODS:
   - ExpoBlur (14.0.3):
     - ExpoModulesCore
   - ExpoCrypto (14.0.2):
+    - ExpoModulesCore
+  - ExpoDevice (7.0.3):
     - ExpoModulesCore
   - ExpoFileSystem (18.0.12):
     - ExpoModulesCore
@@ -2262,9 +2268,11 @@ PODS:
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXApplication (from `../node_modules/expo-application/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
+  - EXNotifications (from `../node_modules/expo-notifications/ios`)
   - Expo (from `../node_modules/expo`)
   - expo-dev-client (from `../node_modules/expo-dev-client/ios`)
   - expo-dev-launcher (from `../node_modules/expo-dev-launcher`)
@@ -2274,6 +2282,7 @@ DEPENDENCIES:
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - ExpoBlur (from `../node_modules/expo-blur/ios`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
+  - ExpoDevice (from `../node_modules/expo-device/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoHaptics (from `../node_modules/expo-haptics/ios`)
@@ -2383,12 +2392,16 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXApplication:
+    :path: "../node_modules/expo-application/ios"
   EXConstants:
     :path: "../node_modules/expo-constants/ios"
   EXJSONUtils:
     :path: "../node_modules/expo-json-utils/ios"
   EXManifests:
     :path: "../node_modules/expo-manifests/ios"
+  EXNotifications:
+    :path: "../node_modules/expo-notifications/ios"
   Expo:
     :path: "../node_modules/expo"
   expo-dev-client:
@@ -2407,6 +2420,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-blur/ios"
   ExpoCrypto:
     :path: "../node_modules/expo-crypto/ios"
+  ExpoDevice:
+    :path: "../node_modules/expo-device/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
@@ -2599,9 +2614,11 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
+  EXApplication: 27a524f5c3e671c6218220fba04752629466a1a9
   EXConstants: a1f35b9aabbb3c6791f8e67722579b1ffcdd3f18
   EXJSONUtils: 01fc7492b66c234e395dcffdd5f53439c5c29c93
   EXManifests: 4e8c6aa537f44e72c2b4e2b71698234b623007da
+  EXNotifications: c024b19d69d31fbc22ed63682559cef38523da9e
   Expo: 3a8a619381412bbf8537746ec27b485be01c8a1f
   expo-dev-client: 9a63f23c68c0fc826a72aee95e2791cd21b49ce5
   expo-dev-launcher: cc76d20b6ca0a1b0cd57e9a942c705f365c33e92
@@ -2611,6 +2628,7 @@ SPEC CHECKSUMS:
   ExpoAsset: 0687fe05f5d051c4a34dd1f9440bd00858413cfe
   ExpoBlur: 567af66164e3043a9a30069594aed1ddf0a88d97
   ExpoCrypto: 1eaf79360c8135af1f2ebb133394fd3513ca9a3d
+  ExpoDevice: cf7419343b6e060209aaadd596defb1b6320597f
   ExpoFileSystem: c8c19bf80d914c83dda3beb8569d7fb603be0970
   ExpoFont: 773955186469acc5108ff569712a2d243857475f
   ExpoHaptics: e01cce0741d68c281853118eb0267f88d42c6b7a
