@@ -40,6 +40,7 @@ import CalenderInactiveIcon from "@/assets/svg/calendar-inactive-icon.svg";
 import UpdownInactiveIcon from "@/assets/svg/up-down-inactive.svg";
 import DateInputV2 from "@/components/ui/date-picker";
 import DescriptionIcon from "@/assets/svg/description-icon.svg";
+import { scheduleNotification } from "@/services/notificationService";
 
 const days = ["S", "M", "T", "W", "T", "F", "S"];
 const colors = [
@@ -89,7 +90,14 @@ const CreateHabit = () => {
       setIsCreatingHabit(true);
       return createOrUpdateHabit(data, habitId);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // console.log("onSuccess", JSON.stringify(data, null, 2));
+      scheduleNotification({
+        reminder_time: data[0]?.reminder_time,
+        habit_name: data[0]?.habit_name,
+        id: data[0]?.id,
+      });
+
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       router.dismissAll();
       router.replace("/(protected)/(tabs)");

@@ -19,6 +19,10 @@ import { router } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { archiveHabit, deleteHabit, unarchiveHabit } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
+import {
+  cancelNotification,
+  scheduleNotification,
+} from "@/services/notificationService";
 
 const _iconSize = horizontalScale(24);
 const closeSheet = () => {
@@ -37,6 +41,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
       return archiveHabit(payload?.id ?? "");
     },
     onSuccess: (isSuccess: boolean) => {
+      cancelNotification(payload?.id ?? "");
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       toast.show(`${payload?.habit_name?.trim()} Archived`, {
         type: "success",
@@ -57,6 +62,11 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
     },
     onSuccess: () => {
       // console.log("unarchived");
+      scheduleNotification({
+        habit_name: payload?.habit_name ?? "",
+        reminder_time: payload?.reminder_time ?? "",
+        id: payload?.id ?? "",
+      });
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
 

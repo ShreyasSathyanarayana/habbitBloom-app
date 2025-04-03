@@ -1,6 +1,11 @@
 import * as Notifications from 'expo-notifications';
-import * as SecureStore from 'expo-secure-store';
+// import * as SecureStore from 'expo-secure-store';
 import { Habit, ScheduledNotifications } from './types';
+import { storage } from '@/utils/storage';
+
+export const notificationKey={
+  scheduledNotifications: 'scheduledNotifications',
+}
 
 // Request notification permissions
 export const requestPermissions = async (): Promise<boolean> => {
@@ -9,21 +14,22 @@ export const requestPermissions = async (): Promise<boolean> => {
 };
 
 // Get stored notifications securely
-const getStoredNotifications = async (): Promise<ScheduledNotifications> => {
-  const data = await SecureStore.getItemAsync('scheduledNotifications');
+const getStoredNotifications = (): ScheduledNotifications => {
+  const data = storage.getString(notificationKey.scheduledNotifications);
   return data ? JSON.parse(data) : {};
 };
 
 // Save updated notifications securely
-const saveStoredNotifications = async (notifications: ScheduledNotifications): Promise<void> => {
-  await SecureStore.setItemAsync('scheduledNotifications', JSON.stringify(notifications));
+const saveStoredNotifications = (notifications: ScheduledNotifications): void => {
+  // await SecureStore.setItemAsync('scheduledNotifications', JSON.stringify(notifications));
+  storage.set(notificationKey.scheduledNotifications, JSON.stringify(notifications));
 };
 
 // Schedule a notification
 export const scheduleNotification = async (habit: Habit): Promise<void> => {
   if (!(await requestPermissions())) return;
 
-  const scheduledNotifications = await getStoredNotifications();
+  const scheduledNotifications = getStoredNotifications();
 
   // Prevent duplicate notifications
   if (scheduledNotifications[habit.id]) {
@@ -49,19 +55,19 @@ export const scheduleNotification = async (habit: Habit): Promise<void> => {
 
   // Save new notification securely
   scheduledNotifications[habit.id] = notificationId;
-  await saveStoredNotifications(scheduledNotifications);
+ saveStoredNotifications(scheduledNotifications);
 
   console.log(`Scheduled notification for "${habit.habit_name}" at ${habit.reminder_time}`);
 };
 
 // Cancel a notification
 export const cancelNotification = async (habitId: string): Promise<void> => {
-  const scheduledNotifications = await getStoredNotifications();
+  const scheduledNotifications = getStoredNotifications();
 
   if (scheduledNotifications[habitId]) {
     await Notifications.cancelScheduledNotificationAsync(scheduledNotifications[habitId]);
     delete scheduledNotifications[habitId];
-    await saveStoredNotifications(scheduledNotifications);
+   saveStoredNotifications(scheduledNotifications);
     console.log(`Cancelled notification for habit ID: ${habitId}`);
   }
 };

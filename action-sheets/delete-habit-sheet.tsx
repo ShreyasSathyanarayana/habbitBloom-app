@@ -11,6 +11,10 @@ import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import Button from "@/components/ui/button";
 import AlertButton from "./alert-button";
+import {
+  cancelNotification,
+  scheduleNotification,
+} from "@/services/notificationService";
 // import Button from "@/components/ui/button";
 const closeSheet = () => {
   SheetManager.hide("delete-habit");
@@ -28,6 +32,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       return deleteHabit(payload?.id ?? "");
     },
     onSuccess: () => {
+      cancelNotification(payload?.id ?? "");
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
       toast.show("Habit Deleted", {
@@ -47,6 +52,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       return archiveHabit(payload?.id ?? "");
     },
     onSuccess: () => {
+      cancelNotification(payload?.id ?? "");
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       toast.show(`Archived`, {
         type: "success",
