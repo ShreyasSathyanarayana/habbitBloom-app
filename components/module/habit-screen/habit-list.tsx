@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import HabitCard, { HabitProp } from "./habit-card";
 import { verticalScale } from "@/metric";
 import { SharedValue } from "react-native-reanimated";
@@ -53,21 +53,21 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
   return (
     <View style={styles.container}>
       {memoizedHabits && memoizedHabits.length > 0 && (
-        <FlashList
+        <FlatList
           ref={ref}
           data={memoizedHabits}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          estimatedItemSize={80} // Adjust based on UI
+          // estimatedItemSize={80} // Adjust based on UI
           // windowSize={5} // Increase for better scrolling performance
           // maxToRenderPerBatch={5} // Adjust this based on testing
           // updateCellsBatchingPeriod={50}
-          removeClippedSubviews={true}
+          // removeClippedSubviews={true}
           contentContainerStyle={{ paddingBottom: verticalScale(80) }}
           scrollEventThrottle={16}
           onScroll={handleScroll}
-          onBlankArea={onBlankArea}
+          // onBlankArea={onBlankArea}
           ItemSeparatorComponent={() => {
             return <View style={{ height: verticalScale(16) }} />;
           }}

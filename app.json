@@ -61,6 +61,18 @@
             "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
           }
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "sounds": [
+            "./assets/ringtone/notification-ringtone.wav"
+          ],
+          "enableBackgroundRemoteNotifications": false
+        }
       ]
     ],
     "experiments": {
