@@ -9,26 +9,26 @@ import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 const data = [
   {
-    title: "No Backdating",
+    title: "No Backdating 🕒",
     description:
       "Mark habits only today or in the future for authentic tracking.",
   },
   {
-    title: "Set Your Schedule",
+    title: "Set Your Schedule 📅",
     description:
       "The app lets you track only on selected days to keep you accountable.",
   },
   {
-    title: "Stay Consistent",
+    title: "Stay Consistent 🔥",
     description: "Log daily to maintain streaks and earn achievement badges.",
   },
   {
-    title: "Use Reminders",
+    title: "Use Reminders ⏰",
     description:
       "Enable notifications & sync with Google Calendar for timely prompts.",
   },
   {
-    title: "Share Your Wins",
+    title: "Share Your Wins 🎉",
     description: "Celebrate progress by sharing your badges with friends!",
   },
 ];

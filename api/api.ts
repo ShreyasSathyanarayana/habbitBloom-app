@@ -10,12 +10,10 @@ type CreateHabitSchema = {
   frequency: number[];
   notificationEnable: boolean;
   habitColor: string;
-  googleNotificationEnable:boolean;
+  googleNotificationEnable: boolean;
   end_date: string | null;
-  description:string
+  description: string;
 };
-
-
 
 export const createOrUpdateHabit = async (
   formData: CreateHabitSchema,
@@ -35,14 +33,15 @@ export const createOrUpdateHabit = async (
     google_notification_enable: formData.googleNotificationEnable,
     updated_at: DateUtils.getCurrentUtcTimestamp(), // Always update timestamp
     end_date: formData.end_date,
-    habit_description: formData.description?.length?formData.description:null
+    habit_description: formData.description?.length
+      ? formData.description
+      : null,
   };
 
   // Include 'id' only if updating an existing habit
   if (habitId) {
     habitData.id = habitId;
-  }
-  else{
+  } else {
     habitData.created_at = DateUtils.getCurrentUtcTimestamp();
   }
 
@@ -59,9 +58,7 @@ export const createOrUpdateHabit = async (
   return data;
 };
 
-
 export const deleteHabit = async (habitId: string) => {
-
   const userId = await getUserId();
 
   const { error: deleteError } = await supabase
@@ -78,9 +75,11 @@ export const deleteHabit = async (habitId: string) => {
   return { message: "Habit deleted successfully" };
 };
 
-
-
-export const markHabitStatus = async (habitId: string, status: boolean, habitDate: string) => {
+export const markHabitStatus = async (
+  habitId: string,
+  status: boolean,
+  habitDate: string
+) => {
   const userId = await getUserId();
 
   const today = new Date();
@@ -105,7 +104,10 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
   if (fetchError && fetchError.code !== "PGRST116") {
     console.error("Error fetching habit progress:", fetchError);
-    throw { message: "Error fetching habit progress. Try again later.", type: "danger" };
+    throw {
+      message: "Error fetching habit progress. Try again later.",
+      type: "danger",
+    };
   }
 
   if (existingRecord) {
@@ -118,7 +120,10 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
       if (deleteError) {
         console.error("Error deleting habit progress:", deleteError);
-        throw { message: "Failed to delete habit progress. Try again later.", type: "danger" };
+        throw {
+          message: "Failed to delete habit progress. Try again later.",
+          type: "danger",
+        };
       }
     } else {
       // 🔹 If today's status is false → UPDATE it to true
@@ -129,7 +134,10 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
       if (updateError) {
         console.error("Error updating habit status:", updateError);
-        throw { message: "Failed to update habit. Try again later.", type: "danger" };
+        throw {
+          message: "Failed to update habit. Try again later.",
+          type: "danger",
+        };
       }
     }
   } else {
@@ -147,18 +155,17 @@ export const markHabitStatus = async (habitId: string, status: boolean, habitDat
 
     if (insertError) {
       console.error("Error inserting habit progress:", insertError);
-      throw { message: "Failed to log habit progress. Try again later.", type: "danger" };
+      throw {
+        message: "Failed to log habit progress. Try again later.",
+        type: "danger",
+      };
     }
   }
 
   return { success: true };
 };
 
-
-
-
 export const getHabitStreak = async (habitId: string) => {
- 
   const userId = await getUserId();
 
   const { data, error: fetchError } = await supabase
@@ -198,7 +205,6 @@ export const getHabitStreak = async (habitId: string) => {
 
   return streak;
 };
-
 
 export const getHabitStats = async (habitId: string) => {
   const userId = await getUserId();
@@ -261,10 +267,12 @@ export const getHabitStats = async (habitId: string) => {
 
   // Convert archive log dates to a sorted list of events
   let isActive = true; // By default, habit is active
-  let archiveEvents: { date: Date; action: string }[] = archiveLogs.map((log) => ({
-    date: new Date(log.action_date),
-    action: log.action
-  }));
+  let archiveEvents: { date: Date; action: string }[] = archiveLogs.map(
+    (log) => ({
+      date: new Date(log.action_date),
+      action: log.action,
+    })
+  );
 
   // 🔹 Initialize tracking variables
   let completedCount = 0;
@@ -290,7 +298,10 @@ export const getHabitStats = async (habitId: string) => {
     const dayOfWeek = currentDate.getUTCDay();
 
     // Process archive/unarchive logs dynamically
-    while (archiveIndex < archiveEvents.length && archiveEvents[archiveIndex].date <= currentDate) {
+    while (
+      archiveIndex < archiveEvents.length &&
+      archiveEvents[archiveIndex].date <= currentDate
+    ) {
       isActive = archiveEvents[archiveIndex].action === "restored";
       archiveIndex++;
     }
@@ -310,14 +321,14 @@ export const getHabitStats = async (habitId: string) => {
       if (progressMap.get(dateString)) {
         completedCount++;
         lastScheduledCompleted = true; // ✅ Mark last scheduled day as completed
-        
+
         // If lastCompletedDate is the previous scheduled habit day, increment streak
         if (lastCompletedDate && lastScheduledCompleted) {
           currentStreak++;
         } else {
           currentStreak = 1; // Reset to 1 for a new streak
         }
-        
+
         highestStreak = Math.max(highestStreak, currentStreak);
         lastCompletedDate = new Date(currentDate);
       } else {
@@ -336,18 +347,15 @@ export const getHabitStats = async (habitId: string) => {
     currentDate.setUTCDate(currentDate.getUTCDate() + 1);
   }
 
-  return { completed: completedCount, notCompleted: notCompletedCount, streak: currentStreak, highestStreak };
+  return {
+    completed: completedCount,
+    notCompleted: notCompletedCount,
+    streak: currentStreak,
+    highestStreak,
+  };
 };
 
-
-
-
-
-
-
-
 export const getHabitsByDate = async (date: string) => {
-
   const userId = await getUserId();
 
   // Convert the given date into a timestamp range for the full day
@@ -378,7 +386,6 @@ export const getHabitsByDate = async (date: string) => {
     isCompleted: habit.habit_progress?.[0]?.status || false, // Default to false if no record
   }));
 };
-
 
 export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
   const userId = await getUserId();
@@ -419,30 +426,26 @@ export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
   return habitsWithProgress;
 };
 
-
-
 export const getAllHabitsArchived = async () => {
-    const todayUtc = DateUtils.getCurrentUtcDate()
-    const userId = await getUserId();
+  const todayUtc = DateUtils.getCurrentUtcDate();
+  const userId = await getUserId();
 
-    // Fetch all habits for the user
-    const { data, error } = await supabase
-      .from("habit")
-      .select(
-       "*"
-      )
-      .eq("user_id", userId)
-      .eq("archived", true)
-      .or(`end_date.gte.${todayUtc},end_date.is.null`)
-      .order("reminder_time", { ascending: true });
+  // Fetch all habits for the user
+  const { data, error } = await supabase
+    .from("habit")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("archived", true)
+    .or(`end_date.gte.${todayUtc},end_date.is.null`)
+    .order("reminder_time", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching habits:", error);
-      return [];
-    }
-
-    return data;
+  if (error) {
+    console.error("Error fetching habits:", error);
+    return [];
   }
+
+  return data;
+};
 
 export const archiveHabit = async (habitId: string): Promise<boolean> => {
   const archiveDate = DateUtils.getCurrentUtcTimestamp();
@@ -451,15 +454,21 @@ export const archiveHabit = async (habitId: string): Promise<boolean> => {
 
   // 2️⃣ Fetch last active date using RPC
   let lastActiveDate: string | null = null;
-  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
-  .rpc("get_last_active_date", { habit_id: habitId });
+  const { data: fetchedLastActiveDate, error: lastActiveError } =
+    await supabase.rpc("get_last_active_date", { habit_id: habitId });
 
   if (lastActiveError) {
-    console.warn("Error fetching last active date, proceeding without it:", lastActiveError);
+    console.warn(
+      "Error fetching last active date, proceeding without it:",
+      lastActiveError
+    );
   } else if (typeof fetchedLastActiveDate === "string") {
     lastActiveDate = fetchedLastActiveDate; // Ensure it's a valid string
   } else {
-    console.warn("Unexpected format for last active date, proceeding without it:", fetchedLastActiveDate);
+    console.warn(
+      "Unexpected format for last active date, proceeding without it:",
+      fetchedLastActiveDate
+    );
   }
 
   // 3️⃣ Update the habit table to mark as archived
@@ -479,16 +488,14 @@ export const archiveHabit = async (habitId: string): Promise<boolean> => {
   }
 
   // 4️⃣ Log the archive action in habit_archive_log
-  const { error: logError } = await supabase
-    .from("habit_archive_log")
-    .insert([
-      {
-        habit_id: habitId,
-        user_id: userId,
-        action: "archived",
-        action_date: archiveDate,
-      },
-    ]);
+  const { error: logError } = await supabase.from("habit_archive_log").insert([
+    {
+      habit_id: habitId,
+      user_id: userId,
+      action: "archived",
+      action_date: archiveDate,
+    },
+  ]);
 
   if (logError) {
     console.error("Error inserting archive log:", logError);
@@ -497,9 +504,6 @@ export const archiveHabit = async (habitId: string): Promise<boolean> => {
 
   return true;
 };
-
-
-
 
 export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
   const restoreDate = DateUtils.getCurrentUtcTimestamp();
@@ -521,16 +525,14 @@ export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
   }
 
   // 3️⃣ Log the restore action in habit_archive_log
-  const { error: logError } = await supabase
-    .from("habit_archive_log")
-    .insert([
-      {
-        habit_id: habitId,
-        user_id: userId,
-        action: "restored", // ✅ Make sure to use "restored" as per the constraint
-        action_date: restoreDate,
-      },
-    ]);
+  const { error: logError } = await supabase.from("habit_archive_log").insert([
+    {
+      habit_id: habitId,
+      user_id: userId,
+      action: "restored", // ✅ Make sure to use "restored" as per the constraint
+      action_date: restoreDate,
+    },
+  ]);
 
   if (logError) {
     console.error("Error inserting unarchive log:", logError);
@@ -540,12 +542,7 @@ export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
   return true;
 };
 
-
-
-
-
 export const getHabitById = async (habitId: string) => {
-
   const userId = await getUserId();
   const { data, error } = await supabase
     .from("habit")
@@ -567,13 +564,12 @@ export interface HabitProgressResponse {
   data: HabitProgressEntry[];
 }
 
-
 export const fetchLast7DaysHabitProgress = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
   // Get today's local date (start of the day)
-  const todayLocal = DateUtils.getCurrentLocalDate()
-  
+  const todayLocal = DateUtils.getCurrentLocalDate();
+
   // Calculate the start date (6 days before today)
   const startOfRange = moment().subtract(6, "days").format("YYYY-MM-DD");
 
@@ -594,8 +590,8 @@ export const fetchLast7DaysHabitProgress = async (
   const frequencyDays: number[] = habitData.frequency || [];
 
   // Fetch last active date using stored procedure
-  const { data: fetchedLastActiveDate, error: lastActiveError } = await supabase
-    .rpc("get_last_active_date", { habit_id: habitId });
+  const { data: fetchedLastActiveDate, error: lastActiveError } =
+    await supabase.rpc("get_last_active_date", { habit_id: habitId });
 
   if (lastActiveError) {
     console.error("Error fetching last active date:", lastActiveError);
@@ -659,9 +655,9 @@ export const fetchLast7DaysHabitProgress = async (
   }
 
   const progressMap = new Map(
-    progressData.map(entry => [
-      DateUtils.convertUtcToLocalDate(entry.date), 
-      entry.status
+    progressData.map((entry) => [
+      DateUtils.convertUtcToLocalDate(entry.date),
+      entry.status,
     ])
   );
 
@@ -695,7 +691,6 @@ export const fetchLast7DaysHabitProgress = async (
   return { habitId, data: result };
 };
 
-
 export type CompletedHabits = {
   id: string;
   user_id: string;
@@ -714,15 +709,13 @@ export type CompletedHabits = {
   last_active_date: string; // ISO date string
   restored_at: string | null;
   habit_description: string | null;
-  public:boolean
+  public: boolean;
 };
 
-
-
-export const getAllCompletedHabits = async ():Promise<CompletedHabits[]> => {
+export const getAllCompletedHabits = async (): Promise<CompletedHabits[]> => {
   const userId = await getUserId();
 
-  const todayUTC = DateUtils.getCurrentUtcDate() // Format: YYYY-MM-DD
+  const todayUTC = DateUtils.getCurrentUtcDate(); // Format: YYYY-MM-DD
 
   const { data, error } = await supabase
     .from("habit")
@@ -738,9 +731,10 @@ export const getAllCompletedHabits = async ():Promise<CompletedHabits[]> => {
   return data;
 };
 
-
-
-export const updateHabitPublicStatus = async (habitId: string, isPublic: boolean) => {
+export const updateHabitPublicStatus = async (
+  habitId: string,
+  isPublic: boolean
+) => {
   const { data, error } = await supabase
     .from("habit")
     .update({ public: isPublic })
@@ -754,18 +748,7 @@ export const updateHabitPublicStatus = async (habitId: string, isPublic: boolean
   return data;
 };
 
-
-
-
-
-
-
 // *************************Analytics*************************
-
-
-
-
-
 
 export interface HabitProgressEntry {
   date: string;
@@ -850,7 +833,9 @@ export const fetchHabitProgressFromCreation = async (
   }
 
   // Convert progress data into a Map for quick lookup
-  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
+  const progressMap = new Map(
+    progressData.map((entry) => [entry.date, entry.status])
+  );
 
   // Generate progress list, excluding archived periods
   const result: HabitProgressEntry[] = [];
@@ -862,7 +847,8 @@ export const fetchHabitProgressFromCreation = async (
 
     // Check if the date falls within an archived period
     const archiveRecord = archivePeriods.find(
-      ({ start, end }) => currentDate >= start && (end === null || currentDate < end)
+      ({ start, end }) =>
+        currentDate >= start && (end === null || currentDate < end)
     );
 
     let status: boolean | null = null;
@@ -882,7 +868,8 @@ export const fetchHabitProgressFromCreation = async (
 
         if (dateString === archiveStart) {
           // If the habit was **completed** before archive, keep the completed status
-          completed = progressMap.has(dateString) && progressMap.get(dateString) === true;
+          completed =
+            progressMap.has(dateString) && progressMap.get(dateString) === true;
         } else {
           status = null; // Mark as archived
         }
@@ -896,11 +883,6 @@ export const fetchHabitProgressFromCreation = async (
 
   return { habitId, data: result };
 };
-
-
-
-
-
 
 export const getCompletedHabitStats = async (habitId: string) => {
   const userId = await getUserId();
@@ -929,11 +911,16 @@ export const getCompletedHabitStats = async (habitId: string) => {
   });
 
   // Initialize tracking variables
-  let completedCount = 0, notCompletedCount = 0;
-  let highestStreak = 0, currentStreak = 0;
-  let weeklyCompleted = 0, weeklyNotCompleted = 0;
-  let monthlyCompleted = 0, monthlyNotCompleted = 0;
-  let yearlyCompleted = 0, yearlyNotCompleted = 0;
+  let completedCount = 0,
+    notCompletedCount = 0;
+  let highestStreak = 0,
+    currentStreak = 0;
+  let weeklyCompleted = 0,
+    weeklyNotCompleted = 0;
+  let monthlyCompleted = 0,
+    monthlyNotCompleted = 0;
+  let yearlyCompleted = 0,
+    yearlyNotCompleted = 0;
 
   // Get current date info
   const today = new Date();
@@ -986,7 +973,6 @@ export const getCompletedHabitStats = async (habitId: string) => {
   };
 };
 
-
 // Helper function to return default stats
 const getDefaultStats = () => ({
   completed: 0,
@@ -998,7 +984,6 @@ const getDefaultStats = () => ({
   yearly: { completed: 0, notCompleted: 0 },
 });
 
-
 export const fetchHabitProgressForCurrentMonth = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
@@ -1007,8 +992,12 @@ export const fetchHabitProgressForCurrentMonth = async (
   today.setUTCHours(0, 0, 0, 0);
 
   // Get the first and last day of the current month
-  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
-  const endOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0));
+  const startOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)
+  );
+  const endOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0)
+  );
 
   // Fetch habit progress for the current month
   const { data: progressData, error: progressError } = await supabase
@@ -1024,7 +1013,9 @@ export const fetchHabitProgressForCurrentMonth = async (
   }
 
   // Convert progress data into a Map for quick lookup
-  const progressMap = new Map(progressData.map(entry => [entry.date, entry.status]));
+  const progressMap = new Map(
+    progressData.map((entry) => [entry.date, entry.status])
+  );
 
   // Generate full month's dates (from 1st to last day)
   const result: HabitProgressEntry[] = [];
@@ -1043,9 +1034,6 @@ export const fetchHabitProgressForCurrentMonth = async (
 
   return { habitId, data: result };
 };
-
-
-
 
 export const fetchWeeklyHabitProgressForYear = async (
   habitId: string
@@ -1072,7 +1060,9 @@ export const fetchWeeklyHabitProgressForYear = async (
 
   // Generate weekly labels for the year (starting from Sunday)
   let currentWeekStart = new Date(startOfYear);
-  currentWeekStart.setUTCDate(startOfYear.getUTCDate() - startOfYear.getUTCDay());
+  currentWeekStart.setUTCDate(
+    startOfYear.getUTCDate() - startOfYear.getUTCDay()
+  );
 
   while (currentWeekStart <= endOfYear) {
     const weekLabel = `${currentWeekStart.toLocaleString("en-US", {
@@ -1107,8 +1097,6 @@ export const fetchWeeklyHabitProgressForYear = async (
   }));
 };
 
-
-
 export const fetchMonthlyHabitProgressForYear = async (
   habitId: string
 ): Promise<{ month: string; completed: number }[]> => {
@@ -1131,8 +1119,18 @@ export const fetchMonthlyHabitProgressForYear = async (
 
   // Initialize months with zero completed count
   const monthlyProgress: Record<string, number> = {
-    Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
-    Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
+    Jan: 0,
+    Feb: 0,
+    Mar: 0,
+    Apr: 0,
+    May: 0,
+    Jun: 0,
+    Jul: 0,
+    Aug: 0,
+    Sep: 0,
+    Oct: 0,
+    Nov: 0,
+    Dec: 0,
   };
 
   // Process progress data
@@ -1152,7 +1150,6 @@ export const fetchMonthlyHabitProgressForYear = async (
   }));
 };
 
-
 export const fetchYearlyHabitProgressForLastThreeYears = async (
   habitId: string
 ): Promise<{ year: number; completed: number }[]> => {
@@ -1161,7 +1158,7 @@ export const fetchYearlyHabitProgressForLastThreeYears = async (
   const endYear = today.getUTCFullYear();
 
   const startOfPeriod = new Date(startYear, 0, 1); // Jan 1st of 3 years ago
-  const endOfPeriod = new Date(endYear, 11, 31);  // Dec 31st of current year
+  const endOfPeriod = new Date(endYear, 11, 31); // Dec 31st of current year
 
   // Fetch habit progress for the last 3 years
   const { data: progressData, error } = await supabase
@@ -1199,7 +1196,6 @@ export const fetchYearlyHabitProgressForLastThreeYears = async (
   }));
 };
 
-
 export const fetchYearlyHabitProgressForLastFiveYears = async (
   habitId: string
 ): Promise<{ year: number; completed: number }[]> => {
@@ -1208,7 +1204,7 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
   const endYear = today.getUTCFullYear(); // Current year
 
   const startOfPeriod = new Date(startYear, 0, 1); // Jan 1st of 5 years ago
-  const endOfPeriod = new Date(endYear, 11, 31);  // Dec 31st of current year
+  const endOfPeriod = new Date(endYear, 11, 31); // Dec 31st of current year
 
   // Fetch habit progress for the last 5 years
   const { data: progressData, error } = await supabase
@@ -1247,8 +1243,7 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
 };
 
 export const getHabitCompletionStats = async (habitId: string) => {
- 
-  const userId =  getUserId()
+  const userId = getUserId();
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
@@ -1267,7 +1262,9 @@ export const getHabitCompletionStats = async (habitId: string) => {
   const habitCreatedAt = new Date(habitData.created_at);
   habitCreatedAt.setUTCHours(0, 0, 0, 0);
 
-  let habitEndDate = habitData.end_date ? new Date(habitData.end_date) : new Date();
+  let habitEndDate = habitData.end_date
+    ? new Date(habitData.end_date)
+    : new Date();
   habitEndDate.setUTCHours(0, 0, 0, 0);
 
   // Fetch habit progress
@@ -1293,7 +1290,8 @@ export const getHabitCompletionStats = async (habitId: string) => {
     progressMap.set(entry.date.split("T")[0], entry.status);
   });
 
-  let completedCount = 0, pendingCount = 0;
+  let completedCount = 0,
+    pendingCount = 0;
   let currentDate = new Date(habitCreatedAt);
 
   // Iterate from habit creation date to end date
@@ -1317,10 +1315,8 @@ export const getHabitCompletionStats = async (habitId: string) => {
   return { completed: completedCount, pending: pendingCount };
 };
 
-
 export const getCompletedAndPendingDays = async (habitId: string) => {
- 
-  const userId = await getUserId()
+  const userId = await getUserId();
 
   // Fetch habit details
   const { data: habitData, error: habitError } = await supabase
@@ -1339,7 +1335,9 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
   const habitCreatedAt = new Date(habitData.created_at);
   habitCreatedAt.setUTCHours(0, 0, 0, 0);
 
-  let habitEndDate = habitData.end_date ? new Date(habitData.end_date) : new Date();
+  let habitEndDate = habitData.end_date
+    ? new Date(habitData.end_date)
+    : new Date();
   habitEndDate.setUTCHours(0, 0, 0, 0);
 
   // Fetch completed habit progress
@@ -1347,7 +1345,7 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id",userId)
+    .eq("user_id", userId)
     .gte("date", habitCreatedAt.toISOString().split("T")[0])
     .lte("date", habitEndDate.toISOString().split("T")[0]);
 
@@ -1391,3 +1389,29 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
   return { completedDays, pendingDays };
 };
 
+/********************************** Profile Api ***************************************** */
+
+export const getUserProfile = async () => {
+  const userId = await getUserId();
+  const { data, error } = await supabase
+    .from("profile")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching profile:", error);
+    return {
+      id: "",
+      full_name: "",
+      mobile: "",
+      email: "",
+      created_at: "",
+      updated_at: "",
+      profile_pic: "NULL",
+      profile_bio: "NULL",
+    };
+  }
+
+  return data;
+};

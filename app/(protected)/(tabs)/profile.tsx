@@ -1,29 +1,36 @@
-import { GradientButton } from "@/components/ui/gradient-button";
-import { ThemedText } from "@/components/ui/theme-text";
-import { useAuth } from "@/context/AuthProvider";
-import { useQueryClient } from "@tanstack/react-query";
+import { getUserProfile } from "@/api/api";
+import ProfileBody from "@/components/module/profile/profile-body";
+import ProfileHead from "@/components/module/profile/profile-head";
+import { verticalScale } from "@/metric";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 const Profile = () => {
-  const { logout } = useAuth();
-  const queryClient = useQueryClient();
+  const getUserDetailsQuery = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () => {
+      return getUserProfile();
+    },
+  });
+
+  const profileData = getUserDetailsQuery.data;
+  console.log("profileData", JSON.stringify(profileData, null, 2));
+
   return (
     <View
       style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
         backgroundColor: "black",
+        flex: 1,
       }}
     >
-      <GradientButton
-        title="SignOut"
-        onPress={() => {
-          queryClient.clear();
-          logout();
-        }}
-      />
+      <ProfileHead {...profileData} />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: verticalScale(100) }}
+      >
+        <ProfileBody />
+      </ScrollView>
     </View>
   );
 };

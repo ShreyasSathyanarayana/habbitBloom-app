@@ -95,12 +95,17 @@ export const getCurrentMonthAndYear = () => {
 export const DateUtils = {
   getCurrentUtcTimestamp: (format = "YYYY-MM-DDTHH:mm:ss[Z]") =>
     moment.utc().format(format),
-  convertUtcToLocal: (utcTimestamp:string, format = "YYYY-MM-DD HH:mm:ss") =>
+  convertUtcToLocal: (utcTimestamp: string, format = "YYYY-MM-DD HH:mm:ss") =>
     moment.utc(utcTimestamp).local().format(format),
-  getCurrentUtcDate: (format = "YYYY-MM-DD") =>
-    moment.utc().format(format),
-  convertUtcToLocalDate: (utcTimestamp:string, format = "YYYY-MM-DD") =>
+  getCurrentUtcDate: (format = "YYYY-MM-DD") => moment.utc().format(format),
+  convertUtcToLocalDate: (utcTimestamp: string, format = "YYYY-MM-DD") =>
     moment.utc(utcTimestamp).local().format(format),
   getCurrentLocalDate: (format = "YYYY-MM-DD") =>
     moment().local().format(format),
+};
+
+export const IsoDateUtils = {
+  convertToLocalDate: (isoDate: string,format='YYYY-MM-DD') => {
+    return moment(isoDate).local().format(format);
+  },
 };
