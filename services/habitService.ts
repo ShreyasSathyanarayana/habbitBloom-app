@@ -12,21 +12,21 @@ export const syncHabitNotifications = async (): Promise<void> => {
 };
 
 // Handle habit deletions
-export const handleDeletedHabits = async (): Promise<void> => {
-  const storedNotifications = JSON.parse(storage.getString(notificationKey.scheduledNotifications) || '{}');
-  const currentHabitIds = await fetchHabitIds();
+// export const handleDeletedHabits = async (): Promise<void> => {
+//   const storedNotifications = JSON.parse(storage.getString(notificationKey.scheduledNotifications) || '{}');
+//   const currentHabitIds = await fetchHabitIds();
 
-  for (const habitId of Object.keys(storedNotifications)) {
-    if (!currentHabitIds.includes(habitId)) {
-      await cancelNotification(habitId);
-    }
-  }
-};
+//   for (const habitId of Object.keys(storedNotifications)) {
+//     if (!currentHabitIds.includes(habitId)) {
+//       await cancelNotification(habitId);
+//     }
+//   }
+// };
 
 // Sync habits (Schedule & Remove Deleted)
 export const syncHabits = async (): Promise<void> => {
   if(!storage.getString(notificationKey.scheduledNotifications)) {
   await syncHabitNotifications();
-  await handleDeletedHabits();
+  // await handleDeletedHabits();
   }
 };
