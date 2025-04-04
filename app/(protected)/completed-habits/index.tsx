@@ -3,7 +3,7 @@ import EmptyCompletedHabits from "@/components/module/completed-habit/empty-comp
 import HabitCompletedCard from "@/components/module/completed-habit/habit-completed-card";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
-import { horizontalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
@@ -23,16 +23,22 @@ const CompletedHabitScreen = () => {
   return (
     <Container>
       <Header title="Completed Tasks" />
-      {getAllCompletedHabitDetails?.data?.length == 0 && (
-        <EmptyCompletedHabits />
-      )}
-      {getAllCompletedHabitDetails?.data?.length !== 0 && (
-        <FlatList
-          data={getAllCompletedHabitDetails?.data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <HabitCompletedCard {...item} />}
-        />
-      )}
+      <View style={{ flex: 1, padding: verticalScale(16) }}>
+        {getAllCompletedHabitDetails?.data?.length == 0 && (
+          <EmptyCompletedHabits />
+        )}
+        {getAllCompletedHabitDetails?.data?.length !== 0 && (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={getAllCompletedHabitDetails?.data}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <HabitCompletedCard {...item} />}
+            ItemSeparatorComponent={() => (
+              <View style={{ height: verticalScale(16) }} />
+            )}
+          />
+        )}
+      </View>
     </Container>
   );
 };

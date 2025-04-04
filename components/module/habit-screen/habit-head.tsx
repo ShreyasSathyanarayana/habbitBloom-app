@@ -9,13 +9,21 @@ import {
 import ArchiveIcon from "@/assets/svg/archive-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import HabitCompleteIcon from "@/assets/svg/habit-completed-icon.svg";
+import HabitFilterIcon from "@/assets/svg/filter-icon.svg";
 import { router } from "expo-router";
+import { SheetManager } from "react-native-actions-sheet";
 
 type Props = {
   onPressArchive?: (event: GestureResponderEvent) => void;
+  onChangeFilter: (filterName: "latest" | "alphabetical") => void;
+  selectedFilter: "latest" | "alphabetical";
 };
 const _iconSize = horizontalScale(22);
-const HabitHead = ({ onPressArchive }: Props) => {
+const HabitHead = ({
+  onPressArchive,
+  selectedFilter,
+  onChangeFilter,
+}: Props) => {
   return (
     <View style={styles.container}>
       <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>Habits</ThemedText>
@@ -26,6 +34,18 @@ const HabitHead = ({ onPressArchive }: Props) => {
           gap: horizontalScale(12),
         }}
       >
+        <TouchableHighlight
+          onPress={() =>
+            SheetManager.show("habit-filter", {
+              payload: {
+                selectedFilter: selectedFilter,
+                setSelectedFilter: onChangeFilter,
+              },
+            })
+          }
+        >
+          <HabitFilterIcon width={_iconSize} height={_iconSize} />
+        </TouchableHighlight>
         <TouchableHighlight
           onPress={() => router.push("/(protected)/completed-habits")}
         >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
 import PlusIcon from "@/assets/svg/plus-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -30,10 +30,15 @@ export default function HabitsScreen() {
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
+  const [selectedFilter, setSelectedFilter] = useState<
+    "latest" | "alphabetical"
+  >("alphabetical");
 
   const getHabitQuery = useQuery({
-    queryKey: ["habitList", isConnected],
-    queryFn: getAllHabits,
+    queryKey: ["habitList", isConnected, selectedFilter],
+    queryFn: () => {
+      return getAllHabits(selectedFilter);
+    },
     staleTime: 10000,
     refetchOnReconnect: true,
   });
@@ -67,7 +72,11 @@ export default function HabitsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <HabitHead onPressArchive={() => router.push("/(protected)/archive")} />
+      <HabitHead
+        selectedFilter={selectedFilter}
+        onChangeFilter={(filterName) => setSelectedFilter(filterName)}
+        onPressArchive={() => router.push("/(protected)/archive")}
+      />
 
       <HabitList
         scrollY={scrollY}

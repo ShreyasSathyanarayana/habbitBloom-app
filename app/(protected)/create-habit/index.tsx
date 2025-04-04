@@ -62,9 +62,9 @@ const CreateHabit = () => {
     defaultValues: {
       habitName: "",
       category: goodHabitsCategories?.[0]?.name,
-      reminderTime: "12:00:00",
+      reminderTime: "10:00:00",
       frequency: [0, 1, 2, 3, 4, 5, 6] as number[],
-      notificationEnable: false,
+      notificationEnable: true,
       habitColor: "rgba(255, 59, 48, 1)",
       googleNotificationEnable: false,
       end_date: null,
@@ -92,11 +92,13 @@ const CreateHabit = () => {
     },
     onSuccess: (data) => {
       // console.log("onSuccess", JSON.stringify(data, null, 2));
-      scheduleNotification({
-        reminder_time: data[0]?.reminder_time,
-        habit_name: data[0]?.habit_name,
-        id: data[0]?.id,
-      });
+      if (watch("notificationEnable")) {
+        scheduleNotification({
+          reminder_time: data[0]?.reminder_time,
+          habit_name: data[0]?.habit_name,
+          id: data[0]?.id,
+        });
+      }
 
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
       router.dismissAll();

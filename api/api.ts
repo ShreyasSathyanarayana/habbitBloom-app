@@ -380,52 +380,45 @@ export const getHabitsByDate = async (date: string) => {
 };
 
 
-export const getAllHabits = async () => {
+export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
   const userId = await getUserId();
+  const todayUtc = DateUtils.getCurrentUtcDate();
 
-  
-  const todayUtc = DateUtils.getCurrentUtcDate()
-
-  // Fetch all habits for the user
-  const { data, error } = await supabase
+  let query = supabase
     .from("habit")
-    .select(
-      "*"
-    )
+    .select("*")
     .eq("user_id", userId)
     .eq("archived", false)
-    .or(`end_date.gte.${todayUtc},end_date.is.null`)
-    .order("created_at", { ascending: false });
+    .or(`end_date.gte.${todayUtc},end_date.is.null`);
+
+  // Apply sorting based on the parameter
+  if (sortBy === "latest") {
+    query = query.order("created_at", { ascending: false });
+  } else if (sortBy === "alphabetical") {
+    query = query.order("habit_name", { ascending: true });
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error fetching habits:", error);
-    throw new Error("Error fetching habits" + error);
+    throw new Error("Error fetching habits: " + error.message);
   }
 
-  // 🔹 For each habit, fetch the last 7 days' progress and combine the data
+  // 🔹 Fetch last 7 days' progress for each habit
   const habitsWithProgress = await Promise.all(
     data.map(async (habit) => {
-      // Fetch last 7 days' progress for the habit
       const progressData = await fetchLast7DaysHabitProgress(habit.id);
-
-      if (progressData) {
-        // Add the progress data to the habit object
-        return {
-          ...habit,
-          progress: progressData.data, // Attach the progress data
-        };
-      } else {
-        // If no progress data is available, return the habit without progress
-        return {
-          ...habit,
-          progress: [],
-        };
-      }
+      return {
+        ...habit,
+        progress: progressData ? progressData.data : [],
+      };
     })
   );
 
   return habitsWithProgress;
 };
+
 
 
 export const getAllHabitsArchived = async () => {

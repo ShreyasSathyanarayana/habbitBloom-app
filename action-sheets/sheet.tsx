@@ -3,6 +3,7 @@ import CreateHabit from "./create-habit";
 import HabitDetailsSheet from "./habit-details-sheet";
 import DeleteHabitSheet from "./delete-habit-sheet";
 import HideHabitSheet from "./hide-habit-sheet";
+import HabitFilterSheet from "./habit-filter-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -19,6 +20,7 @@ registerSheet("create-habit", CreateHabit);
 registerSheet("habit-details", HabitDetailsSheet);
 registerSheet("delete-habit", DeleteHabitSheet);
 registerSheet("hide-habit", HideHabitSheet);
+registerSheet("habit-filter", HabitFilterSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -33,6 +35,12 @@ declare module "react-native-actions-sheet" {
     }>;
     "hide-habit": SheetDefinition<{
       payload: { habitId: string; updateStatus: (status: boolean) => void };
+    }>;
+    "habit-filter": SheetDefinition<{
+      payload: {
+        selectedFilter: "latest" | "alphabetical";
+        setSelectedFilter: (filter: "latest" | "alphabetical") => void;
+      };
     }>;
   }
 }

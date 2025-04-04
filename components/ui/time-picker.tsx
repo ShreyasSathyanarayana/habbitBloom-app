@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Label from "./Label";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -46,9 +46,23 @@ const TimePicker: React.FC<TimePickerProps> = ({
   leftIcon,
 }) => {
   const actionSheetRef = useRef<ActionSheetRef>(null);
-  const [selectedHour, setSelectedHour] = useState("12");
+  const [selectedHour, setSelectedHour] = useState("09");
   const [selectedMinute, setSelectedMinute] = useState("00");
   const [selectedAmPm, setSelectedAmPm] = useState("AM");
+
+  useEffect(() => {
+    const timeSplit = value?.split(":");
+    if (timeSplit && timeSplit.length === 3) {
+      const hour = parseInt(timeSplit[0], 10);
+      const minute = parseInt(timeSplit[1], 10);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const formattedHour =
+        hour % 12 === 0 ? "12" : (hour % 12).toString().padStart(2, "0");
+      setSelectedHour(formattedHour);
+      setSelectedMinute(minute.toString().padStart(2, "0"));
+      setSelectedAmPm(ampm);
+    }
+  }, [value]);
 
   const showPicker = () => {
     if (disabled) return;
