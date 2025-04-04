@@ -4,12 +4,14 @@ import { getCategoryByName } from "@/utils/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import CompletedHabitIcon from "@/assets/svg/completed-badge.svg";
 type Props = {
   habitName: string;
   category: string;
+  completed?: boolean;
 };
 
-const HabitCardHead = ({ habitName, category }: Props) => {
+const HabitCardHead = ({ habitName, category, completed }: Props) => {
   const categoryDetails = getCategoryByName(category);
   return (
     <View style={styles.container}>
@@ -34,6 +36,7 @@ const HabitCardHead = ({ habitName, category }: Props) => {
       >
         {habitName}
       </ThemedText>
+      {completed && <CompletedHabitIcon />}
     </View>
   );
 };

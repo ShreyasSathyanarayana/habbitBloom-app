@@ -8,18 +8,33 @@ import {
 } from "react-native";
 import ArchiveIcon from "@/assets/svg/archive-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
+import HabitCompleteIcon from "@/assets/svg/habit-completed-icon.svg";
+import { router } from "expo-router";
 
 type Props = {
   onPressArchive?: (event: GestureResponderEvent) => void;
 };
-
+const _iconSize = horizontalScale(22);
 const HabitHead = ({ onPressArchive }: Props) => {
   return (
     <View style={styles.container}>
       <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>Habits</ThemedText>
-      <TouchableHighlight onPress={onPressArchive}>
-        <ArchiveIcon width={horizontalScale(22)} height={horizontalScale(22)} />
-      </TouchableHighlight>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: horizontalScale(12),
+        }}
+      >
+        <TouchableHighlight
+          onPress={() => router.push("/(protected)/completed-habits")}
+        >
+          <HabitCompleteIcon width={_iconSize} height={_iconSize} />
+        </TouchableHighlight>
+        <TouchableHighlight onPress={onPressArchive}>
+          <ArchiveIcon width={_iconSize} height={_iconSize} />
+        </TouchableHighlight>
+      </View>
     </View>
   );
 };

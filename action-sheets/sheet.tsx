@@ -32,7 +32,7 @@ declare module "react-native-actions-sheet" {
       payload: { data: HabitDetailsProp };
     }>;
     "hide-habit": SheetDefinition<{
-      payload: { habitId: string };
+      payload: { habitId: string; updateStatus: (status: boolean) => void };
     }>;
   }
 }

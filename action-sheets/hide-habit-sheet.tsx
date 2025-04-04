@@ -8,11 +8,34 @@ import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
 import Button from "@/components/ui/button";
 import AlertButton from "./alert-button";
+import { useMutation } from "@tanstack/react-query";
+import { updateHabitPublicStatus } from "@/api/api";
+import { useToast } from "react-native-toast-notifications";
 const closeSheet = () => {
   SheetManager.hide("hide-habit");
 };
 
 const HideHabitSheet = (props: SheetProps<"hide-habit">) => {
+  const payload = props.payload;
+  const toast = useToast();
+  const hideHabitMutation = useMutation({
+    mutationKey: ["HideHabitStatus"],
+    mutationFn: () => {
+      closeSheet();
+      return updateHabitPublicStatus(payload?.habitId ?? "", false);
+    },
+    onSuccess: () => {
+      payload?.updateStatus(false);
+      toast.show("Public status updated successfully", {
+        type: "success",
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
   return (
     <ActionSheetContainer sheetId={props.sheetId}>
       <SheetHeader title="Hide from Achievements" onClose={closeSheet} />
@@ -26,7 +49,7 @@ const HideHabitSheet = (props: SheetProps<"hide-habit">) => {
         firstBtnLabel="Cancel"
         secondBtnLabel="Hide"
         firstBtnAction={closeSheet}
-        secondBtnAction={closeSheet}
+        secondBtnAction={() => hideHabitMutation.mutateAsync()}
       />
     </ActionSheetContainer>
   );

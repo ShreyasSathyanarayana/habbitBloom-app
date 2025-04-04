@@ -390,9 +390,7 @@ export const getAllHabits = async () => {
   const { data, error } = await supabase
     .from("habit")
     .select(
-      `
-      id, habit_name, category, reminder_time, frequency, habit_color, created_at, archived
-      `
+      "*"
     )
     .eq("user_id", userId)
     .eq("archived", false)
@@ -438,9 +436,7 @@ export const getAllHabitsArchived = async () => {
     const { data, error } = await supabase
       .from("habit")
       .select(
-        `
-        id, habit_name, category, reminder_time, frequency, habit_color, created_at,archived
-      `
+       "*"
       )
       .eq("user_id", userId)
       .eq("archived", true)
@@ -707,6 +703,63 @@ export const fetchLast7DaysHabitProgress = async (
 };
 
 
+export type CompletedHabits = {
+  id: string;
+  user_id: string;
+  habit_name: string;
+  category: string;
+  reminder_time: string; // Format: HH:MM:SS
+  frequency: number[]; // 0 (Sunday) to 6 (Saturday)
+  notification_enable: boolean;
+  habit_color: string;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+  google_notification_enable: boolean;
+  archived: boolean;
+  archive_date: string | null;
+  end_date: string; // Format: YYYY-MM-DD
+  last_active_date: string; // ISO date string
+  restored_at: string | null;
+  habit_description: string | null;
+  public:boolean
+};
+
+
+
+export const getAllCompletedHabits = async ():Promise<CompletedHabits[]> => {
+  const userId = await getUserId();
+
+  const todayUTC = DateUtils.getCurrentUtcDate() // Format: YYYY-MM-DD
+
+  const { data, error } = await supabase
+    .from("habit")
+    .select("*")
+    .eq("user_id", userId)
+    .lte("end_date", todayUTC); // <= end_date
+
+  if (error) {
+    console.error("Error fetching completed habits:", error);
+    throw new Error("Error fetching completed habits: " + error.message);
+  }
+
+  return data;
+};
+
+
+
+export const updateHabitPublicStatus = async (habitId: string, isPublic: boolean) => {
+  const { data, error } = await supabase
+    .from("habit")
+    .update({ public: isPublic })
+    .eq("id", habitId);
+
+  if (error) {
+    console.error("Error updating public status:", error);
+    return null;
+  }
+
+  return data;
+};
 
 
 
@@ -857,7 +910,7 @@ export const fetchHabitProgressFromCreation = async (
 
 
 export const getCompletedHabitStats = async (habitId: string) => {
-  const userId = getUserId();
+  const userId = await getUserId();
 
   // Fetch habit progress directly from habit_progress table
   const { data: progressData, error: fetchError } = await supabase

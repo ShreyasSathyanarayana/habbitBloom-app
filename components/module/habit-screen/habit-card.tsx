@@ -20,6 +20,7 @@ export type HabitProp = {
   created_at: string;
   archived: boolean;
   progress: HabitProgressEntry[];
+  public: boolean;
 };
 
 const HabitCard = (props: HabitProp) => {
@@ -44,8 +45,8 @@ const HabitCard = (props: HabitProp) => {
       // style={styles.container}
     >
       <LinearGradient
-        colors={["#000000", "#2B0053"]}
-        start={{ x: 0.111, y: 0.0147 }} // Approximation of 111.3deg
+        colors={["#2B0053", "#000000"]}
+        start={{ x: 0.0147, y: 0.111 }} // Approximation of 111.3deg
         end={{ x: 1, y: 1 }}
         style={styles.container}
       >
@@ -56,6 +57,7 @@ const HabitCard = (props: HabitProp) => {
         )}
         <Divider style={{ marginVertical: verticalScale(12) }} />
         <MemoizedHabitFooter
+          isHabitPublic={props.public}
           onPressThreeDot={onPressThreeDot}
           habitId={props.id}
         />
