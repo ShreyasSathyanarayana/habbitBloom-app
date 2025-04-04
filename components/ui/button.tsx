@@ -1,6 +1,11 @@
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
-import { StyleProp, TextStyle, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  StyleProp,
+  TextStyle,
+  TouchableOpacity,
+} from "react-native";
 import { StyleSheet, TouchableOpacityProps, View } from "react-native";
 import { ThemedText } from "./theme-text";
 import { getFontSize } from "@/font";
@@ -8,23 +13,43 @@ type Props = {
   label?: string;
   labelStyle?: StyleProp<TextStyle>;
   outline?: boolean;
+  isLoading?: boolean;
 } & TouchableOpacityProps;
 
-const Button = ({ outline, labelStyle, label, style, ...rest }: Props) => {
+const Button = ({
+  outline,
+  labelStyle,
+  label,
+  style,
+  isLoading,
+  disabled,
+  ...rest
+}: Props) => {
   return (
     <TouchableOpacity
-      style={[styles.btnStyle, outline && styles.outLineBtnStyle, style]}
+      style={[
+        styles.btnStyle,
+        outline && styles.outLineBtnStyle,
+        style,
+        disabled && { opacity: 0.5 },
+      ]}
       {...rest}
+      disabled={disabled}
     >
-      <ThemedText
-        style={[
-          { fontSize: getFontSize(14) },
-          outline && styles.outLineText,
-          labelStyle,
-        ]}
-      >
-        {label}
-      </ThemedText>
+      {!isLoading && (
+        <ThemedText
+          style={[
+            { fontSize: getFontSize(14) },
+            outline && styles.outLineText,
+            labelStyle,
+          ]}
+        >
+          {label}
+        </ThemedText>
+      )}
+      {isLoading && (
+        <ActivityIndicator color={"white"} size={"small"} animating={true} />
+      )}
     </TouchableOpacity>
   );
 };

@@ -52,7 +52,7 @@ const HabitCardFooter = ({
     },
     onSuccess: () => {
       updateHabitStatus(true);
-      toast.show("Public status updated successfully", {
+      toast.show("Habit visible again!", {
         type: "success",
       });
     },

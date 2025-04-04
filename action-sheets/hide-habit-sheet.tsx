@@ -26,7 +26,7 @@ const HideHabitSheet = (props: SheetProps<"hide-habit">) => {
     },
     onSuccess: () => {
       payload?.updateStatus(false);
-      toast.show("Public status updated successfully", {
+      toast.show("Habit hidden!", {
         type: "success",
       });
     },

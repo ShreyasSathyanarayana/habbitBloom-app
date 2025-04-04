@@ -1415,3 +1415,33 @@ export const getUserProfile = async () => {
 
   return data;
 };
+
+
+
+export const updateUserProfileInfo = async(fullName: string, profileBio: string)=>{
+  const userId = await getUserId();
+  const { data, error } = await supabase
+    .from("profile")
+    .update({
+      full_name: fullName,
+      profile_bio: profileBio,
+    })
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching profile:", error);
+    return {
+      id: "",
+      full_name: "",
+      mobile: "",
+      email: "",
+      created_at: "",
+      updated_at: "",
+      profile_pic: "NULL",
+      profile_bio: "NULL",
+    };
+  }
+
+  return data;
+}

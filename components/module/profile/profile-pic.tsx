@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import ProfileEditIcon from "@/assets/svg/profile-edit-icon.svg";
 import PremiumProfileIcon from "@/assets/svg/premium-profile-icon.svg";
 import { horizontalScale } from "@/metric";
+import { SheetManager } from "react-native-actions-sheet";
 const _iconSize = horizontalScale(32);
 const _premiumIconSize = horizontalScale(40);
 type Props = {
@@ -18,7 +19,14 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
         width={_premiumIconSize}
         height={_premiumIconSize}
       />
-      <Pressable style={styles.editBtnStyle}>
+      <Pressable
+        onPress={() =>
+          SheetManager.show("profile-pic", {
+            payload: { profile_pic: profilePic },
+          })
+        }
+        style={styles.editBtnStyle}
+      >
         <ProfileEditIcon width={_iconSize} height={_iconSize} />
       </Pressable>
     </View>

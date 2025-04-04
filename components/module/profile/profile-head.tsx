@@ -6,6 +6,7 @@ import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import { IsoDateUtils } from "@/utils/constants";
 import ProfilePic from "./profile-pic";
+import { SheetManager } from "react-native-actions-sheet";
 type UserProfile = {
   id: string;
   full_name: string;
@@ -27,7 +28,18 @@ const ProfileHead = (props: UserProfile) => {
           justifyContent: "flex-end",
         }}
       >
-        <TouchableOpacity style={{ padding: horizontalScale(5) }}>
+        <TouchableOpacity
+          onPress={() =>
+            SheetManager.show("update-profile-info", {
+              payload: {
+                id: props.id,
+                full_name: props.full_name,
+                profile_bio: props.profile_bio,
+              },
+            })
+          }
+          style={{ padding: horizontalScale(5) }}
+        >
           <ThemedText style={{ fontSize: getFontSize(14) }}>Edit</ThemedText>
         </TouchableOpacity>
       </View>
@@ -43,7 +55,7 @@ const ProfileHead = (props: UserProfile) => {
         </ThemedText>
         {props?.profile_bio && (
           <ThemedText
-            style={{ fontFamily: "PoppinsMedium", textAlign: "center" }}
+            style={{ textAlign: "center", fontSize: getFontSize(14) }}
           >
             {props.profile_bio}
           </ThemedText>
