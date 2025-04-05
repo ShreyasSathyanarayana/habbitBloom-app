@@ -17,7 +17,7 @@ type Props = {
 const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
   const markedDates: { [key: string]: any } = {};
 
-  const today = moment().format("YYYY-MM-DD");
+  const today = moment().local().format("YYYY-MM-DD");
 
   data.forEach((item) => {
     const isToday = item.date === today;

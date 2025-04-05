@@ -761,12 +761,12 @@ export interface HabitProgressResponse {
   data: HabitProgressEntry[];
 }
 
+
 export const fetchHabitProgressFromCreation = async (
   habitId: string
 ): Promise<HabitProgressResponse | null> => {
-  // Get today's date and normalize to UTC midnight
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  // Get today's local date at midnight
+  const today = moment().startOf("day").toDate();
 
   // Fetch habit details including created_at and frequency
   const { data: habitData, error: habitError } = await supabase
@@ -780,9 +780,8 @@ export const fetchHabitProgressFromCreation = async (
     return null;
   }
 
-  // Convert habit creation date to midnight UTC
-  const habitStartDate = new Date(habitData.created_at);
-  habitStartDate.setUTCHours(0, 0, 0, 0);
+  // Convert habit creation date to local midnight
+  const habitStartDate = moment(habitData.created_at).startOf("day").toDate();
 
   // Parse frequency days (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
   const frequencyDays: number[] = habitData.frequency || [];
@@ -804,8 +803,7 @@ export const fetchHabitProgressFromCreation = async (
   let lastArchiveStart: Date | null = null;
 
   archiveLogs.forEach((log) => {
-    const actionDate = new Date(log.action_date);
-    actionDate.setUTCHours(0, 0, 0, 0);
+    const actionDate = moment(log.action_date).startOf("day").toDate();
 
     if (log.action === "archived") {
       lastArchiveStart = actionDate;
@@ -815,7 +813,6 @@ export const fetchHabitProgressFromCreation = async (
     }
   });
 
-  // If the last action was "archived" but never restored, mark as still archived
   if (lastArchiveStart) {
     archivePeriods.push({ start: lastArchiveStart, end: null });
   }
@@ -825,31 +822,29 @@ export const fetchHabitProgressFromCreation = async (
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .gte("date", habitStartDate.toISOString().split("T")[0])
-    .lte("date", today.toISOString().split("T")[0]); // Track up to today
+    .gte("date", moment(habitStartDate).format("YYYY-MM-DD"))
+    .lte("date", moment(today).format("YYYY-MM-DD"));
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
     return null;
   }
 
-  // Convert progress data into a Map for quick lookup
   const progressMap = new Map(
     progressData.map((entry) => [entry.date, entry.status])
   );
 
-  // Generate progress list, excluding archived periods
+  // Generate progress list
   const result: HabitProgressEntry[] = [];
-  let currentDate = new Date(habitStartDate);
+  let currentDate = moment(habitStartDate).startOf("day");
 
-  while (currentDate <= today) {
-    const dateString = currentDate.toISOString().split("T")[0];
-    const dayOfWeek = currentDate.getUTCDay();
+  while (currentDate.toDate() <= today) {
+    const dateString = currentDate.format("YYYY-MM-DD");
+    const dayOfWeek = currentDate.day(); // Local day of week
 
-    // Check if the date falls within an archived period
     const archiveRecord = archivePeriods.find(
       ({ start, end }) =>
-        currentDate >= start && (end === null || currentDate < end)
+        currentDate.toDate() >= start && (end === null || currentDate.toDate() < end)
     );
 
     let status: boolean | null = null;
@@ -860,30 +855,29 @@ export const fetchHabitProgressFromCreation = async (
         status = progressMap.get(dateString)!;
         completed = status === true;
       } else {
-        status = false; // Default to false for missing records
+        status = false;
       }
 
-      // Check if archived **after** completion
       if (archiveRecord) {
-        const archiveStart = archiveRecord.start.toISOString().split("T")[0];
+        const archiveStart = moment(archiveRecord.start).format("YYYY-MM-DD");
 
         if (dateString === archiveStart) {
-          // If the habit was **completed** before archive, keep the completed status
           completed =
             progressMap.has(dateString) && progressMap.get(dateString) === true;
         } else {
-          status = null; // Mark as archived
+          status = null; // Archived
         }
       }
 
       result.push({ date: dateString, status });
     }
 
-    currentDate.setUTCDate(currentDate.getUTCDate() + 1); // Move to next day
+    currentDate.add(1, "day");
   }
 
   return { habitId, data: result };
 };
+
 
 export const getCompletedHabitStats = async (habitId: string) => {
   const userId = await getUserId();
