@@ -60,8 +60,8 @@ const ChangePasswordSheet = (props: SheetProps<"change-password">) => {
     mutation.mutateAsync(data?.password);
     // console.log("data", data);
   };
-  console.log("logiMode", loginMode);
-  console.log("localPassword", localPassword);
+//   console.log("logiMode", loginMode);
+//   console.log("localPassword", localPassword);
 
   return (
     <ActionSheetContainer1 onClose={() => reset()} sheetId={props.sheetId}>
