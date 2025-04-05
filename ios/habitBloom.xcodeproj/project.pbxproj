@@ -11,11 +11,12 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		64D13112A63F462D4C29134D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4DE6B9729F645DB4EC785FFB /* PrivacyInfo.xcprivacy */; };
-		8428D3EDD1694B728758DCB9 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60BCF9048174FFF96F7B43C /* noop-file.swift */; };
 		96905EF65AED1B983A6B3ABC /* libPods-habitBloom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-habitBloom.a */; };
+		975B26486F7767751CDF327B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 82381746708EF511AD702039 /* PrivacyInfo.xcprivacy */; };
+		AD3D8FF2B02649029F0FEC90 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EEAA640022E40CC804A3E70 /* noop-file.swift */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		D81F44029A25453F98F3B00B /* notification_ringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = B84A716EE4214A66B9120124 /* notification_ringtone.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,14 +26,15 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = habitBloom/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = habitBloom/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = habitBloom/main.m; sourceTree = "<group>"; };
-		4DE6B9729F645DB4EC785FFB /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = habitBloom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-habitBloom.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-habitBloom.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		67A280CFF2D94970AF75B0F4 /* habitBloom-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "habitBloom-Bridging-Header.h"; path = "habitBloom/habitBloom-Bridging-Header.h"; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-habitBloom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-habitBloom.debug.xcconfig"; path = "Target Support Files/Pods-habitBloom/Pods-habitBloom.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-habitBloom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-habitBloom.release.xcconfig"; path = "Target Support Files/Pods-habitBloom/Pods-habitBloom.release.xcconfig"; sourceTree = "<group>"; };
+		7EEAA640022E40CC804A3E70 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "habitBloom/noop-file.swift"; sourceTree = "<group>"; };
+		82381746708EF511AD702039 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = habitBloom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = habitBloom/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B9B3D4DC29F44B50B50EB850 /* habitBloom-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "habitBloom-Bridging-Header.h"; path = "habitBloom/habitBloom-Bridging-Header.h"; sourceTree = "<group>"; };
+		B84A716EE4214A66B9120124 /* notification_ringtone.wav */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = notification_ringtone.wav; path = habitBloom/notification_ringtone.wav; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		E60BCF9048174FFF96F7B43C /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "habitBloom/noop-file.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-habitBloom/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,9 +61,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				E60BCF9048174FFF96F7B43C /* noop-file.swift */,
-				B9B3D4DC29F44B50B50EB850 /* habitBloom-Bridging-Header.h */,
-				4DE6B9729F645DB4EC785FFB /* PrivacyInfo.xcprivacy */,
+				7EEAA640022E40CC804A3E70 /* noop-file.swift */,
+				67A280CFF2D94970AF75B0F4 /* habitBloom-Bridging-Header.h */,
+				B84A716EE4214A66B9120124 /* notification_ringtone.wav */,
+				82381746708EF511AD702039 /* PrivacyInfo.xcprivacy */,
 			);
 			name = habitBloom;
 			sourceTree = "<group>";
@@ -147,13 +150,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "habitBloom" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				BE80AD2DF172BD2EACFCD429 /* [Expo] Configure project */,
+				C88507E0B1DF906C3FF4ED8A /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				DB20691E4F92F65AE1B25871 /* [CP] Embed Pods Frameworks */,
+				BBA9BC1D7300F190E38F8D6D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -203,7 +206,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				64D13112A63F462D4C29134D /* PrivacyInfo.xcprivacy in Resources */,
+				D81F44029A25453F98F3B00B /* notification_ringtone.wav in Resources */,
+				975B26486F7767751CDF327B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,26 +345,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-habitBloom/Pods-habitBloom-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BE80AD2DF172BD2EACFCD429 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-habitBloom/expo-configure-project.sh\"\n";
-		};
-		DB20691E4F92F65AE1B25871 /* [CP] Embed Pods Frameworks */ = {
+		BBA9BC1D7300F190E38F8D6D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -380,6 +365,25 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-habitBloom/Pods-habitBloom-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		C88507E0B1DF906C3FF4ED8A /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-habitBloom/expo-configure-project.sh\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -390,7 +394,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				8428D3EDD1694B728758DCB9 /* noop-file.swift in Sources */,
+				AD3D8FF2B02649029F0FEC90 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

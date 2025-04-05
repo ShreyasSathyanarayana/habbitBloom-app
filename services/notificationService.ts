@@ -54,7 +54,7 @@ export const scheduleNotification = async (habit: Habit): Promise<void> => {
     content: {
       title: "Progress Reminder",
       body: `Stay consistent! Your streak for ${habit.habit_name} is at ${habit.reminder_time} `,
-      sound: "notification-ringtone.wav",
+      sound: "notification_ringtone.wav",
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
