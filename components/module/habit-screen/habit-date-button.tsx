@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, TouchableHighlight, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 import { HabitProp } from "./habit-card";
+import moment from "moment";
 type Props = {
   date: string;
   status: boolean | null;
@@ -16,8 +17,10 @@ type Props = {
 
 const HabitDateButton = ({ date, status, habitId }: Props) => {
   const [localStatus, setLocalStatus] = useState<boolean | null>(status);
-  const day = new Date(date).getDate();
-  const todayDate = new Date().getDate();
+  const day = moment(date).get("date");
+  const todayDate = moment().local().get("date");
+  // console.log("todayDate", todayDate, day);
+
   const isToday = day === todayDate;
   const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();

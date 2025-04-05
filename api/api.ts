@@ -83,7 +83,8 @@ export const markHabitStatus = async (
   const userId = await getUserId();
 
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = DateUtils.getCurrentLocalDate();
+  
 
   // 🔹 Validate that habitDate is today
   if (habitDate !== todayStr) {
