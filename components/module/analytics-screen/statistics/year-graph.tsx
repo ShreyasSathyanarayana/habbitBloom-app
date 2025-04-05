@@ -9,9 +9,10 @@ type Props = {
   date: string | number;
   completed: number;
   total: number;
+  lastIndex?: boolean;
 };
 
-const YearGraph = ({ date, completed, total }: Props) => {
+const YearGraph = ({ date, completed, total, lastIndex = false }: Props) => {
   return (
     <View
       style={{
@@ -33,11 +34,11 @@ const YearGraph = ({ date, completed, total }: Props) => {
           style={[
             styles.circle,
             completed != 0 && {
-              height: horizontalScale((total / (total - completed)) * 20),
+              height: horizontalScale((total / (total + 1 - completed)) * 20),
             },
           ]}
         />
-        <View style={styles.horizontalLine} />
+        {!lastIndex && <View style={styles.horizontalLine} />}
       </View>
       <ThemedText
         style={[{ fontSize: getFontSize(14), fontFamily: "PoppinsMedium" }]}

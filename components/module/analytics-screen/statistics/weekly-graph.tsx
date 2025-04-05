@@ -57,7 +57,14 @@ const WeeklyGraph = ({ habitId }: Props) => {
         keyExtractor={(_, index) => index.toString() + "weekDetails"}
         renderItem={({ item, index }) => {
           return (
-            <YearGraph date={item.week} completed={item.completed} total={7} />
+            <YearGraph
+              date={item.week}
+              completed={item.completed}
+              total={7}
+              lastIndex={
+                index === (getWeeklyQuery?.data?.length ?? 0) - 1 ? true : false
+              }
+            />
           );
         }}
       />

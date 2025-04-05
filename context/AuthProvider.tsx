@@ -75,6 +75,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       // ]);
       storage.delete(tokenKeys.accessToken);
       storage.delete(tokenKeys.refreshToken);
+      storage.delete(tokenKeys.password);
+      storage.delete(tokenKeys.loginMode);
 
       // setUserId("");
 

@@ -47,6 +47,9 @@ const MontlyGraph = ({ habitId }: Props) => {
               date={item.month}
               completed={item.completed}
               total={30}
+              lastIndex={
+                index === (getMonthlyGraphQuery?.data ?? []).length - 1
+              }
             />
           );
         }}

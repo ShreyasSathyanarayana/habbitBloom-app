@@ -1,6 +1,12 @@
 import { horizontalScale, verticalScale } from "@/metric";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+  Linking,
+  NativeModules,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import KeyIcon from "@/assets/svg/key-icon.svg";
 import ActionSheetButton from "@/components/action-sheet/actionsheet-button";
 import ChangePhoneNumberIcon from "@/assets/svg/phone-icon.svg";
@@ -14,10 +20,12 @@ import LogoutIcon from "@/assets/svg/logout-icon.svg";
 import { getFontSize } from "@/font";
 import { useAuth } from "@/context/AuthProvider";
 import { SheetManager } from "react-native-actions-sheet";
+import { openAppSettings } from "@/utils/permission";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
   const { logout } = useAuth();
+
   return (
     <View style={styles.container}>
       <ActionSheetButton
@@ -62,6 +70,7 @@ const ProfileBody = () => {
         labelStyle={styles.textStyle}
       />
       <ActionSheetButton
+        onPress={openAppSettings}
         leftIcon={<SubscriptionIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Manage Subscription"}
         labelStyle={styles.textStyle}

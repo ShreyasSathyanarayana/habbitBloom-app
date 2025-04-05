@@ -51,6 +51,9 @@ const YearlyGraph = ({ habitId }: Props) => {
                 date={item.year}
                 completed={item.completed}
                 total={365}
+                lastIndex={
+                  index === (getYearlyGraphQuery.data ?? []).length - 1
+                }
               />
             );
           }}

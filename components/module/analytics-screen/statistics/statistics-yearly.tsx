@@ -25,7 +25,7 @@ const StatisticsYearly = ({ habitId }: Props) => {
         onChangeMenu={(item, index) => setSeletedMenu(item)}
       />
       <View
-        style={{ minHeight: verticalScale(200), justifyContent: "flex-end" }}
+        style={{ minHeight: verticalScale(340), justifyContent: "flex-end" }}
       >
         {selectedMenu === "Week" && <WeeklyGraph habitId={habitId} />}
         {selectedMenu === "Month" && <MontlyGraph habitId={habitId} />}
