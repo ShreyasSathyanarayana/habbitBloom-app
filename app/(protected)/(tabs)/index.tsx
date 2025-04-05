@@ -32,7 +32,7 @@ export default function HabitsScreen() {
   const prevScrollY = useSharedValue(0);
   const [selectedFilter, setSelectedFilter] = useState<
     "latest" | "alphabetical"
-  >("alphabetical");
+  >("latest");
 
   const getHabitQuery = useQuery({
     queryKey: ["habitList", isConnected, selectedFilter],

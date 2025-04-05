@@ -17,7 +17,7 @@ type Props = {
 
 const HabitDateButton = ({ date, status, habitId }: Props) => {
   const [localStatus, setLocalStatus] = useState<boolean | null>(status);
-  const day = moment(date).get("date");
+  const day = moment(date).local().get("date");
   const todayDate = moment().local().get("date");
   // console.log("todayDate", todayDate, day);
 
