@@ -1,12 +1,12 @@
 import { registerSheet, SheetDefinition } from "react-native-actions-sheet";
-import CreateHabit from "./create-habit";
-import HabitDetailsSheet from "./habit-details-sheet";
-import DeleteHabitSheet from "./delete-habit-sheet";
-import HideHabitSheet from "./hide-habit-sheet";
-import HabitFilterSheet from "./habit-filter-sheet";
-import UpdateProfileInfoSheet from "./update-profile-info-sheet";
-import ProfilePicSheet from "./profile-pic-sheet";
-import DeleteProfilePicSheet from "./delete-profile-pic-sheet";
+import CreateHabit from "./habit-screen/create-habit";
+import HabitDetailsSheet from "./habit-screen/habit-details-sheet";
+import DeleteHabitSheet from "./habit-screen/delete-habit-sheet";
+import HideHabitSheet from "./habit-screen/hide-habit-sheet";
+import HabitFilterSheet from "./habit-screen/habit-filter-sheet";
+import UpdateProfileInfoSheet from "./profile/update-profile-info-sheet";
+import ProfilePicSheet from "./profile/profile-pic-sheet";
+import DeleteProfilePicSheet from "./profile/delete-profile-pic-sheet";
 
 type HabitDetailsProp = {
   id: string;

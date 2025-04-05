@@ -8,7 +8,7 @@ import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import UserNameIcon from "@/assets/svg/name-icon.svg";
 import DescriptionIcon from "@/assets/svg/description-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
-import AlertButton from "./alert-button";
+import AlertButton from "../alert-button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateUserProfileInfo } from "@/api/api";
 const closeSheet = () => {

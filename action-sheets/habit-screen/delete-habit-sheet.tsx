@@ -6,11 +6,11 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import { useToast } from "react-native-toast-notifications";
-import SheetHeader from "./sheet-header";
+import SheetHeader from "../sheet-header";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
 import Button from "@/components/ui/button";
-import AlertButton from "./alert-button";
+import AlertButton from "../alert-button";
 import {
   cancelNotification,
   scheduleNotification,

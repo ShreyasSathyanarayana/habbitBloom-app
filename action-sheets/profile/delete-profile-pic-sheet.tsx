@@ -1,12 +1,12 @@
 import ActionSheetContainer from "@/components/ui/action-sheet-container";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import SheetHeader from "./sheet-header";
+import SheetHeader from "../sheet-header";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import { verticalScale } from "@/metric";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
-import AlertButton from "./alert-button";
+import AlertButton from "../alert-button";
 const closeSheet = () => {
   SheetManager.hide("delete-profile-pic");
 };
