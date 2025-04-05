@@ -59,24 +59,6 @@ const ForgotPassword = () => {
   });
   const onSubmit = async (data: any) => {
     mutation.mutateAsync(data?.password);
-    // const { error } = await supabase.auth.updateUser({ password: password });
-    // console.log(error);
-
-    // if (error) {
-    //   toast.show("Something went Wrong!", {
-    //     type: "danger",
-    //   });
-    // } else {
-    //   toast.show("Password Updated Succesfully!", {
-    //     type: "success",
-    //   });
-    //   router.back();
-    // }
-
-    // toast.show("Login Succesful", {
-    //   type: "success",
-    // });
-    // Alert.alert("Login Succesful");
   };
 
   return (

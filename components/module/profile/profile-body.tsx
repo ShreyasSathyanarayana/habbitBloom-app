@@ -8,10 +8,12 @@ import SuggestionIcon from "@/assets/svg/suggestion-icon.svg";
 import AboutUsIcon from "@/assets/svg/aboutus-icon.svg";
 import ShareIcon from "@/assets/svg/share-icon.svg";
 import RateAppIcon from "@/assets/svg/rate-icon.svg";
+import SupportAndFeedBackIcon from "@/assets/svg/support-feedback-icon.svg";
 import SubscriptionIcon from "@/assets/svg/subscription-icon.svg";
 import LogoutIcon from "@/assets/svg/logout-icon.svg";
 import { getFontSize } from "@/font";
 import { useAuth } from "@/context/AuthProvider";
+import { SheetManager } from "react-native-actions-sheet";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
@@ -19,6 +21,7 @@ const ProfileBody = () => {
   return (
     <View style={styles.container}>
       <ActionSheetButton
+        onPress={() => SheetManager.show("change-password")}
         leftIcon={<KeyIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Change Password"}
         labelStyle={styles.textStyle}
@@ -30,24 +33,32 @@ const ProfileBody = () => {
         buttonName={"Update Phone number"}
         labelStyle={styles.textStyle}
       />
-      <ActionSheetButton
+      {/* <ActionSheetButton
         leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Suggestion Box"}
         labelStyle={styles.textStyle}
-      />
+      /> */}
       <ActionSheetButton
         leftIcon={<AboutUsIcon width={_iconSize} height={_iconSize} />}
         buttonName={"About Us"}
         labelStyle={styles.textStyle}
       />
-      <ActionSheetButton
+      {/* <ActionSheetButton
         leftIcon={<ShareIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Share Our App"}
         labelStyle={styles.textStyle}
-      />
-      <ActionSheetButton
+      /> */}
+      {/* <ActionSheetButton
         leftIcon={<RateAppIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Rate Us"}
+        labelStyle={styles.textStyle}
+      /> */}
+      <ActionSheetButton
+        onPress={() => SheetManager.show("support-and-feedback")}
+        leftIcon={
+          <SupportAndFeedBackIcon width={_iconSize} height={_iconSize} />
+        }
+        buttonName={"Support & Feedback"}
         labelStyle={styles.textStyle}
       />
       <ActionSheetButton

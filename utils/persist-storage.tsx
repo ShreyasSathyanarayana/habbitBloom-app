@@ -8,3 +8,15 @@ export const getUserId = async (): Promise<string | null> => {
 
   return userId || null;
 };
+
+export const getLoginMode = () => {
+  return storage.getString(tokenKeys.loginMode);
+};
+
+export const getPassword = () => {
+  return storage.getString(tokenKeys.password);
+};
+
+export const setPassword = (password: string) => {
+  return storage.set(tokenKeys.password, password);
+};

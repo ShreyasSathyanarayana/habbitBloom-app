@@ -126,6 +126,8 @@ const SignUp = () => {
       login({
         refreshToken: signUpData.user.id,
         accessToken: signUpData.user.id,
+        loginMode: "normal",
+        password: formData.password,
       });
 
       // ✅ Navigate to Sign-in Page

@@ -8,6 +8,8 @@ import { storage } from "@/utils/storage";
 interface Login {
   accessToken: string;
   refreshToken: string;
+  loginMode: string;
+  password: string;
 }
 
 interface AuthContext {
@@ -19,6 +21,8 @@ interface AuthContext {
 export const tokenKeys = {
   accessToken: "user.accessToken",
   refreshToken: "user.refreshToken",
+  password: "user.password",
+  loginMode: "user.loginMode",
 };
 
 const AuthContext = createContext<AuthContext | null>(null);
@@ -26,14 +30,22 @@ const AuthContext = createContext<AuthContext | null>(null);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [userid, setUserId] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loginMode, setLoginMode] = useState<"normal" | "googleId" | "appleId">(
+    "normal"
+  );
   const [isConnected, setIsConnected] = useState<boolean>(true);
 
   const login = async (arg: Login) => {
     try {
-      const { accessToken, refreshToken } = arg;
+      const { accessToken, refreshToken, loginMode, password = "" } = arg;
 
       storage.set(tokenKeys.accessToken, accessToken);
       storage.set(tokenKeys.refreshToken, refreshToken);
+      storage.set(tokenKeys.loginMode, loginMode);
+      if (loginMode === "normal") {
+        storage.set(tokenKeys.password, password);
+      }
 
       // Store tokens in SecureStore (Offload to background)
       // await Promise.all([

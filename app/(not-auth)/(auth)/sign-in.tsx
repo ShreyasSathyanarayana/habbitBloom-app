@@ -57,6 +57,8 @@ const SignIn = () => {
       login({
         accessToken: data?.user.id, // Replace with actual access token
         refreshToken: data?.user.id,
+        loginMode: "normal",
+        password: watch("password"),
       });
       // toast.show("Login Succesful", {
       //   type: "success",

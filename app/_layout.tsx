@@ -374,8 +374,8 @@ const styles = StyleSheet.create({
   toastText: {
     marginLeft: 10,
     fontSize: getFontSize(15),
-    fontWeight: "bold",
-    fontFamily: "PoppinsBold",
+    // fontWeight: "bold",
+    fontFamily: "PoppinsMedium",
     // color: "#333",
   },
   button: {
