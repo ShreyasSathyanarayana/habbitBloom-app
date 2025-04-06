@@ -9,9 +9,7 @@ const Layout = () => {
         // animation: "ios_from_right",
         // animationDuration: 300,
       }}
-    >
-      <Stack.Screen name="index" options={{ title: "Analytics" }} />
-    </Stack>
+    />
   );
 };
 

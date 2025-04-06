@@ -4,6 +4,7 @@ import ProfileEditIcon from "@/assets/svg/profile-edit-icon.svg";
 import PremiumProfileIcon from "@/assets/svg/premium-profile-icon.svg";
 import { horizontalScale } from "@/metric";
 import { SheetManager } from "react-native-actions-sheet";
+import { Image } from "expo-image";
 const _iconSize = horizontalScale(32);
 const _premiumIconSize = horizontalScale(40);
 type Props = {
@@ -11,14 +12,18 @@ type Props = {
   isSubscribed?: boolean;
 };
 
+const avatar = require("@/assets/images/avatar.png");
+
 const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
   return (
     <View style={[styles.container, isSubscribed && styles.premiumStyle]}>
-      <PremiumProfileIcon
-        style={styles.premiumIconStyle}
-        width={_premiumIconSize}
-        height={_premiumIconSize}
-      />
+      {isSubscribed && (
+        <PremiumProfileIcon
+          style={styles.premiumIconStyle}
+          width={_premiumIconSize}
+          height={_premiumIconSize}
+        />
+      )}
       <Pressable
         onPress={() =>
           SheetManager.show("profile-pic", {
@@ -29,6 +34,23 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
       >
         <ProfileEditIcon width={_iconSize} height={_iconSize} />
       </Pressable>
+      {profilePic && (
+        <View
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            borderRadius: horizontalScale(120),
+          }}
+        >
+          <Image
+            style={{
+              flex: 1,
+            }}
+            // source={avatar}
+            source={profilePic}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -38,7 +60,11 @@ const styles = StyleSheet.create({
     width: horizontalScale(120),
     height: horizontalScale(120),
     borderRadius: horizontalScale(120),
+    borderWidth: horizontalScale(8),
     backgroundColor: "rgba(217, 217, 217, 1)",
+    borderColor: "rgba(138, 43, 226, 0.4)",
+    elevation: 2,
+    // overflow: "hidden",
   },
   editBtnStyle: {
     position: "absolute",
@@ -47,7 +73,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   premiumStyle: {
-    borderWidth: horizontalScale(8),
     borderColor: "rgba(239, 191, 4, 1)",
   },
   premiumIconStyle: {

@@ -1403,3 +1403,50 @@ export const updateUserProfileInfo = async (
 
   return data;
 };
+
+
+export const getAvatarImages = async () => {
+  const { data, error } = await supabase
+    .from('avatars').select('*');
+
+  if (error) {
+    console.error('Error listing avatars:', error.message);
+    return [];
+  }
+
+
+  return data;
+};
+
+
+export const updateProfilePic =  async (imageUrl:string)=>{
+  const userId = await getUserId();
+  const { data, error } = await supabase
+    .from("profile")
+    .update({
+      profile_pic:imageUrl,
+    })
+    .eq("id", userId)
+    .single();
+    if(error){
+      throw new Error(error.message)
+     
+    }
+    return data
+}
+
+
+export const deleteProfilePic =  async ()=>{
+  const userId = await getUserId();
+  const { data, error } = await supabase
+    .from("profile")
+    .update({
+      profile_pic:null,
+    })
+    .eq("id", userId)
+    .single();
+    if(error){
+      throw new Error(error.message)
+    }
+    return data
+}

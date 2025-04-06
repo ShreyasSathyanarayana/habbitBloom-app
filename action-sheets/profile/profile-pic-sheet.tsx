@@ -5,24 +5,32 @@ import CameraIcon from "@/assets/svg/camera-logo.svg";
 import GalleryIcon from "@/assets/svg/gallery-logo.svg";
 import AvatarIcon from "@/assets/svg/avatar-logo.svg";
 import DeleteIcon from "@/assets/svg/delete-logo.svg";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import { horizontalScale, verticalScale } from "@/metric";
+import AvatarSection from "@/components/module/profile/avatar-section";
 const _iconSize = horizontalScale(24);
 
 const ProfilePicSheet = (props: SheetProps<"profile-pic">) => {
+  const payload = props.payload;
+  const [showAvatarSection, setShowAvatarSection] = useState(false);
+
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingVertical: verticalScale(24),
-        }}
-      >
-        <ProfileSheetOptionButton
+      {(showAvatarSection || !payload?.profile_pic) && (
+        <AvatarSection currentProfilePic={payload?.profile_pic ?? null} />
+      )}
+      {(payload?.profile_pic && !showAvatarSection) && ( //check if profile pic exist then show this section
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-around",
+            paddingVertical: verticalScale(24),
+          }}
+        >
+          {/* <ProfileSheetOptionButton
           icon={<CameraIcon height={_iconSize} width={_iconSize} />}
           label="Camera"
           onPress={() => {
@@ -35,22 +43,24 @@ const ProfilePicSheet = (props: SheetProps<"profile-pic">) => {
           onPress={() => {
             console.log("");
           }}
-        />
-        <ProfileSheetOptionButton
-          icon={<AvatarIcon height={_iconSize} width={_iconSize} />}
-          label="Avatar"
-          onPress={() => {
-            console.log("");
-          }}
-        />
-        <ProfileSheetOptionButton
-          icon={<DeleteIcon height={_iconSize} width={_iconSize} />}
-          label="Remove"
-          onPress={() => {
-            SheetManager.show("delete-profile-pic");
-          }}
-        />
-      </View>
+        /> */}
+
+          <ProfileSheetOptionButton
+            icon={<AvatarIcon height={_iconSize} width={_iconSize} />}
+            label="Avatar"
+            onPress={() => {
+              setShowAvatarSection(true);
+            }}
+          />
+          <ProfileSheetOptionButton
+            icon={<DeleteIcon height={_iconSize} width={_iconSize} />}
+            label="Remove"
+            onPress={() => {
+              SheetManager.show("delete-profile-pic");
+            }}
+          />
+        </View>
+      )}
     </ActionSheetContainer1>
   );
 };
