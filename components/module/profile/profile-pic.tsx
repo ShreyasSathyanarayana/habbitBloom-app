@@ -19,8 +19,16 @@ const avatar = require("@/assets/images/avatar.png");
 const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 
 const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
+  const onPress = () => {
+    SheetManager.show("profile-pic", {
+      payload: { profile_pic: profilePic },
+    });
+  };
   return (
-    <View style={[styles.container, isSubscribed && styles.premiumStyle]}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.container, isSubscribed && styles.premiumStyle]}
+    >
       {isSubscribed && (
         <PremiumProfileIcon
           style={styles.premiumIconStyle}
@@ -44,14 +52,7 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
           />
         </View>
       )}
-      <Pressable
-        onPress={() =>
-          SheetManager.show("profile-pic", {
-            payload: { profile_pic: profilePic },
-          })
-        }
-        style={styles.editBtnStyle}
-      >
+      <Pressable onPress={onPress} style={styles.editBtnStyle}>
         <ProfileEditIcon width={_iconSize} height={_iconSize} />
       </Pressable>
       {profilePic && (
@@ -73,7 +74,7 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
           />
         </View>
       )}
-    </View>
+    </Pressable>
   );
 };
 
@@ -84,14 +85,14 @@ const styles = StyleSheet.create({
     borderRadius: horizontalScale(120),
     borderWidth: horizontalScale(8),
     backgroundColor: "rgba(217, 217, 217, 1)",
-    borderColor: "rgba(138, 43, 226, 0.4)",
-    elevation: 2,
+    borderColor: "#9DB2CE",
+    // elevation: 2,
     // overflow: "hidden",
   },
   editBtnStyle: {
     position: "absolute",
-    bottom: 0,
-    right: horizontalScale(5),
+    bottom: horizontalScale(-2),
+    right: horizontalScale(0),
     zIndex: 2,
   },
   premiumStyle: {

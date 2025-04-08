@@ -46,7 +46,7 @@ const ProfileHead = (props: UserProfile) => {
       <View
         style={{ alignItems: "center", width: "100%", gap: verticalScale(16) }}
       >
-        <ProfilePic profilePic={props?.profile_pic} isSubscribed={true} />
+        <ProfilePic profilePic={props?.profile_pic} isSubscribed={false} />
         <ThemedText
           numberOfLines={2}
           style={{ fontFamily: "PoppinsSemiBold", textAlign: "center" }}

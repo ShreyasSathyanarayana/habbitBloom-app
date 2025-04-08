@@ -476,7 +476,7 @@ const CreateHabit = () => {
               )}
             />
           </View>
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -511,7 +511,7 @@ const CreateHabit = () => {
                 <Switch value={value} onPress={() => onChange(!value)} />
               )}
             />
-          </View>
+          </View> */}
           {/* <Label label="Habit Color">
             <View
               style={{

@@ -88,7 +88,7 @@ const ProfileBody = () => {
 const styles = StyleSheet.create({
   container: {
     padding: horizontalScale(16),
-    gap: verticalScale(20),
+    gap: verticalScale(25),
   },
   textStyle: {
     fontSize: getFontSize(14),
