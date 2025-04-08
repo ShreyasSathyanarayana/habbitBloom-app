@@ -12,7 +12,11 @@ type Props = {
   isSubscribed?: boolean;
 };
 
+const _defautIconSize = horizontalScale(120);
+
 const avatar = require("@/assets/images/avatar.png");
+
+const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 
 const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
   return (
@@ -23,6 +27,22 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
           width={_premiumIconSize}
           height={_premiumIconSize}
         />
+      )}
+      {profilePic === null && (
+        <View
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            borderRadius: horizontalScale(120),
+          }}
+        >
+          <Image
+            style={{
+              flex: 1,
+            }}
+            source={require("@/assets/images/default-profile.png")}
+          />
+        </View>
       )}
       <Pressable
         onPress={() =>
@@ -47,7 +67,9 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
               flex: 1,
             }}
             // source={avatar}
+            placeholder={{ blurhash }}
             source={profilePic}
+            transition={500}
           />
         </View>
       )}

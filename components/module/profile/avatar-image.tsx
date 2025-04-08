@@ -8,6 +8,7 @@ type Props = {
   selected?: boolean;
 };
 
+const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 const AvatarImage = ({ imageType, imageUri, selected = false }: Props) => {
   return (
     <View
@@ -17,7 +18,12 @@ const AvatarImage = ({ imageType, imageUri, selected = false }: Props) => {
         selected && { borderColor: "rgba(138, 43, 226, 1)" },
       ]}
     >
-      <Image source={imageUri} style={{ flex: 1 }} />
+      <Image
+        source={imageUri}
+        style={{ flex: 1 }}
+        placeholder={{ blurhash }}
+        transition={500}
+      />
     </View>
   );
 };

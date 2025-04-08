@@ -35,10 +35,9 @@ const DeleteProfilePicSheet = (props: SheetProps<"delete-profile-pic">) => {
   return (
     <ActionSheetContainer sheetId={props.sheetId}>
       <View style={{ gap: verticalScale(24) }}>
-        <SheetHeader title="Remove Profile Picture?" onClose={closeSheet} />
+        <SheetHeader title="Remove Avatar?" onClose={closeSheet} />
         <ThemedText style={{ fontSize: getFontSize(14) }}>
-          Are you sure you want to remove your profile picture? This will reset
-          your profile image to the default avatar.
+          Are you sure you want to remove your current avatar?
         </ThemedText>
         <AlertButton
           firstBtnAction={closeSheet}
