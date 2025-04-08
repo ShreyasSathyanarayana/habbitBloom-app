@@ -1,7 +1,7 @@
 import ActionSheetContainer1 from "@/components/ui/action-sheet-container1";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { SheetProps } from "react-native-actions-sheet";
+import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import SheetHeader from "../sheet-header";
 import ActionSheetButton from "@/components/action-sheet/actionsheet-button";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -9,12 +9,20 @@ import SuggestionIcon from "@/assets/svg/suggestion-icon.svg";
 import ShareIcon from "@/assets/svg/share-icon.svg";
 import RateAppIcon from "@/assets/svg/rate-icon.svg";
 import { getFontSize } from "@/font";
+import { router } from "expo-router";
 const _iconSize = horizontalScale(24);
+const closeSheet = () => {
+  SheetManager.hide("support-and-feedback");
+};
 const SupportAndFeedbackSheet = (props: SheetProps<"support-and-feedback">) => {
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
       <View style={{ gap: verticalScale(24) }}>
         <ActionSheetButton
+          onPress={() => {
+            closeSheet();
+            router.push("/(protected)/suggestion");
+          }}
           leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
           buttonName={"Suggestion Box"}
           labelStyle={styles.textStyle}
