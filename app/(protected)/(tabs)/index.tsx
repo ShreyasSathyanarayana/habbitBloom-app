@@ -33,6 +33,7 @@ export default function HabitsScreen() {
   const [selectedFilter, setSelectedFilter] = useState<
     "latest" | "alphabetical"
   >("latest");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const getHabitQuery = useQuery({
     queryKey: ["habitList", isConnected, selectedFilter],
@@ -66,6 +67,10 @@ export default function HabitsScreen() {
     ],
   }));
 
+  const onRefreshList = () => {
+    getHabitQuery.refetch();
+  };
+
   if (!isConnected) return <NoInternet onRefresh={getHabitQuery.refetch} />;
   if (getHabitQuery.status === "error")
     return <ServerError onRefresh={getHabitQuery.refetch} />;
@@ -82,6 +87,8 @@ export default function HabitsScreen() {
         scrollY={scrollY}
         isLoading={getHabitQuery.isFetching}
         habitList={getHabitQuery.data}
+        onRefresh={getHabitQuery.refetch}
+        isRefreshing={isRefreshing}
       />
 
       {/* Floating Button with Animation */}

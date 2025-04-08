@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo, useRef } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import HabitCard, { HabitProp } from "./habit-card";
 import { verticalScale } from "@/metric";
 import { SharedValue } from "react-native-reanimated";
@@ -11,9 +11,17 @@ type Props = {
   scrollY: SharedValue<number>;
   habitList?: HabitProp[];
   isLoading: boolean;
+  onRefresh: () => void;
+  isRefreshing: boolean;
 };
 
-const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
+const HabitList = ({
+  scrollY,
+  isLoading,
+  habitList,
+  onRefresh,
+  isRefreshing,
+}: Props) => {
   const memoizedHabits = useMemo(() => habitList, [habitList]);
   const MemoizedHabitCard = memo(HabitCard);
   const ref = useRef(null);
@@ -54,11 +62,13 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
     <View style={styles.container}>
       {memoizedHabits && memoizedHabits.length > 0 && (
         <FlatList
+          onRefresh={onRefresh}
           ref={ref}
           data={memoizedHabits}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
+          refreshing={isRefreshing}
           // estimatedItemSize={80} // Adjust based on UI
           // windowSize={5} // Increase for better scrolling performance
           // maxToRenderPerBatch={5} // Adjust this based on testing
@@ -71,6 +81,14 @@ const HabitList = ({ scrollY, isLoading, habitList }: Props) => {
           ItemSeparatorComponent={() => {
             return <View style={{ height: verticalScale(16) }} />;
           }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              colors={["#8A2BE2"]} // Android spinner color
+              tintColor="#8A2BE2" // iOS spinner color
+            />
+          }
           // ListEmptyComponent={HabitEmpty}
         />
       )}
