@@ -23,7 +23,8 @@
       },
       "package": "com.shreyas8747.habitBloom",
       "softwareKeyboardLayoutMode": "pan",
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "hermesEnabled": true
     },
     "web": {
       "bundler": "metro",
