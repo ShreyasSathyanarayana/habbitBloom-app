@@ -81,6 +81,12 @@ const HabitList = ({
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           refreshing={isRefreshing}
+          initialNumToRender={3}
+          getItemLayout={(data, index) => ({
+            length: 50,
+            offset: 50 * index,
+            index,
+          })}
           // estimatedItemSize={80} // Adjust based on UI
           // windowSize={5} // Increase for better scrolling performance
           // maxToRenderPerBatch={5} // Adjust this based on testing

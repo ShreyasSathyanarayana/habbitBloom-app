@@ -22,7 +22,8 @@
         "foregroundImage": "./assets/images/android-icon.png"
       },
       "package": "com.shreyas8747.habitBloom",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "jsEngine": "hermes"
     },
     "web": {
       "bundler": "metro",
