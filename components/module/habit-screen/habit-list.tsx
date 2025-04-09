@@ -1,5 +1,11 @@
 import React, { memo, useCallback, useMemo, useRef } from "react";
-import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 import HabitCard, { HabitProp } from "./habit-card";
 import { verticalScale } from "@/metric";
 import { SharedValue } from "react-native-reanimated";
@@ -13,6 +19,9 @@ type Props = {
   isLoading: boolean;
   onRefresh: () => void;
   isRefreshing: boolean;
+  onScrollEnd: () => void;
+  isNextPageAvailable: boolean;
+  isFetchingNextPage: boolean;
 };
 
 const HabitList = ({
@@ -21,6 +30,9 @@ const HabitList = ({
   habitList,
   onRefresh,
   isRefreshing,
+  onScrollEnd,
+  isNextPageAvailable,
+  isFetchingNextPage,
 }: Props) => {
   const memoizedHabits = useMemo(() => habitList, [habitList]);
   const MemoizedHabitCard = memo(HabitCard);
@@ -81,6 +93,12 @@ const HabitList = ({
           ItemSeparatorComponent={() => {
             return <View style={{ height: verticalScale(16) }} />;
           }}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (isNextPageAvailable) {
+              onScrollEnd();
+            }
+          }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -88,6 +106,14 @@ const HabitList = ({
               colors={["#8A2BE2"]} // Android spinner color
               tintColor="#8A2BE2" // iOS spinner color
             />
+          }
+          ListFooterComponent={
+            isFetchingNextPage && isNextPageAvailable ? (
+              <ActivityIndicator
+                color={"#8A2BE2"}
+                style={{ marginVertical: 16 }}
+              />
+            ) : null
           }
           // ListEmptyComponent={HabitEmpty}
         />

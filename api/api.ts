@@ -369,9 +369,17 @@ export const getHabitsByDate = async (date: string) => {
   }));
 };
 
-export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
+export const getAllHabits = async (
+  sortBy: "latest" | "alphabetical",
+  page: number = 1,
+  limit: number = 5
+) => {
   const userId = await getUserId();
   const todayUtc = DateUtils.getCurrentUtcDate();
+
+  const offset = (page - 1) * limit;
+  const from = offset;
+  const to = offset + limit - 1;
 
   let query = supabase
     .from("habit")
@@ -380,12 +388,15 @@ export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
     .eq("archived", false)
     .or(`end_date.gte.${todayUtc},end_date.is.null`);
 
-  // Apply sorting based on the parameter
+  // Apply sorting
   if (sortBy === "latest") {
     query = query.order("created_at", { ascending: false });
   } else if (sortBy === "alphabetical") {
     query = query.order("habit_name", { ascending: true });
   }
+
+  // Add pagination range
+  query = query.range(from, to);
 
   const { data, error } = await query;
 
@@ -407,6 +418,7 @@ export const getAllHabits = async (sortBy: "latest" | "alphabetical") => {
 
   return habitsWithProgress;
 };
+
 
 export const getAllHabitsArchived = async () => {
   const todayUtc = DateUtils.getCurrentUtcDate();

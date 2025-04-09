@@ -21,10 +21,12 @@ import { getFontSize } from "@/font";
 import { useAuth } from "@/context/AuthProvider";
 import { SheetManager } from "react-native-actions-sheet";
 import { openAppSettings } from "@/utils/permission";
+import { useQueryClient } from "@tanstack/react-query";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
   const { logout } = useAuth();
+  const queryClient = useQueryClient();
 
   return (
     <View style={styles.container}>
@@ -76,7 +78,10 @@ const ProfileBody = () => {
         labelStyle={styles.textStyle}
       />
       <ActionSheetButton
-        onPress={() => logout()}
+        onPress={() => {
+          queryClient.clear();
+          logout();
+        }}
         leftIcon={<LogoutIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Log out"}
         labelStyle={styles.logoutStyle}

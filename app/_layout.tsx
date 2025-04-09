@@ -80,9 +80,9 @@ const RootLayout = () => {
   //   setupDatabase(); // Ensure database is set up
   // }, []);
   useEffect(() => {
-    registerForPushNotificationsAsync().then(
-      (token) => token && setExpoPushToken(token)
-    );
+    // registerForPushNotificationsAsync().then(
+    //   (token) => token && setExpoPushToken(token)
+    // );
 
     if (Platform.OS === "android") {
       Notifications.getNotificationChannelsAsync().then((value) =>

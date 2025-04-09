@@ -14,12 +14,13 @@ import { router } from "expo-router";
 import HabitHead from "@/components/module/habit-screen/habit-head";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HabitList from "@/components/module/habit-screen/habit-list";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getAllHabits } from "@/api/api";
 import ServerError from "@/components/module/errors/server-error";
 import { useAuth } from "@/context/AuthProvider";
 import NoInternet from "@/components/module/errors/no-internet";
 import { LinearGradient } from "expo-linear-gradient";
+import { HabitProp } from "@/components/module/habit-screen/habit-card";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
@@ -34,14 +35,24 @@ export default function HabitsScreen() {
     "latest" | "alphabetical"
   >("latest");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [habitList, setHabitList] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 5;
 
-  const getHabitQuery = useQuery({
+  const getHabitQuery = useInfiniteQuery({
     queryKey: ["habitList", isConnected, selectedFilter],
-    queryFn: () => {
-      return getAllHabits(selectedFilter);
+    queryFn: ({ pageParam }) => {
+      return getAllHabits(selectedFilter, pageParam, limit);
     },
-    staleTime: 10000,
-    refetchOnReconnect: true,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length + 1;
+      if (lastPage?.length < limit) {
+        return undefined;
+      }
+      return nextPage;
+    },
   });
   // console.log("habit list", JSON.stringify(getHabitQuery.data, null, 2));
 
@@ -85,10 +96,13 @@ export default function HabitsScreen() {
 
       <HabitList
         scrollY={scrollY}
-        isLoading={getHabitQuery.isFetching}
-        habitList={getHabitQuery.data}
+        isLoading={getHabitQuery.isLoading}
+        habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]}
         onRefresh={getHabitQuery.refetch}
         isRefreshing={isRefreshing}
+        isNextPageAvailable={getHabitQuery.hasNextPage}
+        onScrollEnd={getHabitQuery.fetchNextPage}
+        isFetchingNextPage={getHabitQuery.isFetchingNextPage}
       />
 
       {/* Floating Button with Animation */}
