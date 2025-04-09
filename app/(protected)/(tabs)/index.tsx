@@ -99,7 +99,7 @@ export default function HabitsScreen() {
         isLoading={
           getHabitQuery.isFetching && !getHabitQuery.isFetchingNextPage
         }
-        habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]}
+        habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]} // for pagination
         onRefresh={getHabitQuery.refetch}
         isRefreshing={isRefreshing}
         isNextPageAvailable={getHabitQuery.hasNextPage}

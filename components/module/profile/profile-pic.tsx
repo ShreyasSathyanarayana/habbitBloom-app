@@ -70,7 +70,7 @@ const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
             // source={avatar}
             placeholder={{ blurhash }}
             source={profilePic}
-            transition={500}
+            // transition={1000}
           />
         </View>
       )}

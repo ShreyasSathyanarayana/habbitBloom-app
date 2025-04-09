@@ -22,7 +22,7 @@ const AvatarImage = ({ imageType, imageUri, selected = false }: Props) => {
         source={imageUri}
         style={{ flex: 1 }}
         placeholder={{ blurhash }}
-        transition={500}
+        // transition={1000}
       />
     </View>
   );

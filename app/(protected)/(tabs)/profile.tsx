@@ -27,7 +27,7 @@ const Profile = () => {
   }
 
   const profileData = getUserDetailsQuery.data;
-  console.log("profileData", JSON.stringify(profileData, null, 2));
+  // console.log("profileData", JSON.stringify(profileData, null, 2));
 
   return (
     <View
