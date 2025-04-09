@@ -96,7 +96,9 @@ export default function HabitsScreen() {
 
       <HabitList
         scrollY={scrollY}
-        isLoading={getHabitQuery.isLoading}
+        isLoading={
+          getHabitQuery.isFetching && !getHabitQuery.isFetchingNextPage
+        }
         habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]}
         onRefresh={getHabitQuery.refetch}
         isRefreshing={isRefreshing}
