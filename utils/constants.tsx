@@ -105,7 +105,37 @@ export const DateUtils = {
 };
 
 export const IsoDateUtils = {
-  convertToLocalDate: (isoDate: string,format='YYYY-MM-DD') => {
+  convertToLocalDate: (isoDate: string, format = "YYYY-MM-DD") => {
     return moment(isoDate).local().format(format);
   },
+};
+
+export const getCurrentWeekIndex = (data: { week: string }[]) => {
+  const today = moment();
+
+  // Map each week string to a moment date (assumes weeks are Sundays)
+  const weeksWithMoment = data.map((item, index) => {
+    const weekDate = moment(item.week, "MMM D");
+
+    // Adjust year if needed
+    if (weekDate.isAfter(today)) {
+      weekDate.subtract(1, "year");
+    }
+
+    return {
+      ...item,
+      index,
+      momentDate: weekDate,
+    };
+  });
+
+  // Find the latest week where weekDate is <= today
+  const currentWeek = weeksWithMoment.reduce((latest, curr) => {
+    return curr.momentDate.isSameOrBefore(today) &&
+      curr.momentDate.isAfter(latest.momentDate)
+      ? curr
+      : latest;
+  }, weeksWithMoment[0]);
+
+  return currentWeek?.index ?? 0;
 };

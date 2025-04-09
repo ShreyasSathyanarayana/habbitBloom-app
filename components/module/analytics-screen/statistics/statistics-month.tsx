@@ -6,12 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import MonthGraph from "./month-graph";
-import { verticalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { Skeleton } from "moti/skeleton";
 
 type Props = {
   habitId: string;
 };
+
+const ITEM_WIDTH = horizontalScale(26);
 
 const StatisticsMonth = ({ habitId }: Props) => {
   const { month, year } = getCurrentMonthAndYear();
@@ -32,11 +34,14 @@ const StatisticsMonth = ({ habitId }: Props) => {
 
   useEffect(() => {
     if (listRef.current && todayIndex !== -1) {
-      listRef.current.scrollToIndex({
-        index: todayIndex,
-        animated: true,
-        viewPosition: 1,
-      });
+      setTimeout(() => {
+        listRef?.current?.scrollToOffset({
+          offset: todayIndex * ITEM_WIDTH,
+          animated: true,
+          // viewPosition: 1,
+        });
+      }, 1000);
+      // console.log("todayIndex", todayIndex);
     }
   }, [todayIndex, data]);
 

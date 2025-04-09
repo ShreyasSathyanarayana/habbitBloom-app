@@ -1,10 +1,10 @@
 import { fetchWeeklyHabitProgressForYear } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
-import { verticalScale } from "@/metric";
-import { getCurrentMonthAndYear } from "@/utils/constants";
+import { horizontalScale, verticalScale } from "@/metric";
+import { getCurrentMonthAndYear, getCurrentWeekIndex } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import YearGraph from "./year-graph";
 import Animated, {
@@ -14,12 +14,16 @@ import Animated, {
   LayoutAnimationConfig,
 } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
+import ScrollArrow from "@/components/ui/scroll-arrow";
 type Props = {
   habitId: string;
 };
+const ITEM_WIDTH = horizontalScale(60);
 
 const WeeklyGraph = ({ habitId }: Props) => {
   const { month, year } = getCurrentMonthAndYear();
+  const flatListRef = useRef<FlatList>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const getWeeklyQuery = useQuery({
     queryKey: ["weekly", habitId],
     queryFn: () => {
@@ -27,7 +31,22 @@ const WeeklyGraph = ({ habitId }: Props) => {
     },
     enabled: !!habitId,
   });
+
   // console.log("weekly", JSON.stringify(getWeeklyQuery.data, null, 2));
+
+  useEffect(() => {
+    if (flatListRef.current && getWeeklyQuery?.data) {
+      const currentWeekIndex = getCurrentWeekIndex(getWeeklyQuery?.data ?? []);
+      setCurrentIndex(currentWeekIndex ?? 0);
+      setTimeout(() => {
+        flatListRef?.current?.scrollToOffset({
+          offset: currentWeekIndex * ITEM_WIDTH,
+          animated: true,
+          // viewPosition: 1,
+        });
+      }, 1000);
+    }
+  }, [getWeeklyQuery.data]);
 
   if (getWeeklyQuery?.isLoading) {
     return <Skeleton width={"100%"} height={verticalScale(54)} />;
@@ -42,16 +61,50 @@ const WeeklyGraph = ({ habitId }: Props) => {
         flex: 1,
       }}
     >
-      <ThemedText
-        style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
-        {month} {year}
-      </ThemedText>
+        <ThemedText
+          style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
+        >
+          {month} {year}
+        </ThemedText>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: horizontalScale(16),
+          }}
+        >
+          <ScrollArrow
+            direction="left"
+            flatListRef={flatListRef}
+            currentIndex={currentIndex}
+            setCurrentIndex={setCurrentIndex}
+            itemWidth={ITEM_WIDTH}
+            dataLength={getWeeklyQuery.data?.length ?? 0}
+          />
+          <ScrollArrow
+            direction="right"
+            flatListRef={flatListRef}
+            currentIndex={currentIndex}
+            setCurrentIndex={setCurrentIndex}
+            itemWidth={ITEM_WIDTH}
+            dataLength={getWeeklyQuery.data?.length ?? 0}
+          />
+        </View>
+      </View>
       <FlatList
         horizontal
         contentContainerStyle={{
           paddingTop: verticalScale(16),
         }}
+        scrollEnabled={false}
+        ref={flatListRef}
         scrollEventThrottle={16}
         data={getWeeklyQuery.data}
         keyExtractor={(_, index) => index.toString() + "weekDetails"}
