@@ -752,10 +752,10 @@ export const fetchHabitProgressFromCreation = async (
   // Get today's local date at midnight
   const today = moment().startOf("day").toDate();
 
-  // Fetch habit details including created_at and frequency
+  // Fetch habit details including created_at, frequency, and end_date
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
-    .select("created_at, frequency")
+    .select("created_at, frequency, end_date")
     .eq("id", habitId)
     .single();
 
@@ -764,8 +764,15 @@ export const fetchHabitProgressFromCreation = async (
     return null;
   }
 
-  // Convert habit creation date to local midnight
+  // Convert habit creation date and end date to local midnight
   const habitStartDate = moment(habitData.created_at).startOf("day").toDate();
+  const rawEndDate = habitData.end_date
+  ? moment(habitData.end_date).startOf("day").toDate()
+  : null;
+
+  const habitEndDate =
+  rawEndDate && rawEndDate <= today ? rawEndDate : today;
+
 
   // Parse frequency days (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
   const frequencyDays: number[] = habitData.frequency || [];
@@ -801,13 +808,13 @@ export const fetchHabitProgressFromCreation = async (
     archivePeriods.push({ start: lastArchiveStart, end: null });
   }
 
-  // Fetch habit progress
+  // Fetch habit progress entries between start and end
   const { data: progressData, error: progressError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
     .gte("date", moment(habitStartDate).format("YYYY-MM-DD"))
-    .lte("date", moment(today).format("YYYY-MM-DD"));
+    .lte("date", moment(habitEndDate).format("YYYY-MM-DD"));
 
   if (progressError) {
     console.error("Error fetching progress data:", progressError);
@@ -822,7 +829,7 @@ export const fetchHabitProgressFromCreation = async (
   const result: HabitProgressEntry[] = [];
   let currentDate = moment(habitStartDate).startOf("day");
 
-  while (currentDate.toDate() <= today) {
+  while (currentDate.toDate() <= habitEndDate) {
     const dateString = currentDate.format("YYYY-MM-DD");
     const dayOfWeek = currentDate.day(); // Local day of week
 
@@ -833,22 +840,24 @@ export const fetchHabitProgressFromCreation = async (
     );
 
     let status: boolean | null = null;
-    let completed = false;
 
     if (frequencyDays.includes(dayOfWeek)) {
       if (progressMap.has(dateString)) {
         status = progressMap.get(dateString)!;
-        completed = status === true;
       } else {
-        status = false;
+        status = false; // Not completed
       }
 
       if (archiveRecord) {
         const archiveStart = moment(archiveRecord.start).format("YYYY-MM-DD");
 
         if (dateString === archiveStart) {
-          completed =
-            progressMap.has(dateString) && progressMap.get(dateString) === true;
+          // Only count the first day of archive if marked complete
+          status =
+            progressMap.has(dateString) &&
+            progressMap.get(dateString) === true
+              ? true
+              : null;
         } else {
           status = null; // Archived
         }
