@@ -42,6 +42,7 @@ const YearlyGraph = ({ habitId }: Props) => {
           contentContainerStyle={{
             paddingTop: verticalScale(16),
           }}
+          showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
           data={getYearlyGraphQuery.data}
           keyExtractor={(_, index) => index.toString() + "weekDetails"}

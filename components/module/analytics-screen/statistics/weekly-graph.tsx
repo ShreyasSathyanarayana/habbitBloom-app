@@ -116,6 +116,7 @@ const WeeklyGraph = ({ habitId }: Props) => {
           offset: ITEM_WIDTH * index,
           index,
         })}
+        showsHorizontalScrollIndicator={false}
         scrollEnabled={false}
         ref={flatListRef}
         scrollEventThrottle={16}

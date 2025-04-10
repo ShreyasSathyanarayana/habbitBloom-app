@@ -99,6 +99,7 @@ const MontlyGraph = ({ habitId }: Props) => {
           offset: ITEM_WIDTH * index,
           index,
         })}
+        showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
         data={getMonthlyGraphQuery?.data}
         keyExtractor={(_, index) => index.toString() + "weekDetails"}

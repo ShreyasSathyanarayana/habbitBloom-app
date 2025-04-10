@@ -63,6 +63,7 @@ const StatisticsMonth = ({ habitId }: Props) => {
       </ThemedText>
       <FlatList
         ref={listRef}
+        showsHorizontalScrollIndicator={false}
         style={{
           marginTop: verticalScale(15),
           marginBottom: verticalScale(15),
