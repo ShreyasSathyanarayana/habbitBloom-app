@@ -23,20 +23,25 @@ const MontlyGraph = ({ habitId }: Props) => {
     queryKey: ["monthly", habitId],
     queryFn: () => fetchMonthlyHabitProgressForYear(habitId),
   });
-  //   console.log("monthly", JSON.stringify(getMonthlyGraphQuery.data, null, 2));
+  // console.log("monthly", JSON.stringify(getMonthlyGraphQuery.data, null, 2));
   useEffect(() => {
-    if (flatListRef.current && getMonthlyGraphQuery?.data) {
-      const currentWeekIndex = moment().get("M");
-      setCurrentIndex(currentWeekIndex ?? 0);
-      setTimeout(() => {
-        flatListRef?.current?.scrollToOffset({
-          offset: currentWeekIndex * ITEM_WIDTH,
+    const data = getMonthlyGraphQuery?.data;
+    if (flatListRef.current && data?.length) {
+      const currentMonthIndex = moment().month();
+      setCurrentIndex(currentMonthIndex);
+
+      const timeoutId = setTimeout(() => {
+        flatListRef.current?.scrollToOffset({
+          offset: currentMonthIndex * ITEM_WIDTH,
           animated: true,
-          // viewPosition: 1,
         });
       }, 1000);
+
+      // Cleanup to prevent memory leaks
+      return () => clearTimeout(timeoutId);
     }
-  }, [getMonthlyGraphQuery.data]);
+  }, [getMonthlyGraphQuery?.data]);
+
   return (
     <View
       style={{
@@ -88,6 +93,12 @@ const MontlyGraph = ({ habitId }: Props) => {
         contentContainerStyle={{
           paddingTop: verticalScale(16),
         }}
+        initialNumToRender={8}
+        getItemLayout={(_, index) => ({
+          length: ITEM_WIDTH,
+          offset: ITEM_WIDTH * index,
+          index,
+        })}
         scrollEventThrottle={16}
         data={getMonthlyGraphQuery?.data}
         keyExtractor={(_, index) => index.toString() + "weekDetails"}

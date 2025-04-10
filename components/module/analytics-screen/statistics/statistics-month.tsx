@@ -33,15 +33,15 @@ const StatisticsMonth = ({ habitId }: Props) => {
   );
 
   useEffect(() => {
-    if (listRef.current && todayIndex !== -1) {
-      setTimeout(() => {
-        listRef?.current?.scrollToOffset({
+    if (listRef.current && todayIndex !== -1 && data) {
+      const timeoutId = setTimeout(() => {
+        listRef.current?.scrollToOffset({
           offset: todayIndex * ITEM_WIDTH,
           animated: true,
-          // viewPosition: 1,
         });
       }, 1000);
-      // console.log("todayIndex", todayIndex);
+
+      return () => clearTimeout(timeoutId); // Cleanup to avoid memory leaks
     }
   }, [todayIndex, data]);
 

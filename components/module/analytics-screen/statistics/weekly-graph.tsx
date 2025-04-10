@@ -35,18 +35,25 @@ const WeeklyGraph = ({ habitId }: Props) => {
   // console.log("weekly", JSON.stringify(getWeeklyQuery.data, null, 2));
 
   useEffect(() => {
-    if (flatListRef.current && getWeeklyQuery?.data) {
-      const currentWeekIndex = getCurrentWeekIndex(getWeeklyQuery?.data ?? []);
-      setCurrentIndex(currentWeekIndex ?? 0);
-      setTimeout(() => {
-        flatListRef?.current?.scrollToOffset({
-          offset: currentWeekIndex * ITEM_WIDTH,
-          animated: true,
-          // viewPosition: 1,
-        });
-      }, 1000);
+    const data = getWeeklyQuery?.data;
+    if (flatListRef.current && data?.length) {
+      const currentWeekIndex = getCurrentWeekIndex(data);
+
+      if (typeof currentWeekIndex === "number") {
+        setCurrentIndex(currentWeekIndex);
+
+        const timeoutId = setTimeout(() => {
+          flatListRef.current?.scrollToOffset({
+            offset: currentWeekIndex * ITEM_WIDTH,
+            animated: true,
+          });
+        }, 1000);
+
+        // Cleanup timeout when component unmounts or data changes
+        return () => clearTimeout(timeoutId);
+      }
     }
-  }, [getWeeklyQuery.data]);
+  }, [getWeeklyQuery?.data]);
 
   if (getWeeklyQuery?.isLoading) {
     return <Skeleton width={"100%"} height={verticalScale(54)} />;
@@ -103,6 +110,12 @@ const WeeklyGraph = ({ habitId }: Props) => {
         contentContainerStyle={{
           paddingTop: verticalScale(16),
         }}
+        initialNumToRender={7}
+        getItemLayout={(_, index) => ({
+          length: ITEM_WIDTH,
+          offset: ITEM_WIDTH * index,
+          index,
+        })}
         scrollEnabled={false}
         ref={flatListRef}
         scrollEventThrottle={16}
