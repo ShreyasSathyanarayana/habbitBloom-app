@@ -1314,8 +1314,9 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
   // 2. Normalize start and end dates to local timezone
   const start = moment.utc(habitData.created_at).local().startOf("day");
   const end = habitData.end_date
-    ? moment.utc(habitData.end_date).local().startOf("day")
-    : moment().local().startOf("day");
+    ? moment.utc(habitData.end_date).local().endOf("day")
+    : moment().local().endOf("day");
+    
 
   // 3. Fetch completed habit entries
   const { data: progressData, error: fetchError } = await supabase
@@ -1323,8 +1324,8 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
     .select("date, status")
     .eq("habit_id", habitId)
     .eq("user_id", userId)
-    .gte("date", start.clone().utc().format("YYYY-MM-DD"))
-    .lte("date", end.clone().utc().format("YYYY-MM-DD"));
+    .gte("date", start.clone().utc().format())
+    .lte("date", end.clone().utc().format());
 
   if (fetchError) {
     console.error("Error fetching habit progress:", fetchError);
@@ -1345,17 +1346,17 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
   let completedDays = 0;
   let pendingDays = 0;
 
-  let current = start.clone();
+  let current = start;
   const today = moment().local().startOf("day");
 
   while (current <= end) {
-    const dateStr = current.format("YYYY-MM-DD");
+    const dateStr = current.local().format("YYYY-MM-DD");
     const dayOfWeek = current.day(); // 0 (Sun) - 6 (Sat)
 
     if (frequencyDays.includes(dayOfWeek)) {
       if (completedDaysSet.has(dateStr)) {
         completedDays++;
-      } else if (current.isSameOrBefore(today)) {
+      } else  {
         pendingDays++;
       }
     }

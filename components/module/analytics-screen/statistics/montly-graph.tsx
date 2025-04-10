@@ -35,7 +35,7 @@ const MontlyGraph = ({ habitId }: Props) => {
           offset: currentMonthIndex * ITEM_WIDTH,
           animated: true,
         });
-      }, 1000);
+      }, 100);
 
       // Cleanup to prevent memory leaks
       return () => clearTimeout(timeoutId);

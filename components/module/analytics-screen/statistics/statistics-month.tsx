@@ -39,7 +39,7 @@ const StatisticsMonth = ({ habitId }: Props) => {
           offset: todayIndex * ITEM_WIDTH,
           animated: true,
         });
-      }, 1000);
+      }, 100);
 
       return () => clearTimeout(timeoutId); // Cleanup to avoid memory leaks
     }

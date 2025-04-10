@@ -47,7 +47,7 @@ const WeeklyGraph = ({ habitId }: Props) => {
             offset: currentWeekIndex * ITEM_WIDTH,
             animated: true,
           });
-        }, 1000);
+        }, 100);
 
         // Cleanup timeout when component unmounts or data changes
         return () => clearTimeout(timeoutId);

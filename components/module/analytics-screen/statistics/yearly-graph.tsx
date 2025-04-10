@@ -34,7 +34,7 @@ const YearlyGraph = ({ habitId }: Props) => {
       <ThemedText
         style={{ fontSize: getFontSize(17), fontFamily: "PoppinsSemiBold" }}
       >
-        {month} {year}
+        Yearly View
       </ThemedText>
       <View style={{ justifyContent: "flex-end" }}>
         <FlatList

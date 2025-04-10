@@ -58,9 +58,15 @@ const DateInputV2 = forwardRef<TextInput, DateInputProps>(
     }, [value]);
 
     const handleConfirm = (selectedDate: Date) => {
-      setPickerVisible(false);
-      setDate(selectedDate);
-      onChange?.(selectedDate.toISOString()); // Output as ISO string in UTC format
+      if (minimumDate && selectedDate < minimumDate) {
+        setPickerVisible(false);
+        setDate(minimumDate);
+        onChange?.(minimumDate.toISOString());
+      } else {
+        setPickerVisible(false);
+        setDate(selectedDate);
+        onChange?.(selectedDate.toISOString()); // Output as ISO string in UTC format
+      }
     };
 
     return (

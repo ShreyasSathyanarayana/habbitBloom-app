@@ -23,7 +23,7 @@ const SuccessFailAnalytics = ({ habitId }: Props) => {
     },
     enabled: !!habitId,
   });
-//   console.log("Sample==>", JSON.stringify(getHabitStatsQuery.data, null, 2));
+  // console.log("Sample==>", JSON.stringify(getHabitStatsQuery.data, null, 2));
 
   const series = [
     {
