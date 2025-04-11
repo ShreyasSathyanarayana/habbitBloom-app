@@ -13,7 +13,8 @@ import { getCategoryByName } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
 import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PagerView from "react-native-pager-view";
 import { LayoutAnimationConfig } from "react-native-reanimated";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
@@ -62,25 +63,47 @@ const Analytics = () => {
             pagerRef.current?.setPage(index);
           }}
         />
+        {Platform.OS == "ios" && (
+          <>
+            {selectedOption === "Calendar" && (
+              <View style={{ flex: 1 }}>
+                <CalenderAnalytics habitId={id as string} />
+              </View>
+            )}
+            {selectedOption === "Statistics" && (
+              <View style={{ flex: 1 }}>
+                <StatisticsAnalytics
+                  habitId={id as string}
+                  habitHasEndDate={
+                    getHabitDetailsQuery?.data?.end_date ? true : false
+                  }
+                />
+              </View>
+            )}
+          </>
+        )}
 
-        <PagerView
-          ref={pagerRef}
-          scrollEnabled={false}
-          initialPage={category === "Calendar" ? 0 : 1}
-          style={{ flex: 1 }}
-        >
-          <View key="1" style={{ flex: 1 }}>
-            <CalenderAnalytics habitId={id as string} />
-          </View>
-          <View key="2" style={{ flex: 1 }}>
-            <StatisticsAnalytics
-              habitId={id as string}
-              habitHasEndDate={
-                getHabitDetailsQuery?.data?.end_date ? true : false
-              }
-            />
-          </View>
-        </PagerView>
+        {Platform.OS != "ios" && (
+          <PagerView
+            ref={pagerRef}
+            scrollEnabled={false}
+            initialPage={category === "Calendar" ? 0 : 1}
+            style={{ flex: 1 }}
+            offscreenPageLimit={2}
+          >
+            <View key="1" style={{ flex: 1 }}>
+              <CalenderAnalytics habitId={id as string} />
+            </View>
+            <View key="2" style={{ flex: 1 }}>
+              <StatisticsAnalytics
+                habitId={id as string}
+                habitHasEndDate={
+                  getHabitDetailsQuery?.data?.end_date ? true : false
+                }
+              />
+            </View>
+          </PagerView>
+        )}
       </View>
     </Container>
   );

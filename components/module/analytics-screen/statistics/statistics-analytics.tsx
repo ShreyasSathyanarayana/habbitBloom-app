@@ -19,39 +19,32 @@ const _dividerColor = "rgba(38, 50, 56, 0.7)";
 
 const StatisticsAnalytics = ({ habitId, habitHasEndDate = false }: Props) => {
   return (
-    <Animated.View
-      key={"statistics-analytics"}
-      entering={FadeInRight.springify().damping(40).stiffness(200)}
-      exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
-      style={{ gap: verticalScale(17), flex: 1 }}
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ gap: verticalScale(17), flexGrow: 1 }}
     >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: verticalScale(17) }}
-      >
-        {/* {habitHasEndDate && (
+      {/* {habitHasEndDate && (
           <>
             <HabitScore habitId={habitId} />
             <Divider style={styles.dividerStyle} />
           </>
         )} */}
-        <StreakDetails habitId={habitId} />
-        <Divider style={styles.dividerStyle} />
-        <TimesCompleted habitId={habitId} />
-        <Divider style={styles.dividerStyle} />
-        <StatisticsMonth habitId={habitId} />
-        <Divider style={styles.dividerStyle} />
-        <StatisticsYearly habitId={habitId} />
-        {habitHasEndDate && (
-          <>
-            <Divider style={styles.dividerStyle} />
-            <SuccessFailAnalytics habitId={habitId} />
-          </>
-        )}
-        <Divider style={styles.dividerStyle} />
-        <StreakChallenge habitId={habitId} />
-      </ScrollView>
-    </Animated.View>
+      <StreakDetails habitId={habitId} />
+      <Divider style={styles.dividerStyle} />
+      <TimesCompleted habitId={habitId} />
+      <Divider style={styles.dividerStyle} />
+      <StatisticsMonth habitId={habitId} />
+      <Divider style={styles.dividerStyle} />
+      <StatisticsYearly habitId={habitId} />
+      {habitHasEndDate && (
+        <>
+          <Divider style={styles.dividerStyle} />
+          <SuccessFailAnalytics habitId={habitId} />
+        </>
+      )}
+      <Divider style={styles.dividerStyle} />
+      <StreakChallenge habitId={habitId} />
+    </ScrollView>
   );
 };
 
