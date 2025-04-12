@@ -419,7 +419,6 @@ export const getAllHabits = async (
   return habitsWithProgress;
 };
 
-
 export const getAllHabitsArchived = async () => {
   const todayUtc = DateUtils.getCurrentUtcDate();
   const userId = await getUserId();
@@ -779,12 +778,10 @@ export const fetchHabitProgressFromCreation = async (
   // Convert habit creation date and end date to local midnight
   const habitStartDate = moment(habitData.created_at).startOf("day").toDate();
   const rawEndDate = habitData.end_date
-  ? moment(habitData.end_date).startOf("day").toDate()
-  : null;
+    ? moment(habitData.end_date).startOf("day").toDate()
+    : null;
 
-  const habitEndDate =
-  rawEndDate && rawEndDate <= today ? rawEndDate : today;
-
+  const habitEndDate = rawEndDate && rawEndDate <= today ? rawEndDate : today;
 
   // Parse frequency days (e.g., [0,1,2] where 0=Sunday, ..., 6=Saturday)
   const frequencyDays: number[] = habitData.frequency || [];
@@ -866,8 +863,7 @@ export const fetchHabitProgressFromCreation = async (
         if (dateString === archiveStart) {
           // Only count the first day of archive if marked complete
           status =
-            progressMap.has(dateString) &&
-            progressMap.get(dateString) === true
+            progressMap.has(dateString) && progressMap.get(dateString) === true
               ? true
               : null;
         } else {
@@ -1032,7 +1028,6 @@ export const fetchHabitProgressForCurrentMonth = async (
   return { habitId, data: result };
 };
 
-
 export const fetchWeeklyHabitProgressForYear = async (
   habitId: string
 ): Promise<{ week: string; completed: number }[]> => {
@@ -1083,8 +1078,6 @@ export const fetchWeeklyHabitProgressForYear = async (
   }));
 };
 
-
-
 export const fetchMonthlyHabitProgressForYear = async (
   habitId: string
 ): Promise<{ month: string; completed: number }[]> => {
@@ -1127,7 +1120,6 @@ export const fetchMonthlyHabitProgressForYear = async (
     completed,
   }));
 };
-
 
 export const fetchYearlyHabitProgressForLastThreeYears = async (
   habitId: string
@@ -1221,7 +1213,6 @@ export const fetchYearlyHabitProgressForLastFiveYears = async (
   }));
 };
 
-
 export const getHabitCompletionStats = async (habitId: string) => {
   const userId = getUserId();
 
@@ -1293,8 +1284,6 @@ export const getHabitCompletionStats = async (habitId: string) => {
   return { completed: completedCount, pending: pendingCount };
 };
 
-
-
 export const getCompletedAndPendingDays = async (habitId: string) => {
   const userId = await getUserId();
 
@@ -1316,7 +1305,6 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
   const end = habitData.end_date
     ? moment.utc(habitData.end_date).local().endOf("day")
     : moment().local().endOf("day");
-    
 
   // 3. Fetch completed habit entries
   const { data: progressData, error: fetchError } = await supabase
@@ -1356,7 +1344,7 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
     if (frequencyDays.includes(dayOfWeek)) {
       if (completedDaysSet.has(dateStr)) {
         completedDays++;
-      } else  {
+      } else {
         pendingDays++;
       }
     }
@@ -1366,7 +1354,6 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
 
   return { completedDays, pendingDays };
 };
-
 
 /********************************** Profile Api ***************************************** */
 
@@ -1426,49 +1413,81 @@ export const updateUserProfileInfo = async (
   return data;
 };
 
-
 export const getAvatarImages = async () => {
-  const { data, error } = await supabase
-    .from('avatars').select('*');
+  const { data, error } = await supabase.from("avatars").select("*");
 
   if (error) {
-    console.error('Error listing avatars:', error.message);
+    console.error("Error listing avatars:", error.message);
     return [];
   }
-
 
   return data;
 };
 
-
-export const updateProfilePic =  async (imageUrl:string)=>{
+export const updateProfilePic = async (imageUrl: string) => {
   const userId = await getUserId();
   const { data, error } = await supabase
     .from("profile")
     .update({
-      profile_pic:imageUrl,
+      profile_pic: imageUrl,
     })
     .eq("id", userId)
     .single();
-    if(error){
-      throw new Error(error.message)
-     
-    }
-    return data
-}
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
 
-
-export const deleteProfilePic =  async ()=>{
+export const deleteProfilePic = async () => {
   const userId = await getUserId();
   const { data, error } = await supabase
     .from("profile")
     .update({
-      profile_pic:null,
+      profile_pic: null,
     })
     .eq("id", userId)
     .single();
-    if(error){
-      throw new Error(error.message)
-    }
-    return data
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+type SuggestionDetails = {
+  categories: string;
+  title: string;
+  description: string;
+};
+
+export const insertSuggestion = async (suggestionDetails: SuggestionDetails) => {
+  const userId = await getUserId();
+  const { title, description, categories } = suggestionDetails;
+  console.log(userId, title, description, categories);
+  
+  const { data, error } = await supabase.from("suggestions").insert([
+    {
+      user_id: userId,
+      title:title,
+      description:description,
+      category:categories,
+    },
+  ]);
+
+  if (error) throw error;
+  return data;
+};
+
+export const getMySuggestions = async ()=>{
+  const userId = await getUserId();
+  const { data, error } = await supabase.from("suggestions").select("*").eq("user_id", userId);
+  if (error) throw error;
+  return data;
 }
+
+export const deleteSuggestionById = async (id: string) => {
+  const userId = await getUserId();
+  const { error } = await supabase.from("suggestions").delete().eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+  return true
+};

@@ -1,7 +1,7 @@
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import ActionSheet, { ActionSheetProps } from "react-native-actions-sheet";
+import ActionSheet, { ActionSheetProps, ActionSheetRef } from "react-native-actions-sheet";
 type Props = {
   sheetId: string;
   children: React.ReactNode;

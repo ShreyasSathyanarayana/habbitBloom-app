@@ -28,8 +28,8 @@ const ActionSheetButton = ({
   labelStyle,
 }: Props) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.continer}>
-      {leftIcon}
+    <TouchableOpacity onPress={onPress} style={styles.container}>
+      {leftIcon && leftIcon}
       <ThemedText style={[{ fontSize: getFontSize(14), flex: 1 }, labelStyle]}>
         {buttonName}
       </ThemedText>
@@ -39,7 +39,7 @@ const ActionSheetButton = ({
 };
 
 const styles = StyleSheet.create({
-  continer: {
+  container: {
     flexDirection: "row",
     alignItems: "center",
     gap: horizontalScale(8),

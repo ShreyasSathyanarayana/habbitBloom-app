@@ -4,9 +4,17 @@ import MeditationIcon from "@/assets/svg/meditation.svg";
 import HydrationIcon from "@/assets/svg/hydration.svg";
 import SleepIcon from "@/assets/svg/sleep-schedule.svg";
 import JournalingIcon from "@/assets/svg/journal.svg";
+import BugIcon from "@/assets/suggestion-catergories-icon/bug-icon.svg";
+import FeatureIcon from "@/assets/suggestion-catergories-icon/feature-icon.svg";
+import AppPerformanceIcon from "@/assets/suggestion-catergories-icon/app-performance-icon.svg";
+import LoginIssueIcon from "@/assets/suggestion-catergories-icon/login-issue-icon.svg";
+import OtherIssuesIcon from "@/assets/suggestion-catergories-icon/other-issue-icon.svg";
+import UIissueIcon from "@/assets/suggestion-catergories-icon/ui-icon.svg";
 import OthersIcon from "@/assets/svg/others.svg";
 import { horizontalScale } from "@/metric";
 import moment from "moment";
+import { Option } from "@/components/ui/drop-down";
+const _categoriesIconSize = horizontalScale(24);
 
 export const goodHabitsCategories = [
   {
@@ -138,4 +146,69 @@ export const getCurrentWeekIndex = (data: { week: string }[]) => {
   }, weeksWithMoment[0]);
 
   return currentWeek?.index ?? 0;
+};
+
+export const Suggestion_categories: Option[] = [
+  {
+    icon: <BugIcon width={_categoriesIconSize} height={_categoriesIconSize} />,
+    value: "Bug Report",
+    label: "Bug Report",
+  },
+  {
+    icon: (
+      <FeatureIcon width={_categoriesIconSize} height={_categoriesIconSize} />
+    ),
+    label: "Features Request",
+    value: "Features Request",
+  },
+  {
+    icon: (
+      <AppPerformanceIcon
+        width={_categoriesIconSize}
+        height={_categoriesIconSize}
+      />
+    ),
+    label: "App Performances",
+    value: "App Performances",
+  },
+  {
+    icon: (
+      <UIissueIcon width={_categoriesIconSize} height={_categoriesIconSize} />
+    ),
+    label: "UI Issues",
+    value: "UI Issues",
+  },
+  {
+    icon: (
+      <LoginIssueIcon
+        width={_categoriesIconSize}
+        height={_categoriesIconSize}
+      />
+    ),
+    label: "Login/Account Issues",
+    value: "Login/Account Issues",
+  },
+  {
+    icon: (
+      <OtherIssuesIcon
+        width={_categoriesIconSize}
+        height={_categoriesIconSize}
+      />
+    ),
+    label: "Others",
+    value: "Others",
+  },
+];
+
+export const getSuggestionCategoryColor = (value: string): string => {
+  const colorMap: Record<string, string> = {
+    "Bug Report": "rgba(255, 59, 48, 1)", // Red
+    "Features Request": "rgba(0, 122, 255, 1) ", // Blue
+    "App Performances": "rgba(52, 199, 89, 1)", // Amber
+    "UI Issues": "rgba(175, 82, 222, 1)", // Purple
+    "Login/Account Issues": "rgba(255, 149, 0, 1)", // Orange
+    Others: "rgba(255, 204, 0, 1)", // Grey
+  };
+
+  return colorMap[value] || "rgba(255, 204, 0, 1)"; // Default grey
 };

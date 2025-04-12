@@ -24,7 +24,7 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
       <View
         style={[
           styles.container,
-          disabled && { backgroundColor: "#f3f3f3" },
+          disabled && { opacity: 0.7 },
           typeof safeValue === "string" &&
             safeValue.length > 0 && { borderColor: "white" },
           error
