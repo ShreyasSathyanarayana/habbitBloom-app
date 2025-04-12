@@ -1569,3 +1569,11 @@ export const updateSuggestionStatus = async (id: string, status: string) => {
   if (error) throw error;
   return true
 };
+
+export const getAboutUs = async ()=>{
+  const {data,error} =await supabase.from('profile').select('*').eq('role','admin');
+  if(error){
+    throw error;
+  }
+  return data;
+}

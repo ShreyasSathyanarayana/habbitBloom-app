@@ -66,7 +66,7 @@ const CreateSuggestion = () => {
             rules={{
               required: "Title is required",
               validate: (val) =>
-                val?.length < 30 || "can contain only 30 character",
+                val?.length < 50 || "can contain only 30 character",
             }}
             render={({
               field: { onChange, onBlur, value },

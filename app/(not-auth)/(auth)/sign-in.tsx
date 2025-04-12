@@ -37,6 +37,7 @@ const SignIn = () => {
       email: "",
       password: "",
     },
+    // mode: "all",
   });
   const { login } = useAuth();
   const mutation = useMutation({

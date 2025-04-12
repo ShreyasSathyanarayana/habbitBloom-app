@@ -59,6 +59,9 @@ const ProfileBody = () => {
         labelStyle={styles.textStyle}
       />
       <ActionSheetButton
+        onPress={() => {
+          SheetManager.show("about-us");
+        }}
         leftIcon={<AboutUsIcon width={_iconSize} height={_iconSize} />}
         buttonName={"About Us"}
         labelStyle={styles.textStyle}

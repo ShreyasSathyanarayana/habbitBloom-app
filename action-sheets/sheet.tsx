@@ -9,6 +9,7 @@ import ProfilePicSheet from "./profile/profile-pic-sheet";
 import DeleteProfilePicSheet from "./profile/delete-profile-pic-sheet";
 import SupportAndFeedbackSheet from "./profile/support-and-feedback-sheet";
 import ChangePasswordSheet from "./profile/change-password-sheet";
+import AboutUsSheet from "./profile/about-us-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -31,6 +32,7 @@ registerSheet("profile-pic", ProfilePicSheet);
 registerSheet("delete-profile-pic", DeleteProfilePicSheet);
 registerSheet("support-and-feedback", SupportAndFeedbackSheet);
 registerSheet("change-password", ChangePasswordSheet);
+registerSheet("about-us", AboutUsSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -67,5 +69,6 @@ declare module "react-native-actions-sheet" {
     "delete-profile-pic": SheetDefinition;
     "support-and-feedback": SheetDefinition;
     "change-password": SheetDefinition;
+    'about-us': SheetDefinition;
   }
 }
