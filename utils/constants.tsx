@@ -8,8 +8,10 @@ import BugIcon from "@/assets/suggestion-catergories-icon/bug-icon.svg";
 import FeatureIcon from "@/assets/suggestion-catergories-icon/feature-icon.svg";
 import AppPerformanceIcon from "@/assets/suggestion-catergories-icon/app-performance-icon.svg";
 import LoginIssueIcon from "@/assets/suggestion-catergories-icon/login-issue-icon.svg";
-import OtherIssuesIcon from "@/assets/suggestion-catergories-icon/other-issue-icon.svg";
+// import OtherIssuesIcon from "@/assets/suggestion-catergories-icon/other-issue-icon.svg";
 import UIissueIcon from "@/assets/suggestion-catergories-icon/ui-icon.svg";
+// import OtherIssuesIcon from "@/assets/svg/suggestion-description.svg";
+import OtherIssuesIcon from "@/assets/svg/categories-icon.svg";
 import OthersIcon from "@/assets/svg/others.svg";
 import { horizontalScale } from "@/metric";
 import moment from "moment";
@@ -148,57 +150,60 @@ export const getCurrentWeekIndex = (data: { week: string }[]) => {
   return currentWeek?.index ?? 0;
 };
 
-export const Suggestion_categories: Option[] = [
-  {
-    icon: <BugIcon width={_categoriesIconSize} height={_categoriesIconSize} />,
-    value: "Bug Report",
-    label: "Bug Report",
-  },
-  {
-    icon: (
-      <FeatureIcon width={_categoriesIconSize} height={_categoriesIconSize} />
-    ),
-    label: "Features Request",
-    value: "Features Request",
-  },
-  {
-    icon: (
-      <AppPerformanceIcon
-        width={_categoriesIconSize}
-        height={_categoriesIconSize}
-      />
-    ),
-    label: "App Performances",
-    value: "App Performances",
-  },
-  {
-    icon: (
-      <UIissueIcon width={_categoriesIconSize} height={_categoriesIconSize} />
-    ),
-    label: "UI Issues",
-    value: "UI Issues",
-  },
-  {
-    icon: (
-      <LoginIssueIcon
-        width={_categoriesIconSize}
-        height={_categoriesIconSize}
-      />
-    ),
-    label: "Login/Account Issues",
-    value: "Login/Account Issues",
-  },
-  {
-    icon: (
-      <OtherIssuesIcon
-        width={_categoriesIconSize}
-        height={_categoriesIconSize}
-      />
-    ),
-    label: "Others",
-    value: "Others",
-  },
-];
+  export const Suggestion_categories: Option[] = [
+    {
+      icon: <BugIcon width={_categoriesIconSize} height={_categoriesIconSize} />,
+      value: "Bug Report",
+      label: "Bug Report",
+    },
+    {
+      icon: (
+        <FeatureIcon width={_categoriesIconSize} height={_categoriesIconSize} />
+      ),
+      label: "Features Request",
+      value: "Features Request",
+    },
+    {
+      icon: (
+        <AppPerformanceIcon
+          width={_categoriesIconSize}
+          height={_categoriesIconSize}
+        />
+      ),
+      label: "App Performances",
+      value: "App Performances",
+    },
+    {
+      icon: (
+        <UIissueIcon width={_categoriesIconSize} height={_categoriesIconSize} />
+      ),
+      label: "UI Issues",
+      value: "UI Issues",
+    },
+    {
+      icon: (
+        <LoginIssueIcon
+          width={_categoriesIconSize}
+          height={_categoriesIconSize}
+        />
+      ),
+      label: "Login/Account Issues",
+      value: "Login/Account Issues",
+    },
+    {
+      icon: (
+        <OtherIssuesIcon
+          width={_categoriesIconSize}
+          height={_categoriesIconSize}
+        />
+      ),
+      label: "Others",
+      value: "Others",
+    },
+  ];
+  export const suggestionCategoryValues = Suggestion_categories.map(
+    (option) => option.value
+  );
 
 export const getSuggestionCategoryColor = (value: string): string => {
   const colorMap: Record<string, string> = {
@@ -235,3 +240,22 @@ export const Status_options: Option[] = [
     label: "In Progress 🛠️",
   },
 ];
+
+export const statusValues= [
+  {
+    value: "pending",
+    label: "Pending",
+  },
+  {
+    value: "approved",
+    label: "Approved",
+  },
+  {
+    value: "rejected",
+    label: "Rejected",
+  },
+  {
+    value: "in_progress",
+    label: "In Progress",
+  }
+]

@@ -1478,9 +1478,9 @@ export const insertSuggestion = async (suggestionDetails: SuggestionDetails) => 
   return data;
 };
 
-export const getMySuggestions = async ()=>{
+export const getMySuggestions = async (status:string)=>{
   const userId = await getUserId();
-  const { data, error } = await supabase.from("suggestions").select("*").eq("user_id", userId);
+  const { data, error } = await supabase.from("suggestions").select("*").eq("user_id", userId).eq('status',status);
   if (error) throw error;
   return data;
 }
@@ -1515,7 +1515,8 @@ export type SuggestionWithProfile = {
 
 export const getAllSuggestions = async (
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  status:string='pending',
 ): Promise<SuggestionWithProfile[]> => {
   const role = getUserRole();
   if (role !== "admin") return [];
@@ -1537,6 +1538,8 @@ export const getAllSuggestions = async (
     `
     )
     .order("created_at", { ascending: false }) // optional: latest first
+    .eq('status',status)
+    // .eq('category',category)
     .range(from, to); // 👈 this handles pagination
 
   if (error) {

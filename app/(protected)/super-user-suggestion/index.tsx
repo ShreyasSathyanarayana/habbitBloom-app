@@ -1,9 +1,13 @@
 import { deleteSuggestionByAdmin, getAllSuggestions } from "@/api/api";
+import EmptySuggestion from "@/components/module/suggestion/empty-suggestion";
+import { statusMap } from "@/components/module/suggestion/ui/status";
+import StatusList from "@/components/module/suggestion/ui/status-list";
 import SuperSuggestionCard from "@/components/module/super-suggestion/super-suggestion-card";
 import Container from "@/components/ui/container";
 import Divider from "@/components/ui/divider";
 import Header from "@/components/ui/header";
-import { horizontalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
+import { statusValues, suggestionCategoryValues } from "@/utils/constants";
 import {
   useInfiniteQuery,
   useMutation,
@@ -11,7 +15,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -25,10 +29,11 @@ const Index = () => {
   const limit = 10;
   const toast = useToast();
   const queryclient = useQueryClient();
+  const [selectedStatus, setSelectedStatus] = useState("pending");
   const getAllSuggestionQuery = useInfiniteQuery({
-    queryKey: ["getAllSuggestion"],
+    queryKey: ["getAllSuggestion", selectedStatus],
     queryFn: ({ pageParam }) => {
-      return getAllSuggestions(pageParam, limit);
+      return getAllSuggestions(pageParam, limit, selectedStatus);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
@@ -65,40 +70,68 @@ const Index = () => {
     <Container>
       <Header title="Suggestion Received" />
       <View style={styles.container}>
-        <FlatList
-          data={getAllSuggestionQuery.data?.pages?.flat()}
-          keyExtractor={(_, index) => index.toString() + "All Suggestion"}
-          renderItem={({ item }) => (
-            <SuperSuggestionCard
-              {...item}
-              handleDelete={(id) => deleteSuggestionMutation?.mutateAsync(id)}
-            />
-          )}
-          ItemSeparatorComponent={() => (
-            <Divider
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.18)",
-                marginHorizontal: horizontalScale(16),
-              }}
-            />
-          )}
-          scrollEventThrottle={16}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {
-            if (getAllSuggestionQuery?.hasNextPage) {
-              getAllSuggestionQuery?.fetchNextPage();
-            }
+        <View
+          style={{
+            padding: horizontalScale(16),
+            paddingBottom: horizontalScale(6),
+            gap: verticalScale(16),
           }}
-          ListFooterComponent={
-            getAllSuggestionQuery?.isFetchingNextPage &&
-            getAllSuggestionQuery?.hasNextPage ? (
-              <ActivityIndicator
-                color={"#8A2BE2"}
-                style={{ marginVertical: 16 }}
-              />
-            ) : null
-          }
-        />
+        >
+          <StatusList
+            selectedValue={selectedStatus}
+            data={statusValues}
+            keyName="StatusList"
+            onClick={(value) => setSelectedStatus(value)}
+          />
+          {/* <StatusList
+            selectedValue={selectedCategory}
+            data={suggestionCategoryValues}
+            keyName="categoryList"
+            onClick={(value) => setSelectedCategory(value)}
+          /> */}
+        </View>
+        {getAllSuggestionQuery?.data?.pages?.length === 0 && (
+          <EmptySuggestion />
+        )}
+        {getAllSuggestionQuery?.data?.pages &&
+          getAllSuggestionQuery?.data?.pages?.flat().length > 0 && (
+            <FlatList
+              data={getAllSuggestionQuery.data?.pages?.flat()}
+              keyExtractor={(_, index) => index.toString() + "All Suggestion"}
+              renderItem={({ item }) => (
+                <SuperSuggestionCard
+                  {...item}
+                  handleDelete={(id) =>
+                    deleteSuggestionMutation?.mutateAsync(id)
+                  }
+                />
+              )}
+              ItemSeparatorComponent={() => (
+                <Divider
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.18)",
+                    marginHorizontal: horizontalScale(16),
+                  }}
+                />
+              )}
+              scrollEventThrottle={16}
+              onEndReachedThreshold={0.5}
+              onEndReached={() => {
+                if (getAllSuggestionQuery?.hasNextPage) {
+                  getAllSuggestionQuery?.fetchNextPage();
+                }
+              }}
+              ListFooterComponent={
+                getAllSuggestionQuery?.isFetchingNextPage &&
+                getAllSuggestionQuery?.hasNextPage ? (
+                  <ActivityIndicator
+                    color={"#8A2BE2"}
+                    style={{ marginVertical: 16 }}
+                  />
+                ) : null
+              }
+            />
+          )}
       </View>
     </Container>
   );

@@ -64,6 +64,10 @@ export const TextFieldRaw = forwardRef<TextInput, TextFieldRawProps>(
           ]}
           value={safeValue}
           {...rest}
+          autoCorrect={true}
+          autoComplete="off" // Or use "sentences" or "name" if relevant
+          textContentType="none" // Can be "none", "name", "addressCity", etc.
+          autoCapitalize="sentences" // Optional, better UX
           placeholderTextColor={"rgba(81, 85, 98, 1)"}
           editable={!disabled}
         />

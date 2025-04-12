@@ -21,7 +21,7 @@ interface SuggestionCardProps {
   title: string;
   description: string | null;
   category: string;
-  status: "pending" | "approved" | "rejected"|"in_progress"; // You can expand this if needed
+  status: "pending" | "approved" | "rejected" | "in_progress"; // You can expand this if needed
   created_at: string; // ISO timestamp
   updated_at: string;
   handleDelete: (id: string) => void;
@@ -37,7 +37,6 @@ const SuggestionCard = ({
   updated_at,
   handleDelete,
 }: SuggestionCardProps) => {
-  
   return (
     <CardSwipeContainer id={id} handleDelete={handleDelete}>
       <View style={styles.container}>
@@ -49,7 +48,7 @@ const SuggestionCard = ({
         <ThemedText style={{ fontSize: getFontSize(14) }}>
           {description}
         </ThemedText>
-        <View style={styles.row}>
+        <View style={[styles.row, styles.statusContainer]}>
           <Status status={status} />
           <TimeAgoOrToday createdAt={updated_at} />
         </View>
@@ -72,6 +71,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  statusContainer: {
+    backgroundColor: "rgba(38, 50, 56, 1)",
+    paddingHorizontal: horizontalScale(12),
+    paddingVertical: horizontalScale(4),
+    borderRadius: horizontalScale(8),
   },
 });
 

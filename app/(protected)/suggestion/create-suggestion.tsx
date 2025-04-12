@@ -5,7 +5,7 @@ import TextField from "@/components/ui/TextField";
 import { horizontalScale, verticalScale } from "@/metric";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import SuggestionTitleIcon from "@/assets/svg/suggestion-title.svg";
 import SuggestionDescriptionIcon from "@/assets/svg/suggestion-description.svg";
 import DropdownField from "@/components/ui/drop-down";
@@ -28,7 +28,7 @@ const CreateSuggestion = () => {
     mode: "onChange",
   });
   const toast = useToast();
-  const queryclient = useQueryClient()
+  const queryclient = useQueryClient();
 
   const insertSuggestionMutation = useMutation({
     mutationKey: ["insertSuggestion"],
@@ -60,7 +60,10 @@ const CreateSuggestion = () => {
           padding: horizontalScale(16),
         }}
       >
-        <View style={{ gap: verticalScale(16) }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ gap: verticalScale(16) }}
+        >
           <Controller
             control={control}
             rules={{
@@ -131,6 +134,7 @@ const CreateSuggestion = () => {
                 textarea={true}
                 maxLength={200}
                 multiline
+               
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -146,7 +150,7 @@ const CreateSuggestion = () => {
             )}
             name="description"
           />
-        </View>
+        </ScrollView>
         <GradientButton
           isLoading={insertSuggestionMutation.isPending}
           disabled={insertSuggestionMutation.isPending}

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import CardSwipeContainer from "../suggestion/ui/card-swipe-container";
 import { ThemedText } from "@/components/ui/theme-text";
 import { SuggestionWithProfile } from "@/api/api";
-import { verticalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
 import CategoryChip from "../suggestion/ui/category-chip";
 import TimeAgoOrToday from "../suggestion/ui/TimeAgoOrToday";
@@ -27,7 +27,7 @@ const SuperSuggestionCard = ({
       <Pressable
         onPress={() =>
           router.push(
-            `/(protected)/super-user-suggestion/update-suggestion?title=${title}&categories=${category}&description=${description}&status=${status}&id=${id}`
+            `/(protected)/super-user-suggestion/update-suggestion?title=${title}&categories=${category}&description=${description}&status=${status}&id=${id}&full_name=${profile.full_name}&email=${profile.email}`
           )
         }
         style={styles.container}
@@ -43,7 +43,7 @@ const SuperSuggestionCard = ({
         <ThemedText style={{ fontSize: getFontSize(14) }}>
           {description}
         </ThemedText>
-        <View style={styles.row}>
+        <View style={[styles.row, styles.statusContainer]}>
           <Status status={status} />
           <TimeAgoOrToday createdAt={updated_at} />
         </View>
@@ -61,6 +61,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  statusContainer: {
+    backgroundColor: "rgba(38, 50, 56, 1)",
+    paddingHorizontal: horizontalScale(12),
+    paddingVertical: horizontalScale(4),
+    borderRadius: horizontalScale(8),
   },
 });
 

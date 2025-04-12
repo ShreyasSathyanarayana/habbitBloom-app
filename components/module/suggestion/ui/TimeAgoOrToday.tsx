@@ -24,7 +24,7 @@ const TimeAgoOrToday: React.FC<TimeAgoOrTodayProps> = ({
   return (
     <Text
       style={[
-        { color: "rgba(255, 255, 255, 1)", fontSize: getFontSize(12) },
+        { color: "rgba(118, 118, 118, 1)", fontSize: getFontSize(12) },
         style,
       ]}
     >

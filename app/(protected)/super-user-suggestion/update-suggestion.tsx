@@ -5,7 +5,7 @@ import TextField from "@/components/ui/TextField";
 import { horizontalScale, verticalScale } from "@/metric";
 import React, { useEffect, useState } from "react";
 import { Controller, set, useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import SuggestionTitleIcon from "@/assets/svg/suggestion-title.svg";
 import SuggestionDescriptionIcon from "@/assets/svg/suggestion-description.svg";
 import DropdownField from "@/components/ui/drop-down";
@@ -17,16 +17,21 @@ import { router } from "expo-router";
 import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
 import StatusIcon from "@/assets/svg/status-icon.svg";
 import { updateSuggestionStatus } from "@/api/api";
+import { ThemedText } from "@/components/ui/theme-text";
+import { getFontSize } from "@/font";
 const _iconSize = horizontalScale(24);
 
 const UpdateSuggestion = () => {
-  const { title, categories, description, status, id } = useLocalSearchParams<{
-    title: string;
-    categories: string;
-    description: string;
-    status: string;
-    id: string;
-  }>();
+  const { title, categories, description, status, id, full_name, email } =
+    useLocalSearchParams<{
+      title: string;
+      categories: string;
+      description: string;
+      status: string;
+      id: string;
+      full_name: string;
+      email: string;
+    }>();
   const { control, watch, handleSubmit, setValue } = useForm({
     defaultValues: {
       categories: "",
@@ -76,14 +81,20 @@ const UpdateSuggestion = () => {
           padding: horizontalScale(16),
         }}
       >
-        <View style={{ gap: verticalScale(16) }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ gap: verticalScale(16) }}
+        >
+          <ThemedText style={{ fontSize: getFontSize(14) }}>
+            {full_name} {`(${email})`}
+          </ThemedText>
           <Controller
             control={control}
-            rules={{
-              required: "Title is required",
-              validate: (val) =>
-                val?.length < 30 || "can contain only 30 character",
-            }}
+            // rules={{
+            //   required: "Title is required",
+            //   validate: (val) =>
+            //     val?.length < 30 || "can contain only 30 character",
+            // }}
             render={({
               field: { onChange, onBlur, value },
               formState: { errors },
@@ -111,7 +122,7 @@ const UpdateSuggestion = () => {
           <Controller
             control={control}
             name="categories"
-            rules={{ required: "Category is required" }}
+            // rules={{ required: "Category is required" }}
             render={({ field: { onChange, value }, formState: { errors } }) => (
               <DropdownField
                 disabled
@@ -131,12 +142,12 @@ const UpdateSuggestion = () => {
           />
           <Controller
             control={control}
-            rules={{
-              // required: "Habit Name is required",
-              required: "Suggestion is Required",
-              validate: (val) =>
-                val?.length < 200 || "can contain only 200 character",
-            }}
+            // rules={{
+            //   // required: "Habit Name is required",
+            //   required: "Suggestion is Required",
+            //   validate: (val) =>
+            //     val?.length < 200 || "can contain only 200 character",
+            // }}
             render={({
               field: { onChange, onBlur, value },
               formState: { errors },
@@ -183,7 +194,7 @@ const UpdateSuggestion = () => {
               />
             )}
           />
-        </View>
+        </ScrollView>
         <GradientButton
           isLoading={updateSuggestionMutation?.isPending}
           disabled={updateSuggestionMutation?.isPending}

@@ -82,11 +82,24 @@ const DropdownField = ({
           disabled={disabled}
           activeOpacity={0.8}
         >
-          {leftIcon && leftIcon}
-          <Text style={[styles.text, !value && { color: "#aaa" }]}>
+          {/* {leftIcon && leftIcon} */}
+          {leftIcon &&
+            React.isValidElement(leftIcon) &&
+            React.cloneElement(leftIcon, {
+              width: horizontalScale(24),
+              height: horizontalScale(24),
+              opacity: value ? 1 : 0.5,
+            })}
+          <Text
+            style={[styles.text, !value && { color: "rgba(81, 85, 98, 1)" }]}
+          >
             {options.find((opt) => opt.value === value)?.label || placeholder}
           </Text>
-          <UpdownActiveIcon width={_iconSize} height={_iconSize} />
+          <UpdownActiveIcon
+            width={_iconSize}
+            height={_iconSize}
+            opacity={value ? 1 : 0.5}
+          />
         </TouchableOpacity>
       </Label>
 

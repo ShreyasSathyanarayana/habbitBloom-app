@@ -46,8 +46,10 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
       closeSheet();
       queryClient.invalidateQueries({ queryKey: ["userDetails"] });
     },
-    onError: () => {
+    onError: (error) => {
       closeSheet();
+      console.log(error.message);
+      
       toast.show("Something went wrong", {
         type: "warning",
       });

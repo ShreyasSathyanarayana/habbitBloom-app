@@ -1,13 +1,13 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import EmptyHabit from "@/assets/svg/empty-habit.svg";
+import EmptySuggestionIcon from "@/assets/svg/empty-suggestion.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { ThemedText } from "@/components/ui/theme-text";
 
 const EmptySuggestion = () => {
   return (
     <View style={styles.container}>
-      <EmptyHabit />
+      <EmptySuggestionIcon />
       <ThemedText style={{ fontFamily: "PoppinsMedium", textAlign: "center" }}>
         Help us improve! Tap the + button to send a suggestion or report an
         issue.

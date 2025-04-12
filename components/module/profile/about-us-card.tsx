@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     gap: verticalScale(8),
     // backgroundColor: "red",
     padding: horizontalScale(8),
+    justifyContent:'space-around'
   },
 });
 
