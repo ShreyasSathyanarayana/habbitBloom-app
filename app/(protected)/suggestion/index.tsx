@@ -3,19 +3,24 @@ import SuggestionCard from "@/components/module/suggestion/suggestion-card";
 import Container from "@/components/ui/container";
 import Divider from "@/components/ui/divider";
 import Header from "@/components/ui/header";
-import { ThemedText } from "@/components/ui/theme-text";
-import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import PlusIcon from "@/assets/svg/add-icon.svg";
 import { useToast } from "react-native-toast-notifications";
 import EmptySuggestion from "@/components/module/suggestion/empty-suggestion";
 import StatusList from "@/components/module/suggestion/ui/status-list";
-import { statusMap } from "@/components/module/suggestion/ui/status";
 import { statusValues } from "@/utils/constants";
+import Loading from "@/components/ui/loading";
 const _iconSize = horizontalScale(24);
 const Index = () => {
   const [selectedStatus, setSelectedStatus] = useState("pending");
@@ -77,10 +82,10 @@ const Index = () => {
             onClick={(value) => setSelectedStatus(value)}
           />
         </View>
-        {mySuggestionQuery?.data?.length == 0 ? (
-          <EmptySuggestion />
-        ) : (
-          <>
+        {mySuggestionQuery?.isLoading && <Loading />}
+        {mySuggestionQuery?.data?.length == 0 && <EmptySuggestion />}
+        {(mySuggestionQuery?.data?.length ?? 0) > 0 &&
+          !mySuggestionQuery?.isLoading && (
             <FlatList
               data={mySuggestionQuery?.data}
               keyExtractor={(_, index) => index.toString() + "SuggestionList"}
@@ -100,9 +105,16 @@ const Index = () => {
                   }}
                 />
               )}
+              refreshControl={
+                <RefreshControl
+                  refreshing={mySuggestionQuery?.isRefetching}
+                  onRefresh={mySuggestionQuery?.refetch}
+                  colors={["#8A2BE2"]} // Android spinner color
+                  tintColor="white" // iOS spinner color
+                />
+              }
             />
-          </>
-        )}
+          )}
       </View>
     </Container>
   );

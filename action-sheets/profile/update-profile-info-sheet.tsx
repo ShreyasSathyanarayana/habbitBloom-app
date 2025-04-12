@@ -91,8 +91,8 @@ const UpdateProfileInfoSheet = (props: SheetProps<"update-profile-info">) => {
           }) => (
             <TextField
               // key={"habitName"}
-              label="Description (Optional)"
-              placeholder="Description here"
+              label="Bio"
+              placeholder="Bio"
               numberOfLines={5}
               textarea={true}
               maxLength={100}

@@ -6,6 +6,7 @@ import SuperSuggestionCard from "@/components/module/super-suggestion/super-sugg
 import Container from "@/components/ui/container";
 import Divider from "@/components/ui/divider";
 import Header from "@/components/ui/header";
+import Loading from "@/components/ui/loading";
 import { horizontalScale, verticalScale } from "@/metric";
 import { statusValues, suggestionCategoryValues } from "@/utils/constants";
 import {
@@ -19,6 +20,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -90,11 +92,11 @@ const Index = () => {
             onClick={(value) => setSelectedCategory(value)}
           /> */}
         </View>
-        {getAllSuggestionQuery?.data?.pages?.length === 0 && (
-          <EmptySuggestion />
-        )}
-        {getAllSuggestionQuery?.data?.pages &&
-          getAllSuggestionQuery?.data?.pages?.flat().length > 0 && (
+        {getAllSuggestionQuery?.isLoading && <Loading />}
+        {getAllSuggestionQuery?.data?.pages?.flat().length === 0 &&
+          !getAllSuggestionQuery?.isLoading && <EmptySuggestion />}
+        {(getAllSuggestionQuery?.data?.pages?.flat().length ?? 0) > 0 &&
+          !getAllSuggestionQuery?.isLoading && (
             <FlatList
               data={getAllSuggestionQuery.data?.pages?.flat()}
               keyExtractor={(_, index) => index.toString() + "All Suggestion"}
@@ -106,6 +108,14 @@ const Index = () => {
                   }
                 />
               )}
+              refreshControl={
+                <RefreshControl
+                  refreshing={getAllSuggestionQuery?.isRefetching}
+                  onRefresh={getAllSuggestionQuery?.refetch}
+                  colors={["#8A2BE2"]} // Android spinner color
+                  tintColor="white" // iOS spinner color
+                />
+              }
               ItemSeparatorComponent={() => (
                 <Divider
                   style={{
