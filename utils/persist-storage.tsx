@@ -20,3 +20,8 @@ export const getPassword = () => {
 export const setPassword = (password: string) => {
   return storage.set(tokenKeys.password, password);
 };
+
+export const getUserRole = () => {
+  return storage.getString(tokenKeys.role);
+  // console.log("User Role from storage:", data, error);
+};

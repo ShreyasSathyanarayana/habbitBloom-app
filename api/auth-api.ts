@@ -1,5 +1,6 @@
 // import { supabase } from "@/lib/supabaseClient";
 
+import { getUserId } from "@/utils/persist-storage";
 import { supabase } from "@/utils/SupaLegend";
 
 // ✅ Step 1: Send OTP to the user's phone
@@ -120,4 +121,14 @@ export const signIn = async (email: string, password: string) => {
 
   return data;
 };
+
+export const getUserRole = async (id:string)=>{
+  // const userId = await getUserId();
+  const { data, error } = await supabase.from("profile").select("role").eq("id", id).single();
+  if(error){
+    throw error;
+  }
+  return data;
+}
+
 

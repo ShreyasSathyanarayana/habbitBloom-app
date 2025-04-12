@@ -22,6 +22,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { SheetManager } from "react-native-actions-sheet";
 import { openAppSettings } from "@/utils/permission";
 import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
@@ -48,6 +49,15 @@ const ProfileBody = () => {
         buttonName={"Suggestion Box"}
         labelStyle={styles.textStyle}
       /> */}
+      <ActionSheetButton
+        onPress={() => {
+          // closeSheet();
+          router.push("/(protected)/suggestion");
+        }}
+        leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
+        buttonName={"Suggestion Box"}
+        labelStyle={styles.textStyle}
+      />
       <ActionSheetButton
         leftIcon={<AboutUsIcon width={_iconSize} height={_iconSize} />}
         buttonName={"About Us"}

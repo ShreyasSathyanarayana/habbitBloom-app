@@ -10,23 +10,27 @@ import ShareIcon from "@/assets/svg/share-icon.svg";
 import RateAppIcon from "@/assets/svg/rate-icon.svg";
 import { getFontSize } from "@/font";
 import { router } from "expo-router";
+import { getUserRole } from "@/utils/persist-storage";
 const _iconSize = horizontalScale(24);
 const closeSheet = () => {
   SheetManager.hide("support-and-feedback");
 };
 const SupportAndFeedbackSheet = (props: SheetProps<"support-and-feedback">) => {
+  const userRole = getUserRole();
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
       <View style={{ gap: verticalScale(24) }}>
-        <ActionSheetButton
-          onPress={() => {
-            closeSheet();
-            router.push("/(protected)/suggestion");
-          }}
-          leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
-          buttonName={"Suggestion Box"}
-          labelStyle={styles.textStyle}
-        />
+        {userRole === "admin" && (
+          <ActionSheetButton
+            onPress={() => {
+              closeSheet();
+              router.push("/(protected)/super-user-suggestion");
+            }}
+            leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
+            buttonName={"Suggestion Box"}
+            labelStyle={styles.textStyle}
+          />
+        )}
         <ActionSheetButton
           leftIcon={<ShareIcon width={_iconSize} height={_iconSize} />}
           buttonName={"Share Our App"}

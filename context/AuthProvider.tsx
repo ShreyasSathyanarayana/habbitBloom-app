@@ -4,6 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
 import { useQueryClient } from "@tanstack/react-query";
 import { storage } from "@/utils/storage";
+import { getUserRole } from "@/api/auth-api";
 
 interface Login {
   accessToken: string;
@@ -23,6 +24,7 @@ export const tokenKeys = {
   refreshToken: "user.refreshToken",
   password: "user.password",
   loginMode: "user.loginMode",
+  role: "user.role",
 };
 
 const AuthContext = createContext<AuthContext | null>(null);
@@ -46,6 +48,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       if (loginMode === "normal") {
         storage.set(tokenKeys.password, password);
       }
+      const role = await getUserRole(accessToken);
+      console.log("role", role);
+      role?.role && storage.set(tokenKeys.role, role?.role);
 
       // Store tokens in SecureStore (Offload to background)
       // await Promise.all([
@@ -77,6 +82,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       storage.delete(tokenKeys.refreshToken);
       storage.delete(tokenKeys.password);
       storage.delete(tokenKeys.loginMode);
+      storage.delete(tokenKeys.role);
 
       // setUserId("");
 

@@ -45,7 +45,7 @@ const Index = () => {
   return (
     <Container>
       <Header
-        title="Suggestion"
+        title="Suggestion List"
         rightIcon={
           <TouchableOpacity
             // style={{ padding: horizontalScale(5) }}

@@ -212,3 +212,26 @@ export const getSuggestionCategoryColor = (value: string): string => {
 
   return colorMap[value] || "rgba(255, 204, 0, 1)"; // Default grey
 };
+
+export const Status_options: Option[] = [
+  {
+    icon: null,
+    value: "pending",
+    label: "Pending ⏳",
+  },
+  {
+    icon: null,
+    value: "approved",
+    label: "Resolved ✅",
+  },
+  {
+    icon: null,
+    value: "rejected",
+    label: "Rejected ❌",
+  },
+  {
+    icon: null,
+    value: "in_progress",
+    label: "In Progress 🛠️",
+  },
+];

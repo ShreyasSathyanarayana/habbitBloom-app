@@ -21,7 +21,7 @@ interface SuggestionCardProps {
   title: string;
   description: string | null;
   category: string;
-  status: "pending" | "approved" | "rejected"; // You can expand this if needed
+  status: "pending" | "approved" | "rejected"|"in_progress"; // You can expand this if needed
   created_at: string; // ISO timestamp
   updated_at: string;
   handleDelete: (id: string) => void;

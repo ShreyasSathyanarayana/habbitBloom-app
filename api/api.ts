@@ -1,6 +1,6 @@
 import { supabase } from "@/utils/SupaLegend";
 import { DateUtils } from "@/utils/constants";
-import { getUserId } from "@/utils/persist-storage";
+import { getUserId, getUserRole } from "@/utils/persist-storage";
 import moment from "moment";
 
 type CreateHabitSchema = {
@@ -1488,6 +1488,84 @@ export const getMySuggestions = async ()=>{
 export const deleteSuggestionById = async (id: string) => {
   const userId = await getUserId();
   const { error } = await supabase.from("suggestions").delete().eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+  return true
+};
+
+export type SuggestionWithProfile = {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  status:  "pending" | "approved" | "rejected"|"in_progress";
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  profile: {
+    id: string;
+    email: string;
+    mobile: string;
+    full_name: string;
+  };
+};
+
+
+
+/***************************************** Super User Suggestion *****************************************/
+
+export const getAllSuggestions = async (
+  page: number = 1,
+  limit: number = 10
+): Promise<SuggestionWithProfile[]> => {
+  const role = getUserRole();
+  if (role !== "admin") return [];
+
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error } = await supabase
+    .from("suggestions")
+    .select(
+      `
+      *,
+      profile (
+        id,
+        full_name,
+        email,
+        mobile
+      )
+    `
+    )
+    .order("created_at", { ascending: false }) // optional: latest first
+    .range(from, to); // 👈 this handles pagination
+
+  if (error) {
+    console.log(error);
+    throw error;
+  }
+
+  return data;
+};
+
+
+export const deleteSuggestionByAdmin = async (id: string) => {
+  const role = getUserRole();
+  if(role!='admin'){
+    throw Error('You are not authorized to delete this suggestion')
+  }
+  const { error } = await supabase.from("suggestions").delete().eq("id", id);
+  if (error) throw error;
+  return true
+};
+
+
+export const updateSuggestionStatus = async (id: string, status: string) => {
+  const role = getUserRole();
+  if(role!='admin'){
+    throw Error('You are not authorized to update this suggestion')
+  }
+  
+  const { error } = await supabase.from("suggestions").update({ status,updated_at:new Date().toISOString()}).eq("id", id);
   if (error) throw error;
   return true
 };

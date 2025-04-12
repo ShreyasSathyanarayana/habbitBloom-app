@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
@@ -53,6 +53,10 @@ const DropdownField = ({
     setSelectedLabel(option.label);
     actionSheetRef.current?.hide();
   };
+  useEffect(() => {
+    const selectedOption = options.find((opt) => opt.value === value);
+    setSelectedLabel(selectedOption?.label || "");
+  }, [value, options]);
 
   return (
     <>
@@ -66,8 +70,8 @@ const DropdownField = ({
         <TouchableOpacity
           style={[
             styles.container,
-            selectedLabel && { borderColor: "#FFFF" },
-            disabled && { backgroundColor: "#f3f3f3" },
+            value && { borderColor: "#FFFF" },
+            disabled && { opacity: 0.8 },
             error
               ? { borderColor: "rgba(255, 0, 0, 1)" }
               : success
