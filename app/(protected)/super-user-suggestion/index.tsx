@@ -110,7 +110,10 @@ const Index = () => {
               )}
               refreshControl={
                 <RefreshControl
-                  refreshing={getAllSuggestionQuery?.isRefetching}
+                  refreshing={
+                    !getAllSuggestionQuery?.isLoading &&
+                    getAllSuggestionQuery?.isRefetching
+                  }
                   onRefresh={getAllSuggestionQuery?.refetch}
                   colors={["#8A2BE2"]} // Android spinner color
                   tintColor="white" // iOS spinner color

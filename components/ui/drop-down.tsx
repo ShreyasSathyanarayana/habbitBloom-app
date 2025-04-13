@@ -102,42 +102,43 @@ const DropdownField = ({
           />
         </TouchableOpacity>
       </Label>
-
-      <ActionSheet
-        ref={actionSheetRef}
-        containerStyle={{
-          backgroundColor: "black", // Fix for Android transparency issue
-          paddingBottom: horizontalScale(16),
-          paddingHorizontal: horizontalScale(16),
-          // paddingVertical: verticalScale(24),
-        }}
-        indicatorStyle={{
-          backgroundColor: "white",
-          marginTop: verticalScale(16),
-          width: horizontalScale(80),
-          marginBottom: verticalScale(24),
-        }}
-        gestureEnabled={true}
-      >
-        <FlatList
-          data={options}
-          keyExtractor={(item) => item.value}
-          contentContainerStyle={{
-            gap: verticalScale(24),
+      <View>
+        <ActionSheet
+          ref={actionSheetRef}
+          containerStyle={{
+            backgroundColor: "black", // Fix for Android transparency issue
+            paddingBottom: horizontalScale(16),
+            paddingHorizontal: horizontalScale(16),
+            // paddingVertical: verticalScale(24),
           }}
-          style={{
-            paddingBottom: verticalScale(16),
+          indicatorStyle={{
+            backgroundColor: "white",
+            marginTop: verticalScale(16),
+            width: horizontalScale(80),
+            marginBottom: verticalScale(24),
           }}
-          renderItem={({ item }) => (
-            <ActionSheetButton
-              buttonName={item.label}
-              onPress={() => handleSelect(item)}
-              leftIcon={item?.icon ?? null}
-              selected={item.value === value}
-            />
-          )}
-        />
-      </ActionSheet>
+          gestureEnabled={true}
+        >
+          <FlatList
+            data={options}
+            keyExtractor={(item) => item.value}
+            contentContainerStyle={{
+              gap: verticalScale(24),
+            }}
+            style={{
+              paddingBottom: verticalScale(16),
+            }}
+            renderItem={({ item }) => (
+              <ActionSheetButton
+                buttonName={item.label}
+                onPress={() => handleSelect(item)}
+                leftIcon={item?.icon ?? null}
+                selected={item.value === value}
+              />
+            )}
+          />
+        </ActionSheet>
+      </View>
     </>
   );
 };

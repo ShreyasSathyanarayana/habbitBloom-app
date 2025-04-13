@@ -4,10 +4,10 @@ import { StyleSheet, View } from "react-native";
 import StreakIcon from "@/assets/svg/streak-icon.svg";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
-import Divider from "@/components/ui/divider";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
 import StreakValue from "../streak-value";
+import { Divider } from "@rneui/base";
 type Props = {
   habitId: string;
 };
@@ -37,35 +37,26 @@ const StreakDetails = ({ habitId }: Props) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          //   justifyContent: "space-around",
-          justifyContent: "center",
+          justifyContent: "space-around",
+          // justifyContent: "center",
           paddingBottom: verticalScale(16),
         }}
       >
         <View style={styles.column}>
           <ThemedText style={styles.title}>Current</ThemedText>
-          {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
-            <ThemedText style={styles.numberStyle}>
-              {getHabitStatsQuery?.data?.streak}
-            </ThemedText>{" "}
-            Days
-          </ThemedText> */}
           <StreakValue streakDays={getHabitStatsQuery?.data?.streak ?? 0} />
         </View>
+
         <Divider
           style={{
-            width: verticalScale(100),
+            // backgroundColor: "red",
+            width: verticalScale(90),
             transform: [{ rotate: "90deg" }],
           }}
         />
+
         <View style={styles.column}>
           <ThemedText style={styles.title}>Best</ThemedText>
-          {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
-            <ThemedText style={styles.numberStyle}>
-              {getHabitStatsQuery?.data?.highestStreak}
-            </ThemedText>{" "}
-            Days
-          </ThemedText> */}
           <StreakValue
             streakDays={getHabitStatsQuery?.data?.highestStreak ?? 0}
           />

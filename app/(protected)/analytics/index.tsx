@@ -5,8 +5,7 @@ import CalenderAnalytics from "@/components/module/analytics-screen/calender-ana
 import StatisticsAnalytics from "@/components/module/analytics-screen/statistics/statistics-analytics";
 import NoInternet from "@/components/module/errors/no-internet";
 import Container from "@/components/ui/container";
-import Header from "@/components/ui/header";
-import { ThemedText } from "@/components/ui/theme-text";
+
 import { useAuth } from "@/context/AuthProvider";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
@@ -59,42 +58,26 @@ const Analytics = () => {
           menu={menu}
           selectedMenu={category as string}
           onChangeMenu={(item, index) => {
+            // console.log(index);
+
             setSelectedOption(item);
-            pagerRef.current?.setPage(index);
+            pagerRef.current?.setPageWithoutAnimation(index);
           }}
         />
-        {Platform.OS == "ios" && (
-          <>
-            {selectedOption === "Calendar" && (
-              <View style={{ flex: 1 }}>
-                <CalenderAnalytics habitId={id as string} />
-              </View>
-            )}
-            {selectedOption === "Statistics" && (
-              <View style={{ flex: 1 }}>
-                <StatisticsAnalytics
-                  habitId={id as string}
-                  habitHasEndDate={
-                    getHabitDetailsQuery?.data?.end_date ? true : false
-                  }
-                />
-              </View>
-            )}
-          </>
-        )}
 
-        {Platform.OS != "ios" && (
+        {
           <PagerView
             ref={pagerRef}
             scrollEnabled={false}
             initialPage={category === "Calendar" ? 0 : 1}
             style={{ flex: 1 }}
             offscreenPageLimit={2}
+            overdrag={true}
           >
-            <View key="1" style={{ flex: 1 }}>
+            <View key="calendar" style={{ flex: 1 }}>
               <CalenderAnalytics habitId={id as string} />
             </View>
-            <View key="2" style={{ flex: 1 }}>
+            <View key="stats" style={{ flex: 1 }}>
               <StatisticsAnalytics
                 habitId={id as string}
                 habitHasEndDate={
@@ -103,7 +86,7 @@ const Analytics = () => {
               />
             </View>
           </PagerView>
-        )}
+        }
       </View>
     </Container>
   );

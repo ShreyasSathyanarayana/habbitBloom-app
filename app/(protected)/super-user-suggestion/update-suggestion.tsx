@@ -72,20 +72,28 @@ const UpdateSuggestion = () => {
   // console.log(id);
 
   return (
-    <Container>
+    <Container style={{ flex: 1 }}>
       <Header title="Suggestion Box" />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "space-between",
-          padding: horizontalScale(16),
-        }}
-      >
+      <View style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ gap: verticalScale(16) }}
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            flex: 1,
+            padding: horizontalScale(16),
+            gap: verticalScale(16),
+          }}
+          scrollEnabled
         >
-          <ThemedText style={{ fontSize: getFontSize(14) }}>
+          {/* <View
+          style={{
+            // flex: 1,
+            // justifyContent: "space-between",
+            padding: horizontalScale(16),
+          }}
+        > */}
+          {/* <View style={{ gap: verticalScale(16) }}> */}
+          <ThemedText numberOfLines={1} style={{ fontSize: getFontSize(14) }}>
             {full_name} {`(${email})`}
           </ThemedText>
           <Controller
@@ -194,15 +202,17 @@ const UpdateSuggestion = () => {
               />
             )}
           />
+          {/* </View> */}
+          <GradientButton
+            isLoading={updateSuggestionMutation?.isPending}
+            disabled={updateSuggestionMutation?.isPending}
+            title="DONE"
+            onPress={handleSubmit((data) =>
+              updateSuggestionMutation?.mutateAsync()
+            )}
+          />
+          {/* </View> */}
         </ScrollView>
-        <GradientButton
-          isLoading={updateSuggestionMutation?.isPending}
-          disabled={updateSuggestionMutation?.isPending}
-          title="DONE"
-          onPress={handleSubmit((data) =>
-            updateSuggestionMutation?.mutateAsync()
-          )}
-        />
       </View>
     </Container>
   );

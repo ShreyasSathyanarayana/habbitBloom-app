@@ -4,12 +4,10 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import StreakDetails from "./streak-details";
 import Divider from "@/components/ui/divider";
 import TimesCompleted from "./times-completed";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import StatisticsMonth from "./statistics-month";
 import StatisticsYearly from "./statistics-yearly";
 import StreakChallenge from "./streak-challenge";
 import SuccessFailAnalytics from "./success-fail-analytics";
-import HabitScore from "./habit-score";
 
 type Props = {
   habitId: string;
