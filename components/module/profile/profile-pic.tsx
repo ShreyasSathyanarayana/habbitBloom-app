@@ -5,6 +5,7 @@ import PremiumProfileIcon from "@/assets/svg/premium-profile-icon.svg";
 import { horizontalScale } from "@/metric";
 import { SheetManager } from "react-native-actions-sheet";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 const _iconSize = horizontalScale(32);
 const _premiumIconSize = horizontalScale(40);
 type Props = {
@@ -20,6 +21,10 @@ const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 
 const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
   const onPress = () => {
+    if (!profilePic) {
+      router.push(`/(protected)/change-profile-pic`);
+      return;
+    }
     SheetManager.show("profile-pic", {
       payload: { profile_pic: profilePic },
     });

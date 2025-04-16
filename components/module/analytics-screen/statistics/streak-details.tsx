@@ -37,8 +37,8 @@ const StreakDetails = ({ habitId }: Props) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "space-around",
-          // justifyContent: "center",
+          // justifyContent: "space-around",
+          justifyContent: "center",
           paddingBottom: verticalScale(16),
         }}
       >
@@ -48,10 +48,12 @@ const StreakDetails = ({ habitId }: Props) => {
         </View>
 
         <Divider
+        // color="rgba(138, 43, 226, 0.24)"
           style={{
             // backgroundColor: "red",
             width: verticalScale(90),
             transform: [{ rotate: "90deg" }],
+            // backgroundColor: "rgba(138, 43, 226, 0.24)",
           }}
         />
 

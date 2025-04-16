@@ -8,6 +8,7 @@ const BackButton = ({ style }: TouchableOpacityProps) => {
   const router = useRouter();
   return (
     <TouchableOpacity
+      hitSlop={20}
       onPress={() => router.back()}
       style={[{ marginBottom: 28, left: -10 }, style]}
     >

@@ -9,33 +9,45 @@ import { getAvatarImages, updateProfilePic } from "@/api/api";
 import { FlatList, SheetManager } from "react-native-actions-sheet";
 import AlertButton from "@/action-sheets/alert-button";
 import { useToast } from "react-native-toast-notifications";
+import { router } from "expo-router";
+import { getUserRole, isUserSubscribed } from "@/utils/persist-storage";
 
 type Props = {
   currentProfilePic: string | null;
 };
 const closeSheet = () => {
-  SheetManager.hide("profile-pic");
+  // SheetManager.hide("profile-pic");
+  router.back();
 };
 
 const AvatarSection = ({ currentProfilePic }: Props) => {
+  // const role = getUserRole();
+  const isSubscribed = isUserSubscribed();
   const queryClient = useQueryClient();
   const toast = useToast();
   const getAvatarImagesQuery = useQuery({
     queryKey: ["getAvatarImages"],
     queryFn: () => getAvatarImages(),
   });
-  //   console.log(
-  //     "getAvatarImagesQuery",
-  //     JSON.stringify(getAvatarImagesQuery.data, null, 2)
-  //   );
+  // console.log(
+  //   "getAvatarImagesQuery",
+  //   JSON.stringify(getAvatarImagesQuery.data, null, 2)
+  // );
   const [profilePic, setProfilePic] = React.useState<string | null>(
     currentProfilePic
   );
+
   useEffect(() => {
-    if (getAvatarImagesQuery?.data && !currentProfilePic) {
-      setProfilePic(getAvatarImagesQuery?.data[0]?.avatar_url);
-    } else if (currentProfilePic) {
+    // If currentProfilePic is a valid URL
+    if (currentProfilePic) {
       setProfilePic(currentProfilePic);
+    }
+    // If currentProfilePic is null and avatar images have been loaded
+    else if (
+      !currentProfilePic &&
+      getAvatarImagesQuery?.data?.[0]?.avatar_url
+    ) {
+      setProfilePic(getAvatarImagesQuery.data[0].avatar_url);
     }
   }, [getAvatarImagesQuery?.data, currentProfilePic]);
 
@@ -49,16 +61,17 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
     onError: (error) => {
       closeSheet();
       console.log(error.message);
-      
+
       toast.show("Something went wrong", {
         type: "warning",
       });
     },
   });
+  // console.log("currentProfilePic", currentProfilePic);
 
   return (
     <View style={styles.container}>
-      <ThemedText
+      {/* <ThemedText
         style={{
           fontSize: getFontSize(18),
           fontFamily: "PoppinsSemiBold",
@@ -66,9 +79,13 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
         }}
       >
         Avatars
-      </ThemedText>
+      </ThemedText> */}
       <View style={{ alignItems: "center" }}>
-        <AvatarImage imageType="View" imageUri={profilePic} />
+        <AvatarImage
+          imageType="View"
+          imageUri={profilePic}
+          isSubscribed={isSubscribed}
+        />
       </View>
       <FlatList
         // horizontal
@@ -83,12 +100,18 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
           gap: horizontalScale(10),
         }}
         renderItem={({ item }) => {
+          // console.log(item?.avatar_url === profilePic);
+
           return (
             <TouchableOpacity onPress={() => setProfilePic(item?.avatar_url)}>
               <AvatarImage
+                isSubscribed={item?.is_subscribed_only}
                 imageType="Option"
                 imageUri={item?.avatar_url}
-                selected={item?.avatar_url === profilePic}
+                selected={
+                  decodeURIComponent(item?.avatar_url) ===
+                  decodeURIComponent(profilePic ?? "") // this compare by removing spaces from the url
+                }
               />
             </TouchableOpacity>
           );
@@ -108,6 +131,8 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
 const styles = StyleSheet.create({
   container: {
     gap: verticalScale(30),
+    justifyContent: "space-between",
+    flex: 1,
   },
 });
 

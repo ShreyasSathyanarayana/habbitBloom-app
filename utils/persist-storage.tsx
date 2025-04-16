@@ -25,3 +25,11 @@ export const getUserRole = () => {
   return storage.getString(tokenKeys.role);
   // console.log("User Role from storage:", data, error);
 };
+
+export const isUserSubscribed = () => {
+  const role = getUserRole();
+  if (role == "user") {
+    return false;
+  }
+  return true;
+};
