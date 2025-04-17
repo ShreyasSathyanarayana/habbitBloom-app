@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
 import PlusIcon from "@/assets/svg/plus-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -21,6 +21,8 @@ import { useAuth } from "@/context/AuthProvider";
 import NoInternet from "@/components/module/errors/no-internet";
 import { LinearGradient } from "expo-linear-gradient";
 import { HabitProp } from "@/components/module/habit-screen/habit-card";
+import * as Notifications from "expo-notifications";
+import AllowPermissionModal from "@/components/modal/allow-permission-modal";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
@@ -35,10 +37,23 @@ export default function HabitsScreen() {
     "latest" | "alphabetical"
   >("latest");
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-  const [habitList, setHabitList] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [showNotificationPermissionModal, setShowNotificationPermissionModal] =
+    useState(false);
+
   const limit = 5;
+  useEffect(() => {
+    getNotificationPermission();
+  }, []);
+
+  const getNotificationPermission = async () => {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    console.log("existingStatus", existingStatus);
+
+    setShowNotificationPermissionModal(
+      existingStatus === Notifications.PermissionStatus.DENIED
+    );
+  };
 
   const getHabitQuery = useInfiniteQuery({
     queryKey: ["habitList", isConnected, selectedFilter],
@@ -101,10 +116,15 @@ export default function HabitsScreen() {
         }
         habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]} // for pagination
         onRefresh={getHabitQuery.refetch}
-        isRefreshing={isRefreshing}
+        isRefreshing={getHabitQuery?.isFetchingNextPage}
         isNextPageAvailable={getHabitQuery.hasNextPage}
         onScrollEnd={getHabitQuery.fetchNextPage}
         isFetchingNextPage={getHabitQuery.isFetchingNextPage}
+      />
+      <AllowPermissionModal
+        isModalVisible={showNotificationPermissionModal}
+        permissionType="Notifications"
+        onClose={() => setShowNotificationPermissionModal(false)}
       />
 
       {/* Floating Button with Animation */}

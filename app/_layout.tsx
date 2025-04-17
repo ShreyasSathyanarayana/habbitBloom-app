@@ -80,9 +80,9 @@ const RootLayout = () => {
   //   setupDatabase(); // Ensure database is set up
   // }, []);
   useEffect(() => {
-    // registerForPushNotificationsAsync().then(
-    //   (token) => token && setExpoPushToken(token)
-    // );
+    registerForPushNotificationsAsync().then(
+      (token) => token && setExpoPushToken(token)
+    );
 
     if (Platform.OS === "android") {
       Notifications.getNotificationChannelsAsync().then((value) =>
@@ -417,13 +417,16 @@ async function registerForPushNotificationsAsync() {
   if (Device.isDevice) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
+
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      // alert("Failed to get push token for push notification!");
+      console.log("Failed to get push token for push notification!");
+
       return;
     }
     // Learn more about projectId:
@@ -446,7 +449,8 @@ async function registerForPushNotificationsAsync() {
       token = `${e}`;
     }
   } else {
-    alert("Must use physical device for Push Notifications");
+    // alert("Must use physical device for Push Notifications");
+    console.log("Must use physical device for Push Notifications");
   }
 
   return token;

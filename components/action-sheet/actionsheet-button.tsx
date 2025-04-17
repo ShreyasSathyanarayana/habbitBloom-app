@@ -28,7 +28,7 @@ const ActionSheetButton = ({
   labelStyle,
 }: Props) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity hitSlop={20} onPress={onPress} style={styles.container}>
       {leftIcon && leftIcon}
       <ThemedText style={[{ fontSize: getFontSize(14), flex: 1 }, labelStyle]}>
         {buttonName}

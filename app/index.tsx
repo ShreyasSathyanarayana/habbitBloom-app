@@ -23,6 +23,7 @@ interface FormProps extends FieldValues {
 }
 
 export default function Index() {
+  
   return (
     <SafeAreaView
       style={{

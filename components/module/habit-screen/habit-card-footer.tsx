@@ -89,6 +89,7 @@ const HabitCardFooter = ({
       <View style={styles.column}>
         {localIsHabitPublic && (
           <TouchableHighlight
+            hitSlop={10}
             onPress={() =>
               SheetManager.show("hide-habit", {
                 payload: { habitId: habitId, updateStatus: updateHabitStatus },
@@ -101,6 +102,7 @@ const HabitCardFooter = ({
         )}
         {!localIsHabitPublic && (
           <TouchableHighlight
+            hitSlop={10}
             onPress={() => unHideHabitMutation.mutateAsync()}
             // onPress={() =>
             //   SheetManager.show("hide-habit", { payload: { habitId: habitId } })
@@ -111,18 +113,21 @@ const HabitCardFooter = ({
           </TouchableHighlight>
         )}
         <TouchableHighlight
+          hitSlop={10}
           onPress={navigateToCalendar}
           style={styles.iconWrapper}
         >
           <CalenderIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
         <TouchableHighlight
+          hitSlop={10}
           onPress={navigateToStatistics}
           style={styles.iconWrapper}
         >
           <StatsIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
         <TouchableHighlight
+          hitSlop={10}
           onPress={onPressThreeDot}
           style={styles.iconWrapper}
         >

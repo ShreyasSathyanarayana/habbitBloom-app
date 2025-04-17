@@ -1,7 +1,7 @@
 import Button from "@/components/ui/button";
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 type Props = {
   firstBtnLabel: string;
   secondBtnLabel: string;
@@ -9,6 +9,7 @@ type Props = {
   secondBtnAction: () => void;
   secondBtnLoading?: boolean;
   firstBtnLoading?: boolean;
+  style?: ViewStyle;
 };
 const AlertButton = ({
   firstBtnAction,
@@ -17,15 +18,19 @@ const AlertButton = ({
   secondBtnLabel,
   secondBtnLoading = false,
   firstBtnLoading = false,
+  style,
 }: Props) => {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        gap: horizontalScale(8),
-        paddingBottom: verticalScale(16),
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: horizontalScale(8),
+          paddingBottom: verticalScale(16),
+        },
+        style,
+      ]}
     >
       <Button
         disabled={firstBtnLoading}

@@ -1,8 +1,14 @@
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
-import React, { useEffect } from "react";
-import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AvatarImage from "./avatar-image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAvatarImages, updateProfilePic } from "@/api/api";
@@ -11,6 +17,8 @@ import AlertButton from "@/action-sheets/alert-button";
 import { useToast } from "react-native-toast-notifications";
 import { router } from "expo-router";
 import { getUserRole, isUserSubscribed } from "@/utils/persist-storage";
+import ModalContainer from "@/components/ui/modal-container";
+import SheetHeader from "@/action-sheets/sheet-header";
 
 type Props = {
   currentProfilePic: string | null;
@@ -25,6 +33,7 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
   const isSubscribed = isUserSubscribed();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [isSubscribedModalOpen, setIsSubscribedModalOpen] = useState(false);
   const getAvatarImagesQuery = useQuery({
     queryKey: ["getAvatarImages"],
     queryFn: () => getAvatarImages(),
@@ -67,7 +76,25 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
       });
     },
   });
-  // console.log("currentProfilePic", currentProfilePic);
+  const closeModal = () => {
+    setIsSubscribedModalOpen(false);
+  };
+  const openModal = () => {
+    setIsSubscribedModalOpen(true);
+  };
+
+  const onChangeProfilePic = (imageSubscribed: boolean, imageUri: string) => {
+    if (!imageSubscribed) {
+      // if the image is not subscribed no need to check
+      setProfilePic(imageUri);
+    } else if (isSubscribed && imageSubscribed) {
+      // if the image is subscribed and use is also subscribed then update the profile pic
+      setProfilePic(imageUri);
+    } else {
+      // user how are not subscribed then show modal
+      openModal();
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -103,7 +130,12 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
           // console.log(item?.avatar_url === profilePic);
 
           return (
-            <TouchableOpacity onPress={() => setProfilePic(item?.avatar_url)}>
+            <TouchableOpacity
+              onPress={() => {
+                // setProfilePic(item?.avatar_url);
+                onChangeProfilePic(item?.is_subscribed_only, item?.avatar_url);
+              }}
+            >
               <AvatarImage
                 isSubscribed={item?.is_subscribed_only}
                 imageType="Option"
@@ -124,6 +156,32 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
         firstBtnAction={closeSheet}
         secondBtnAction={() => updateProfilePicMutation.mutateAsync()}
       />
+      <Modal
+        visible={isSubscribedModalOpen}
+        style={styles.modalStyle}
+        onRequestClose={closeModal}
+        transparent
+        animationType="fade"
+      >
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ModalContainer>
+            <SheetHeader title="Premium Avatar" onClose={closeModal} />
+            <ThemedText style={{ fontSize: getFontSize(14) }}>
+              Unlock with a subscription to access this avatar and more.
+            </ThemedText>
+            <AlertButton
+              firstBtnLabel="Cancel"
+              firstBtnAction={closeModal}
+              secondBtnLabel="View Plans"
+              secondBtnAction={() => {
+                closeModal();
+                router.push("/(protected)/subscription");
+              }}
+              style={{ paddingBottom: 0 }}
+            />
+          </ModalContainer>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -133,6 +191,12 @@ const styles = StyleSheet.create({
     gap: verticalScale(30),
     justifyContent: "space-between",
     flex: 1,
+  },
+  modalStyle: {
+    flex: 1,
+    // justifyContent: "center",
+    padding: horizontalScale(16),
+    // alignItems: "center",
   },
 });
 
