@@ -8,6 +8,7 @@ import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "moti/skeleton";
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
@@ -30,12 +31,26 @@ const CompletedHabitScreen = () => {
         {getAllCompletedHabitDetails?.data?.length == 0 && (
           <EmptyCompletedHabits />
         )}
-        {getAllCompletedHabitDetails?.data?.length !== 0 && (
+        {getAllCompletedHabitDetails?.data?.length !== 0 &&
+          !getAllCompletedHabitDetails?.isLoading && (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={getAllCompletedHabitDetails?.data}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <HabitCompletedCard {...item} />}
+              ItemSeparatorComponent={() => (
+                <View style={{ height: verticalScale(16) }} />
+              )}
+            />
+          )}
+        {getAllCompletedHabitDetails?.isLoading && (
           <FlatList
             showsVerticalScrollIndicator={false}
-            data={getAllCompletedHabitDetails?.data}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <HabitCompletedCard {...item} />}
+            data={[1, 2, 3, 4]}
+            keyExtractor={(item) => item.toString()}
+            renderItem={({ item }) => {
+              return <Skeleton width={"100%"} height={verticalScale(100)} />;
+            }}
             ItemSeparatorComponent={() => (
               <View style={{ height: verticalScale(16) }} />
             )}
