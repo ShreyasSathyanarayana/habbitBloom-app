@@ -1,4 +1,4 @@
-import { CompletedHabits } from "@/api/api";
+import { CompletedHabits, CompletedHabitWithStreak } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,7 +12,7 @@ import CompletedTagIcon from "@/assets/svg/completed-tag.svg";
 
 const _iconSize = horizontalScale(150);
 
-const HabitCompletedCard = (props: CompletedHabits) => {
+const HabitCompletedCard = (props: CompletedHabitWithStreak) => {
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
       payload: { data: props },
@@ -35,9 +35,14 @@ const HabitCompletedCard = (props: CompletedHabits) => {
           habitName={props.habit_name}
           category={props.category}
           completed={true}
+          rewardUri={props.rewardImageUrl}
         />
 
-        <HabitCardFooter isHabitPublic={props.public} habitId={props.id} onPressThreeDot={onPressThreeDot} />
+        <HabitCardFooter
+          isHabitPublic={props.public}
+          habitId={props.id}
+          onPressThreeDot={onPressThreeDot}
+        />
       </LinearGradient>
     </Pressable>
   );

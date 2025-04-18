@@ -6,13 +6,20 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import CompletedHabitIcon from "@/assets/svg/completed-badge.svg";
 import HabitCompletedTagIcon from "@/assets/svg/habit-completed-tag.svg";
+import RewardIcon from "../analytics-screen/rewards/reward-icon";
 type Props = {
   habitName: string;
   category: string;
   completed?: boolean;
+  rewardUri?: string;
 };
 
-const HabitCardHead = ({ habitName, category, completed }: Props) => {
+const HabitCardHead = ({
+  habitName,
+  category,
+  completed,
+  rewardUri,
+}: Props) => {
   const categoryDetails = getCategoryByName(category);
   return (
     <View style={styles.container}>
@@ -37,7 +44,7 @@ const HabitCardHead = ({ habitName, category, completed }: Props) => {
       >
         {habitName}
       </ThemedText>
-      {completed && <CompletedHabitIcon />}
+      {completed && <RewardIcon imageUri={rewardUri ?? ""} />}
     </View>
   );
 };

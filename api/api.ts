@@ -728,6 +728,48 @@ export const getAllCompletedHabits = async (): Promise<CompletedHabits[]> => {
   return data;
 };
 
+export type CompletedHabitWithStreak = CompletedHabits & {
+  highestStreak: number;
+  rewardImageUrl?: string;
+};
+
+export const getAllCompletedHabitsWithStreaks = async (): Promise<CompletedHabitWithStreak[]> => {
+  const habits = await getAllCompletedHabits();
+
+  // Fetch all rewards from DB
+  const { data: rewards, error: rewardError } = await supabase
+    .from("rewards")
+    .select("*");
+
+  if (rewardError) {
+    console.error("Error fetching rewards:", rewardError);
+    throw new Error("Could not fetch rewards.");
+  }
+
+  // Sort rewards by day descending for matching highest reward for streak
+  const sortedRewards = (rewards ?? []).sort((a, b) => b.day - a.day);
+
+  // Map habits to include highest streak and reward image
+  const enrichedHabits: CompletedHabitWithStreak[] = [];
+
+  for (const habit of habits) {
+    const stats = await getCompletedHabitStats(habit.id);
+    const highestStreak = stats.highestStreak;
+
+    // Find the most relevant reward for this streak
+    const matchingReward = sortedRewards.find((r) => highestStreak >= r.day);
+
+    enrichedHabits.push({
+      ...habit,
+      highestStreak,
+      rewardImageUrl: matchingReward?.reward_image_url,
+    });
+  }
+
+  return enrichedHabits;
+};
+
+
 export const updateHabitPublicStatus = async (
   habitId: string,
   isPublic: boolean

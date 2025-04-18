@@ -13,7 +13,7 @@ type Props = {
   habitId: string;
 };
 
-const ITEM_WIDTH = horizontalScale(26);
+const ITEM_WIDTH = horizontalScale(35);
 
 const StatisticsMonth = ({ habitId }: Props) => {
   const { month, year } = getCurrentMonthAndYear();

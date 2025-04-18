@@ -1,4 +1,7 @@
-import { getAllCompletedHabits } from "@/api/api";
+import {
+  getAllCompletedHabits,
+  getAllCompletedHabitsWithStreaks,
+} from "@/api/api";
 import EmptyCompletedHabits from "@/components/module/completed-habit/empty-completed-habits";
 import HabitCompletedCard from "@/components/module/completed-habit/habit-completed-card";
 import Container from "@/components/ui/container";
@@ -12,7 +15,7 @@ const CompletedHabitScreen = () => {
   const getAllCompletedHabitDetails = useQuery({
     queryKey: ["completed-habit"],
     queryFn: () => {
-      return getAllCompletedHabits();
+      return getAllCompletedHabitsWithStreaks();
     },
   });
   // console.log(
