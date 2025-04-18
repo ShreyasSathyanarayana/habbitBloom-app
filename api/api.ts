@@ -1510,6 +1510,32 @@ export type SuggestionWithProfile = {
 };
 
 
+export type Reward = {
+  id: string;
+  day: number;
+  reward_image_url: string;
+  created_at: string;
+};
+
+export const getStreakChallengeDetails = async (): Promise<Reward[]> => {
+
+    const { data, error } = await supabase
+      .from("rewards")
+      .select("*")
+      .order("day", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching rewards:", error.message);
+      throw new Error("Failed to fetch streak challenge details");
+    }
+
+    return data as Reward[]??[];
+  
+};
+
+
+
+
 
 /***************************************** Super User Suggestion *****************************************/
 

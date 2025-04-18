@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import CompletedHabitIcon from "@/assets/svg/completed-badge.svg";
+import HabitCompletedTagIcon from "@/assets/svg/habit-completed-tag.svg";
 type Props = {
   habitName: string;
   category: string;

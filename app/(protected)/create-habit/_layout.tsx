@@ -8,10 +8,14 @@ const Layout = () => {
         headerShown: false,
         // animation: "ios_from_right",
         // animationDuration: 300,
-        animation:'slide_from_bottom'
+        // animation: "slide_from_bottom",
       }}
     >
       <Stack.Screen name="index" options={{ title: "habbits" }} />
+      <Stack.Screen
+        name="habit-instruction"
+        options={{ title: "Habit instruction", presentation: "modal" }}
+      />
     </Stack>
   );
 };

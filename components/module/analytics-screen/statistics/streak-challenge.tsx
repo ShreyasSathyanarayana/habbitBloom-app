@@ -4,12 +4,34 @@ import StreakChallengeIcon from "@/assets/svg/streak-awards-icon.svg";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
+import { useQuery } from "@tanstack/react-query";
+import { getHabitStats, getStreakChallengeDetails } from "@/api/api";
+import RewardDetail from "../rewards/reward-detail";
 type Props = {
   habitId: string;
 };
 
 const StreakChallenge = ({ habitId }: Props) => {
-  const sampleAward = [1, 2, 3, 4, 5, 6];
+  const getStreakChallengeQuery = useQuery({
+    queryKey: ["streakChallenge"],
+    queryFn: () => {
+      return getStreakChallengeDetails();
+    },
+  });
+  // console.log(
+  //   "Streak Challenge",
+  //   JSON.stringify(getStreakChallengeQuery.data, null, 2)
+  // );
+  const getHabitStatsQuery = useQuery({
+    queryKey: ["habit-stats", habitId],
+    queryFn: () => {
+      return getHabitStats(habitId);
+    },
+    enabled: !!habitId,
+  });
+
+  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+
   return (
     <View style={{ gap: verticalScale(16) }}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -27,10 +49,15 @@ const StreakChallenge = ({ habitId }: Props) => {
           justifyContent: "space-between",
           gap: horizontalScale(16),
         }}
-        data={sampleAward}
+        data={getStreakChallengeQuery?.data}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => {
-          return <View style={styles.awardContainer} />;
+          return (
+            <RewardDetail
+              {...item}
+              highest_streak={getHabitStatsQuery?.data?.highestStreak ?? 0}
+            />
+          );
         }}
       />
     </View>

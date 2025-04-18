@@ -35,7 +35,6 @@ const HabitHead = ({
         }}
       >
         <TouchableHighlight
-          hitSlop={20}
           onPress={() =>
             SheetManager.show("habit-filter", {
               payload: {
@@ -48,12 +47,11 @@ const HabitHead = ({
           <HabitFilterIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
         <TouchableHighlight
-          hitSlop={20}
           onPress={() => router.push("/(protected)/completed-habits")}
         >
           <HabitCompleteIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
-        <TouchableHighlight hitSlop={20} onPress={onPressArchive}>
+        <TouchableHighlight onPress={onPressArchive}>
           <ArchiveIcon width={_iconSize} height={_iconSize} />
         </TouchableHighlight>
       </View>
