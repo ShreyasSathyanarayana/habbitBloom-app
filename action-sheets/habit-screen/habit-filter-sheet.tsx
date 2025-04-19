@@ -7,6 +7,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import { horizontalScale, verticalScale } from "@/metric";
+import { useHabitStore } from "@/store/habit-store";
 const _iconSize = horizontalScale(24);
 const closeSheet = () => {
   SheetManager.hide("habit-filter");
@@ -14,14 +15,17 @@ const closeSheet = () => {
 
 const HabitFilterSheet = (props: SheetProps<"habit-filter">) => {
   const payload = props.payload;
+  const updateSelectedFilter = useHabitStore(
+    (state) => state.updateSelectedFilter
+  );
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
       <View style={{ gap: verticalScale(24) }}>
         <ActionSheetButton
           onPress={() => {
             closeSheet();
-            payload?.setSelectedFilter("alphabetical");
-            
+            // payload?.setSelectedFilter("alphabetical");
+            updateSelectedFilter("alphabetical");
           }}
           selected={payload?.selectedFilter === "alphabetical"}
           buttonName="Alphabetical order (A-Z)"
@@ -31,9 +35,9 @@ const HabitFilterSheet = (props: SheetProps<"habit-filter">) => {
         />
         <ActionSheetButton
           onPress={() => {
-              closeSheet();
-            payload?.setSelectedFilter("latest");
-          
+            closeSheet();
+            // payload?.setSelectedFilter("latest");
+            updateSelectedFilter("latest");
           }}
           selected={payload?.selectedFilter === "latest"}
           leftIcon={

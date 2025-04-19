@@ -15,6 +15,8 @@ import {
   cancelNotification,
   scheduleNotification,
 } from "@/services/notificationService";
+import { useAuth } from "@/context/AuthProvider";
+import { useHabitStore } from "@/store/habit-store";
 // import Button from "@/components/ui/button";
 const closeSheet = () => {
   SheetManager.hide("delete-habit");
@@ -23,6 +25,8 @@ const closeSheet = () => {
 const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
   const payload = props?.payload?.data;
   const toast = useToast();
+  const { isConnected } = useAuth();
+  const selectedFilter = useHabitStore((state) => state.selectedFilter);
   const queryClient = useQueryClient();
   const deleteHabitMutation = useMutation({
     mutationKey: ["deleteHabit"],
@@ -33,8 +37,22 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
     },
     onSuccess: () => {
       cancelNotification(payload?.id ?? "");
-      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      // queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      queryClient.setQueryData(
+        ["habitList", isConnected, selectedFilter],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any[]) =>
+              page.filter((habit) => habit.id !== payload?.id)
+            ),
+          };
+        }
+      );
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
+      queryClient.invalidateQueries({ queryKey: ["completed-habit"] });
       toast.show("Habit Deleted", {
         type: "success",
       });

@@ -51,7 +51,7 @@ declare module "react-native-actions-sheet" {
     "habit-filter": SheetDefinition<{
       payload: {
         selectedFilter: "latest" | "alphabetical";
-        setSelectedFilter: (filter: "latest" | "alphabetical") => void;
+        // setSelectedFilter: (filter: "latest" | "alphabetical") => void;
       };
     }>;
     "update-profile-info": SheetDefinition<{

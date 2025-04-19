@@ -9,6 +9,7 @@ import { StyleSheet, TouchableHighlight, View } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 import { HabitProp } from "./habit-card";
 import moment from "moment";
+import { useHabitStore } from "@/store/habit-store";
 type Props = {
   date: string;
   status: boolean | null;
@@ -20,7 +21,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   const day = moment(date).local().get("date");
   const todayDate = moment().local().get("date");
   // console.log("todayDate", todayDate, day);
-
+  const selectedFilter  = useHabitStore((state) => state.selectedFilter);
   const isToday = day === todayDate;
   const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();
@@ -39,7 +40,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
       // 2. Update query cache
       queryClient.setQueryData(
-        ["habitList", true, "latest"],
+        ["habitList", true, selectedFilter],
         (oldData: any) => {
           if (!oldData) return oldData;
 

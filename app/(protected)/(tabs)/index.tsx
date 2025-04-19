@@ -23,6 +23,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { HabitProp } from "@/components/module/habit-screen/habit-card";
 import * as Notifications from "expo-notifications";
 import AllowPermissionModal from "@/components/modal/allow-permission-modal";
+import { useHabitStore } from "@/store/habit-store";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
@@ -33,9 +34,10 @@ export default function HabitsScreen() {
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
-  const [selectedFilter, setSelectedFilter] = useState<
-    "latest" | "alphabetical"
-  >("latest");
+  // const [selectedFilter, setSelectedFilter] = useState<
+  //   "latest" | "alphabetical"
+  // >("latest");
+  const selectedFilter = useHabitStore((state) => state.selectedFilter);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotificationPermissionModal, setShowNotificationPermissionModal] =
     useState(false);
@@ -105,7 +107,7 @@ export default function HabitsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <HabitHead
         selectedFilter={selectedFilter}
-        onChangeFilter={(filterName) => setSelectedFilter(filterName)}
+        // onChangeFilter={(filterName) => setSelectedFilter(filterName)}
         onPressArchive={() => router.push("/(protected)/archive")}
       />
 

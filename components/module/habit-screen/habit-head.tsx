@@ -15,7 +15,7 @@ import { SheetManager } from "react-native-actions-sheet";
 
 type Props = {
   onPressArchive?: (event: GestureResponderEvent) => void;
-  onChangeFilter: (filterName: "latest" | "alphabetical") => void;
+  onChangeFilter?: (filterName: "latest" | "alphabetical") => void;
   selectedFilter: "latest" | "alphabetical";
 };
 const _iconSize = horizontalScale(22);
@@ -39,7 +39,7 @@ const HabitHead = ({
             SheetManager.show("habit-filter", {
               payload: {
                 selectedFilter: selectedFilter,
-                setSelectedFilter: onChangeFilter,
+                // setSelectedFilter: onChangeFilter,
               },
             })
           }
