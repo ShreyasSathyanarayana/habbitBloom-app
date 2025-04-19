@@ -60,7 +60,8 @@ export const scheduleNotification = async (habit: Habit): Promise<void> => {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: parseInt(habit.reminder_time.split(":")[0], 10),
       minute: parseInt(habit.reminder_time.split(":")[1], 10),
-      //   repeats: true,
+      channelId:'habitBloomNotificationChannel'
+      // repeats: false,
     },
   });
 

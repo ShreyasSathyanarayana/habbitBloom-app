@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
   container: {
     width: horizontalScale(30),
     height: horizontalScale(40),
+    backgroundColor: "transparent",
   },
 });
 

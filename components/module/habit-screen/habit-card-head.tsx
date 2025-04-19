@@ -13,6 +13,7 @@ type Props = {
   completed?: boolean;
   rewardUri?: string;
 };
+const _iconSize = horizontalScale(40);
 
 const HabitCardHead = ({
   habitName,
@@ -44,7 +45,25 @@ const HabitCardHead = ({
       >
         {habitName}
       </ThemedText>
-      {completed && <RewardIcon imageUri={rewardUri ?? ""} />}
+      {completed && (
+        <View>
+          <RewardIcon
+            style={{ top: horizontalScale(-15), zIndex: 1 }}
+            imageUri={rewardUri ?? ""}
+          />
+
+          <HabitCompletedTagIcon
+            style={{
+              position: "absolute",
+              right: horizontalScale(-4),
+              zIndex: 0,
+              top: horizontalScale(-22),
+            }}
+            width={_iconSize}
+            height={_iconSize}
+          />
+        </View>
+      )}
     </View>
   );
 };

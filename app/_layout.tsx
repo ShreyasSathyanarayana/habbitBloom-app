@@ -406,7 +406,7 @@ async function registerForPushNotificationsAsync() {
   let token;
 
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("myNotificationChannel", {
+    await Notifications.setNotificationChannelAsync("habitBloomNotificationChannel", {
       name: "A channel is needed for the permissions prompt to appear",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],

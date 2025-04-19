@@ -10,6 +10,14 @@ import { SheetManager } from "react-native-actions-sheet";
 import HabitDateList from "./habit-date-list";
 import { HabitProgressEntry } from "@/api/api";
 import { LinearGradient } from "expo-linear-gradient";
+import HabitCardFooterV2 from "./habit-card-footer-v2";
+
+export type HabitStats = {
+  completed: number;
+  notCompleted: number;
+  streak: number;
+  highestStreak: number;
+};
 export type HabitProp = {
   id: string;
   habit_name: string;
@@ -21,13 +29,16 @@ export type HabitProp = {
   archived: boolean;
   progress: HabitProgressEntry[];
   public: boolean;
+  stats: HabitStats;
 };
 
 const HabitCard = (props: HabitProp) => {
   const { habit_name, category, archived, progress } = props;
   const MemoizedHabitDateList = memo(HabitDateList);
   const MemoizedFrequencyList = memo(HabitFrequencyList);
-  const MemoizedHabitFooter = memo(HabitCardFooter);
+  const MemoizedHabitFooter = memo(HabitCardFooterV2);
+
+  // console.log("habit card updated");
 
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
@@ -60,6 +71,7 @@ const HabitCard = (props: HabitProp) => {
           isHabitPublic={props.public}
           onPressThreeDot={onPressThreeDot}
           habitId={props.id}
+          stats={props.stats}
         />
       </LinearGradient>
     </Pressable>

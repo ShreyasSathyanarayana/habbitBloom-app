@@ -1,4 +1,4 @@
-import { markHabitStatus } from "@/api/api";
+import { getHabitStats, markHabitStatus } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
@@ -33,11 +33,46 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
     mutationFn: () => {
       return markHabitStatus(habitId, !localStatus, date); // Toggle the habit status (true/false)
     },
-    onSuccess: () => {
-      // Invalidate the query to refresh the stats data
-      queryClient.invalidateQueries({ queryKey: ["habit-stats", habitId] });
+    onSuccess: async () => {
+      // 1. Fetch updated stats
+      const updatedStats = await getHabitStats(habitId);
+
+      // 2. Update query cache
+      queryClient.setQueryData(
+        ["habitList", true, "latest"],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: HabitProp[]) =>
+              page.map((habit) => {
+                if (habit.id !== habitId) return habit;
+
+                // Update the specific date's status in the progress array
+                const updatedProgress = habit.progress.map((entry) =>
+                  moment.utc(entry.date).local().format("YYYY-MM-DD") ===
+                  moment.utc(date).local().format("YYYY-MM-DD")
+                    ? { ...entry, status: !localStatus }
+                    : entry
+                );
+
+                return {
+                  ...habit,
+                  stats: {
+                    ...habit.stats,
+                    ...updatedStats,
+                  },
+                  progress: updatedProgress,
+                };
+              })
+            ),
+          };
+        }
+      );
+
+      // 3. Update local UI state and show toast
       setLocalStatus((prev) => !prev);
-      // Show a toast notification based on the new status
       toast.show(
         !localStatus ? "Marked Successfully" : "Unmarked Successfully",
         {

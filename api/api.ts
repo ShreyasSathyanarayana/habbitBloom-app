@@ -405,19 +405,25 @@ export const getAllHabits = async (
     throw new Error("Error fetching habits: " + error.message);
   }
 
-  // 🔹 Fetch last 7 days' progress for each habit
-  const habitsWithProgress = await Promise.all(
+  // 🔹 Fetch last 7 days' progress and stats for each habit
+  const habitsWithDetails = await Promise.all(
     data.map(async (habit) => {
-      const progressData = await fetchLast7DaysHabitProgress(habit.id);
+      const [progressData, stats] = await Promise.all([
+        fetchLast7DaysHabitProgress(habit.id),
+        getHabitStats(habit.id),
+      ]);
+
       return {
         ...habit,
-        progress: progressData ? progressData.data : [],
+        progress: progressData?.data || [],
+        stats, // includes completed, notCompleted, streak, highestStreak
       };
     })
   );
 
-  return habitsWithProgress;
+  return habitsWithDetails;
 };
+
 
 export const getAllHabitsArchived = async () => {
   const todayUtc = DateUtils.getCurrentUtcDate();

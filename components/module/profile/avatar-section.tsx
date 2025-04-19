@@ -163,7 +163,14 @@ const AvatarSection = ({ currentProfilePic }: Props) => {
         transparent
         animationType="fade"
       >
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            paddingHorizontal: horizontalScale(16),
+          }}
+        >
           <ModalContainer>
             <SheetHeader title="Premium Avatar" onClose={closeModal} />
             <ThemedText style={{ fontSize: getFontSize(14) }}>

@@ -19,8 +19,9 @@ const HabitFilterSheet = (props: SheetProps<"habit-filter">) => {
       <View style={{ gap: verticalScale(24) }}>
         <ActionSheetButton
           onPress={() => {
-            payload?.setSelectedFilter("alphabetical");
             closeSheet();
+            payload?.setSelectedFilter("alphabetical");
+            
           }}
           selected={payload?.selectedFilter === "alphabetical"}
           buttonName="Alphabetical order (A-Z)"
@@ -30,8 +31,9 @@ const HabitFilterSheet = (props: SheetProps<"habit-filter">) => {
         />
         <ActionSheetButton
           onPress={() => {
+              closeSheet();
             payload?.setSelectedFilter("latest");
-            closeSheet();
+          
           }}
           selected={payload?.selectedFilter === "latest"}
           leftIcon={

@@ -9,7 +9,7 @@ import { Skeleton } from "moti/skeleton";
 type Props = {
   completedValue?: number;
   notCompletedValue?: number;
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 const convertToPercentage = (value: number, total: number) => {
@@ -19,7 +19,7 @@ const convertToPercentage = (value: number, total: number) => {
 const HabitComplete = ({
   completedValue = 0,
   notCompletedValue = 0,
-  isLoading,
+  isLoading = false,
 }: Props) => {
   const [percentage, setPercentage] = useState(0);
 
