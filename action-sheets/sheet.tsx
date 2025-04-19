@@ -10,6 +10,7 @@ import DeleteProfilePicSheet from "./profile/delete-profile-pic-sheet";
 import SupportAndFeedbackSheet from "./profile/support-and-feedback-sheet";
 import ChangePasswordSheet from "./profile/change-password-sheet";
 import AboutUsSheet from "./profile/about-us-sheet";
+import MarkedHabitSheet from "./habit-screen/marked-habit-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -27,6 +28,7 @@ registerSheet("habit-details", HabitDetailsSheet);
 registerSheet("delete-habit", DeleteHabitSheet);
 registerSheet("hide-habit", HideHabitSheet);
 registerSheet("habit-filter", HabitFilterSheet);
+registerSheet("marked-habit", MarkedHabitSheet);
 registerSheet("update-profile-info", UpdateProfileInfoSheet);
 registerSheet("profile-pic", ProfilePicSheet);
 registerSheet("delete-profile-pic", DeleteProfilePicSheet);
@@ -54,6 +56,7 @@ declare module "react-native-actions-sheet" {
         // setSelectedFilter: (filter: "latest" | "alphabetical") => void;
       };
     }>;
+    "marked-habit": SheetDefinition;
     "update-profile-info": SheetDefinition<{
       payload: {
         id: string;
@@ -69,6 +72,6 @@ declare module "react-native-actions-sheet" {
     "delete-profile-pic": SheetDefinition;
     "support-and-feedback": SheetDefinition;
     "change-password": SheetDefinition;
-    'about-us': SheetDefinition;
+    "about-us": SheetDefinition;
   }
 }

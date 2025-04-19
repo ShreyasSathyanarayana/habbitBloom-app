@@ -10,6 +10,7 @@ import { useToast } from "react-native-toast-notifications";
 import { HabitProp } from "./habit-card";
 import moment from "moment";
 import { useHabitStore } from "@/store/habit-store";
+import { SheetManager } from "react-native-actions-sheet";
 type Props = {
   date: string;
   status: boolean | null;
@@ -21,7 +22,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   const day = moment(date).local().get("date");
   const todayDate = moment().local().get("date");
   // console.log("todayDate", todayDate, day);
-  const selectedFilter  = useHabitStore((state) => state.selectedFilter);
+  const selectedFilter = useHabitStore((state) => state.selectedFilter);
   const isToday = day === todayDate;
   const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();
@@ -37,6 +38,7 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
     onSuccess: async () => {
       // 1. Fetch updated stats
       const updatedStats = await getHabitStats(habitId);
+      !localStatus && SheetManager.show("marked-habit");
 
       // 2. Update query cache
       queryClient.setQueryData(
@@ -74,12 +76,13 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
       // 3. Update local UI state and show toast
       setLocalStatus((prev) => !prev);
-      toast.show(
-        !localStatus ? "Marked Successfully" : "Unmarked Successfully",
-        {
-          type: "success",
-        }
-      );
+      localStatus &&
+        toast.show(
+          !localStatus ? "Marked Successfully" : "Unmarked Successfully",
+          {
+            type: "success",
+          }
+        );
     },
   });
 

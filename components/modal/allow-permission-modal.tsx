@@ -24,13 +24,14 @@ const AllowPermissionModal = ({
       style={{ flex: 1 }}
       transparent
     >
-      <View style={styles.container}>
-        <View style={styles.modalContainer}>
+      <View style={ModalStyles.container}>
+        <View style={ModalStyles.modalContainer}>
           <SheetHeader title="Allow Permission" onClose={onClose} />
           <ThemedText style={{ fontSize: getFontSize(14) }}>
             To give you the best experience, we need access to your
             <ThemedText style={{ color: "rgba(138, 43, 226, 1)" }}>
-              {" "}{permissionType}
+              {" "}
+              {permissionType}
             </ThemedText>
             . You can enable it in settings anytime.
           </ThemedText>
@@ -47,7 +48,7 @@ const AllowPermissionModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+export const ModalStyles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
