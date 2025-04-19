@@ -43,7 +43,7 @@ const CompletedHabitScreen = () => {
               )}
             />
           )}
-        {getAllCompletedHabitDetails?.isFetching && (
+        {getAllCompletedHabitDetails?.isLoading && (
           <FlatList
             showsVerticalScrollIndicator={false}
             data={[1, 2, 3, 4]}

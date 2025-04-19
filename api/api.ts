@@ -429,7 +429,6 @@ export const getAllHabitsArchived = async () => {
   const todayUtc = DateUtils.getCurrentUtcDate();
   const userId = await getUserId();
 
-  // Fetch all habits for the user
   const { data, error } = await supabase
     .from("habit")
     .select("*")
@@ -443,8 +442,22 @@ export const getAllHabitsArchived = async () => {
     return [];
   }
 
-  return data;
+  if (!data || data.length === 0) return [];
+
+  // Attach stats to each habit
+  const habitsWithStats = await Promise.all(
+    data.map(async (habit) => {
+      const stats = await getHabitStats(habit.id);
+      return {
+        ...habit,
+        stats,
+      };
+    })
+  );
+
+  return habitsWithStats;
 };
+
 
 export const archiveHabit = async (habitId: string): Promise<boolean> => {
   const archiveDate = DateUtils.getCurrentUtcTimestamp();

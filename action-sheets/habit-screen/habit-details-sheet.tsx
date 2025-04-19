@@ -23,6 +23,8 @@ import {
   cancelNotification,
   scheduleNotification,
 } from "@/services/notificationService";
+import { useAuth } from "@/context/AuthProvider";
+import { useHabitStore } from "@/store/habit-store";
 
 const _iconSize = horizontalScale(24);
 const closeSheet = () => {
@@ -33,6 +35,8 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
   const payload = props?.payload?.data;
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { isConnected } = useAuth();
+  const selectedFilter = useHabitStore((state) => state.selectedFilter);
 
   const archiveHabitMutation = useMutation({
     mutationKey: ["archiveHabit"],
@@ -42,7 +46,20 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
     },
     onSuccess: (isSuccess: boolean) => {
       cancelNotification(payload?.id ?? "");
-      queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      // queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      queryClient.setQueryData(
+        ["habitList", isConnected, selectedFilter],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any[]) =>
+              page.filter((habit) => habit.id !== payload?.id)
+            ),
+          };
+        }
+      );
       toast.show(`${payload?.habit_name?.trim()} Archived`, {
         type: "success",
       });
@@ -67,8 +84,8 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
         reminder_time: payload?.reminder_time ?? "",
         id: payload?.id ?? "",
       });
-      queryClient.invalidateQueries({ queryKey: ["habitList"] });
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
+      queryClient.invalidateQueries({ queryKey: ["habitList"] });
 
       toast.show(`${payload?.habit_name?.trim()} Unarchived`, {
         type: "success",
@@ -134,9 +151,9 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
             leftIcon={<EditIcon width={_iconSize} height={_iconSize} />}
             buttonName="Edit"
           /> */}
-        </View>
+        {/* </View>
         <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer}> */}
           {!payload?.archived && (
             <ActionSheetButton
               onPress={() => archiveHabitMutation.mutateAsync()}
