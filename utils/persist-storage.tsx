@@ -33,3 +33,11 @@ export const isUserSubscribed = () => {
   }
   return true;
 };
+
+export const setNumberReadSuggestion = (number: number) => {
+  return storage.set("readSuggestion", number);
+};
+
+export const getReadSuggestion = () => {
+  return storage.getNumber("readSuggestion") ?? 0;
+};

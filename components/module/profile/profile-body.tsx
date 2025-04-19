@@ -23,6 +23,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import { openAppSettings } from "@/utils/permission";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import SupportFeedback from "./support-feedback";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
@@ -37,13 +38,13 @@ const ProfileBody = () => {
         buttonName={"Change Password"}
         labelStyle={styles.textStyle}
       />
-      <ActionSheetButton
+      {/* <ActionSheetButton
         leftIcon={
           <ChangePhoneNumberIcon width={_iconSize} height={_iconSize} />
         }
         buttonName={"Update Phone number"}
         labelStyle={styles.textStyle}
-      />
+      /> */}
       {/* <ActionSheetButton
         leftIcon={<SuggestionIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Suggestion Box"}
@@ -76,14 +77,15 @@ const ProfileBody = () => {
         buttonName={"Rate Us"}
         labelStyle={styles.textStyle}
       /> */}
-      <ActionSheetButton
+      {/* <ActionSheetButton
         onPress={() => SheetManager.show("support-and-feedback")}
         leftIcon={
           <SupportAndFeedBackIcon width={_iconSize} height={_iconSize} />
         }
         buttonName={"Support & Feedback"}
         labelStyle={styles.textStyle}
-      />
+      /> */}
+      <SupportFeedback />
       <ActionSheetButton
         onPress={openAppSettings}
         leftIcon={<SubscriptionIcon width={_iconSize} height={_iconSize} />}

@@ -424,7 +424,6 @@ export const getAllHabits = async (
   return habitsWithDetails;
 };
 
-
 export const getAllHabitsArchived = async () => {
   const todayUtc = DateUtils.getCurrentUtcDate();
   const userId = await getUserId();
@@ -1667,3 +1666,16 @@ export const getAboutUs = async ()=>{
   }
   return data;
 }
+
+export const getSuggestionCount = async () => {
+  const { count, error } = await supabase
+    .from("suggestions")
+    .select("*", { count: "exact", head: true }) // head: true to avoid fetching data
+
+  if (error) {
+    console.error("Error fetching suggestion count:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+};
