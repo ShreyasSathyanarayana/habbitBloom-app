@@ -1,5 +1,5 @@
 import { horizontalScale } from "@/metric";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
@@ -12,33 +12,15 @@ type Props = {
   isLoading?: boolean;
 };
 
-const convertToPercentage = (value: number, total: number) => {
-  return total > 0 ? Math.round((value / total) * 100) : 0;
-};
-
 const HabitComplete = ({
   completedValue = 0,
   notCompletedValue = 0,
   isLoading = false,
 }: Props) => {
-  const [percentage, setPercentage] = useState(0);
+  const total = completedValue + notCompletedValue;
+  const percentage = total > 0 ? Math.round((completedValue / total) * 100) : 0;
 
-  useEffect(() => {
-    if (
-      typeof completedValue === "number" &&
-      typeof notCompletedValue === "number" &&
-      !isNaN(completedValue) &&
-      !isNaN(notCompletedValue)
-    ) {
-      setPercentage(
-        convertToPercentage(completedValue, completedValue + notCompletedValue)
-      );
-    } else {
-      setPercentage(0);
-    }
-  }, [completedValue, notCompletedValue]);
-
-  const ProgressIcon = getProgressIcon(percentage); // Ensure it returns a valid React element
+  const ProgressIcon = getProgressIcon(percentage);
 
   return (
     <View style={styles.container}>

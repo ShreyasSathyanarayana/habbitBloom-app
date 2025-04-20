@@ -27,9 +27,9 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
   const isTodayStatus = isToday && localStatus !== true;
   const toast = useToast();
   const queryClient = useQueryClient();
-  useCallback(() => {
-    setLocalStatus(status);
-  }, [status]);
+  // useCallback(() => {
+  //   setLocalStatus(status);
+  // }, [status]);
   const mutation = useMutation({
     mutationKey: ["markHabitStatus"],
     mutationFn: () => {

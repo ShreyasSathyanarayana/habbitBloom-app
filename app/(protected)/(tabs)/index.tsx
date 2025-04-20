@@ -52,9 +52,9 @@ export default function HabitsScreen() {
       await Notifications.getPermissionsAsync();
     console.log("existingStatus", existingStatus);
 
-    setShowNotificationPermissionModal(
-      existingStatus === Notifications.PermissionStatus.DENIED
-    );
+    // setShowNotificationPermissionModal(
+    //   existingStatus === Notifications.PermissionStatus.DENIED
+    // );
   };
 
   const getHabitQuery = useInfiniteQuery({

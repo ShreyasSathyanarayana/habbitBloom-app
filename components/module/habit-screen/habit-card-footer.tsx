@@ -41,9 +41,9 @@ const HabitCardFooter = ({
   });
   const [localIsHabitPublic, setLocalIsHabitPublic] = useState(isHabitPublic);
   const toast = useToast();
-  useEffect(() => {
-    setLocalIsHabitPublic(isHabitPublic);
-  }, [isHabitPublic]);
+  // useEffect(() => {
+  //   setLocalIsHabitPublic(isHabitPublic);
+  // }, [isHabitPublic]);
 
   const unHideHabitMutation = useMutation({
     mutationKey: ["UnHideHabit"],

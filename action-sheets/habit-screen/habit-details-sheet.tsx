@@ -33,6 +33,7 @@ const closeSheet = () => {
 
 const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
   const payload = props?.payload?.data;
+  const isHabitCompleted = props?.payload?.isHabitCompleted;
   const toast = useToast();
   const queryClient = useQueryClient();
   const { isConnected } = useAuth();
@@ -151,10 +152,10 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
             leftIcon={<EditIcon width={_iconSize} height={_iconSize} />}
             buttonName="Edit"
           /> */}
-        {/* </View>
+          {/* </View>
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}> */}
-          {!payload?.archived && (
+          {!isHabitCompleted && !payload?.archived && (
             <ActionSheetButton
               onPress={() => archiveHabitMutation.mutateAsync()}
               leftIcon={<ArchiveIcon width={_iconSize} height={_iconSize} />}

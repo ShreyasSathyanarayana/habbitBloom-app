@@ -15,7 +15,7 @@ const _iconSize = horizontalScale(150);
 const HabitCompletedCard = (props: CompletedHabitWithStreak) => {
   const onPressThreeDot = () => {
     SheetManager.show("habit-details", {
-      payload: { data: props },
+      payload: { data: props, isHabitCompleted: true },
     });
   };
   return (

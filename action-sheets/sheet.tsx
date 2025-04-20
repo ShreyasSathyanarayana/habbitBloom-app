@@ -42,7 +42,7 @@ declare module "react-native-actions-sheet" {
     // "example-sheet": SheetDefinition;
     "create-habit": SheetDefinition;
     "habit-details": SheetDefinition<{
-      payload: { data: HabitDetailsProp };
+      payload: { data: HabitDetailsProp; isHabitCompleted?: boolean };
     }>;
     "delete-habit": SheetDefinition<{
       payload: { data: HabitDetailsProp };
