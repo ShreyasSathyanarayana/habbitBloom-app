@@ -12,6 +12,7 @@ import { SharedValue } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
 import { FlashList, useBlankAreaTracker } from "@shopify/flash-list";
 import HabitEmpty from "./habit-empty";
+import { LegendList } from "@legendapp/list";
 
 type Props = {
   scrollY: SharedValue<number>;
@@ -37,7 +38,6 @@ const HabitList = ({
   const memoizedHabits = useMemo(() => habitList, [habitList]);
   const MemoizedHabitCard = memo(HabitCard);
   const ref = useRef(null);
-  const [blankAreaTrackerResult, onBlankArea] = useBlankAreaTracker(ref);
 
   const renderItem = useCallback(({ item }: { item: HabitProp }) => {
     return <MemoizedHabitCard {...item} />;
@@ -53,7 +53,8 @@ const HabitList = ({
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <FlashList
+        <LegendList
+          key={"loading"}
           estimatedItemSize={50}
           showsVerticalScrollIndicator={false}
           data={[1, 2, 3]}
@@ -64,7 +65,7 @@ const HabitList = ({
           renderItem={() => (
             <Skeleton width={"100%"} height={verticalScale(250)} />
           )}
-          scrollEventThrottle={16}
+          // scrollEventThrottle={16}
         />
       </View>
     );
@@ -73,7 +74,8 @@ const HabitList = ({
   return (
     <View style={styles.container}>
       {memoizedHabits && memoizedHabits.length > 0 && (
-        <FlatList
+        <LegendList
+          key={"habit-list"}
           onRefresh={onRefresh}
           ref={ref}
           data={memoizedHabits}
@@ -81,30 +83,15 @@ const HabitList = ({
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           refreshing={isRefreshing}
-          initialNumToRender={3}
-          getItemLayout={(data, index) => ({
-            length: 50,
-            offset: 50 * index,
-            index,
-          })}
-          // estimatedItemSize={80} // Adjust based on UI
-          // windowSize={5} // Increase for better scrolling performance
-          // maxToRenderPerBatch={5} // Adjust this based on testing
-          // updateCellsBatchingPeriod={50}
-          // removeClippedSubviews={true}
           contentContainerStyle={{ paddingBottom: verticalScale(80) }}
-          scrollEventThrottle={16}
           onScroll={handleScroll}
+          // recycleItems
           // onBlankArea={onBlankArea}
           ItemSeparatorComponent={() => {
             return <View style={{ height: verticalScale(16) }} />;
           }}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {
-            if (isNextPageAvailable) {
-              onScrollEnd();
-            }
-          }}
+          onEndReachedThreshold={0.8}
+          onEndReached={isNextPageAvailable ? onScrollEnd : null}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}

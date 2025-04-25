@@ -117,7 +117,7 @@ export default function HabitsScreen() {
           getHabitQuery.isFetching && !getHabitQuery.isFetchingNextPage
         }
         habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]} // for pagination
-        onRefresh={getHabitQuery.refetch}
+        onRefresh={onRefreshList}
         isRefreshing={getHabitQuery?.isFetchingNextPage}
         isNextPageAvailable={getHabitQuery.hasNextPage}
         onScrollEnd={getHabitQuery.fetchNextPage}

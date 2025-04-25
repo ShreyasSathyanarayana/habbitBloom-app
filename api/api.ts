@@ -1540,7 +1540,7 @@ export const insertSuggestion = async (suggestionDetails: SuggestionDetails) => 
 
 export const getMySuggestions = async (status:string)=>{
   const userId = await getUserId();
-  const { data, error } = await supabase.from("suggestions").select("*").eq("user_id", userId).eq('status',status);
+  const { data, error } = await supabase.from("suggestions").select("*").eq("user_id", userId).eq('status',status).order("created_at", { ascending: false }); // Most recent first;
   if (error) throw error;
   return data;
 }
