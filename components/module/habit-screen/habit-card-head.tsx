@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import CompletedHabitIcon from "@/assets/svg/completed-badge.svg";
 import HabitCompletedTagIcon from "@/assets/svg/habit-completed-tag.svg";
@@ -21,7 +21,9 @@ const HabitCardHead = ({
   completed,
   rewardUri,
 }: Props) => {
-  const categoryDetails = getCategoryByName(category);
+  const categoryDetails = useMemo(() => {
+    return getCategoryByName(category);
+  }, [category]);
   return (
     <View style={styles.container}>
       <LinearGradient

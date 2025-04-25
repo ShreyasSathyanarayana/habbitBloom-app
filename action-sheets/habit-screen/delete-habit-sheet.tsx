@@ -31,8 +31,6 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
   const deleteHabitMutation = useMutation({
     mutationKey: ["deleteHabit"],
     mutationFn: () => {
-      closeSheet();
-      SheetManager.hide("habit-details");
       return deleteHabit(payload?.id ?? "");
     },
     onSuccess: () => {
@@ -61,6 +59,10 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       toast.show("Something went wrong", {
         type: "warning",
       });
+    },
+    onSettled: () => {
+      closeSheet();
+      SheetManager.hide("habit-details");
     },
   });
   const archiveHabitMutation = useMutation({
@@ -139,6 +141,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
             archiveHabitMutation.mutateAsync();
             SheetManager.hide("habit-details");
           }}
+          secondBtnLoading={deleteHabitMutation.isPending}
           secondBtnAction={() => {
             deleteHabitMutation.mutateAsync();
           }}
@@ -151,6 +154,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
           firstBtnAction={() => {
             closeSheet();
           }}
+          secondBtnLoading={deleteHabitMutation.isPending}
           secondBtnAction={() => {
             deleteHabitMutation.mutateAsync();
           }}

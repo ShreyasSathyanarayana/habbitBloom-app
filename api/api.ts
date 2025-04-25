@@ -771,8 +771,9 @@ export const getAllCompletedHabitsWithStreaks = async (): Promise<CompletedHabit
   const enrichedHabits: CompletedHabitWithStreak[] = [];
 
   for (const habit of habits) {
-    const stats = await getCompletedHabitStats(habit.id);
+    const stats = await getHabitStats(habit.id);
     const highestStreak = stats.highestStreak;
+    
 
     // Find the most relevant reward for this streak
     const matchingReward = sortedRewards.find((r) => highestStreak >= r.day);

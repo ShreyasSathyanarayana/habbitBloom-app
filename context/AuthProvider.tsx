@@ -1,5 +1,11 @@
 import { useRouter } from "expo-router";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import * as SecureStore from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,7 +22,6 @@ interface Login {
 interface AuthContext {
   login: (arg: Login) => Promise<void>;
   logout: () => Promise<void>;
-  user_id: string;
   isConnected: boolean;
 }
 export const tokenKeys = {
@@ -31,11 +36,6 @@ const AuthContext = createContext<AuthContext | null>(null);
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [userid, setUserId] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loginMode, setLoginMode] = useState<"normal" | "googleId" | "appleId">(
-    "normal"
-  );
   const [isConnected, setIsConnected] = useState<boolean>(true);
 
   const login = async (arg: Login) => {
@@ -52,15 +52,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("role", role);
       role?.role && storage.set(tokenKeys.role, role?.role);
 
-      // Store tokens in SecureStore (Offload to background)
-      // await Promise.all([
-      //   // SecureStore.setItemAsync("accessToken", accessToken),
-      //   // SecureStore.setItemAsync("refreshToken", refreshToken),
-      // ]);
-
-      // Update user ID after SecureStore operation completes
-      // setUserId(accessToken);
-
       // Perform navigation after a slight delay to allow UI to stabilize
       setTimeout(() => {
         if (router.canDismiss()) router.dismissAll();
@@ -73,18 +64,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      // Delete tokens
-      // await Promise.all([
-      //   SecureStore.deleteItemAsync("accessToken"),
-      //   SecureStore.deleteItemAsync("refreshToken"),
-      // ]);
       storage.delete(tokenKeys.accessToken);
       storage.delete(tokenKeys.refreshToken);
       storage.delete(tokenKeys.password);
       storage.delete(tokenKeys.loginMode);
       storage.delete(tokenKeys.role);
-
-      // setUserId("");
 
       // Navigate out of protected routes
       setTimeout(() => {
@@ -104,13 +88,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{ login, logout, user_id: userid, isConnected }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = useMemo(() => ({ login, logout, isConnected }), [isConnected]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export default AuthProvider;

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
-import PlusIcon from "@/assets/svg/plus-icon.svg";
-import { horizontalScale, verticalScale } from "@/metric";
-import { useTabBar } from "@/context/TabBarContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -10,23 +8,28 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { router } from "expo-router";
-import HabitHead from "@/components/module/habit-screen/habit-head";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import HabitList from "@/components/module/habit-screen/habit-list";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAllHabits } from "@/api/api";
-import ServerError from "@/components/module/errors/server-error";
-import { useAuth } from "@/context/AuthProvider";
-import NoInternet from "@/components/module/errors/no-internet";
 import { LinearGradient } from "expo-linear-gradient";
-import { HabitProp } from "@/components/module/habit-screen/habit-card";
 import * as Notifications from "expo-notifications";
-import AllowPermissionModal from "@/components/modal/allow-permission-modal";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+
+import PlusIcon from "@/assets/svg/plus-icon.svg";
+import { horizontalScale, verticalScale } from "@/metric";
+import { useTabBar } from "@/context/TabBarContext";
+import { useAuth } from "@/context/AuthProvider";
+import { getAllHabits } from "@/api/api";
 import { useHabitStore } from "@/store/habit-store";
+import HabitHead from "@/components/module/habit-screen/habit-head";
+import HabitList from "@/components/module/habit-screen-v2/habit-list";
+import ServerError from "@/components/module/errors/server-error";
+import NoInternet from "@/components/module/errors/no-internet";
+import AllowPermissionModal from "@/components/modal/allow-permission-modal";
+import { HabitProp } from "@/components/module/habit-screen/habit-card";
+// import HabitList from "@/components/module/habit-screen/habit-list";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
+const HABIT_LIMIT = 5;
 
 export default function HabitsScreen() {
   const { isTabBarVisible, showTabBar, hideTabBar } = useTabBar();
@@ -34,52 +37,43 @@ export default function HabitsScreen() {
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
   const prevScrollY = useSharedValue(0);
-  // const [selectedFilter, setSelectedFilter] = useState<
-  //   "latest" | "alphabetical"
-  // >("latest");
+
   const selectedFilter = useHabitStore((state) => state.selectedFilter);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotificationPermissionModal, setShowNotificationPermissionModal] =
     useState(false);
 
-  const limit = 5;
+  // === Notification Permission ===
   useEffect(() => {
-    getNotificationPermission();
+    const checkPermission = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      setShowNotificationPermissionModal(status === "denied");
+    };
+    checkPermission();
   }, []);
 
-  const getNotificationPermission = async () => {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    console.log("existingStatus", existingStatus);
-
-    // setShowNotificationPermissionModal(
-    //   existingStatus === Notifications.PermissionStatus.DENIED
-    // );
-  };
-
+  // === Data Fetching ===
   const getHabitQuery = useInfiniteQuery({
     queryKey: ["habitList", isConnected, selectedFilter],
-    queryFn: ({ pageParam }) => {
-      return getAllHabits(selectedFilter, pageParam, limit);
-    },
+    queryFn: ({ pageParam = 1 }) =>
+      getAllHabits(selectedFilter, pageParam, HABIT_LIMIT),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const nextPage = allPages.length + 1;
-      if (lastPage?.length < limit) {
-        return undefined;
-      }
-      return nextPage;
-    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage?.length < HABIT_LIMIT ? undefined : allPages.length + 1,
   });
-  // console.log("habit list", JSON.stringify(getHabitQuery.data, null, 2));
 
+  const onRefreshList = () => {
+    getHabitQuery.refetch();
+  };
+
+  // === Hide/Show TabBar on Scroll ===
   useDerivedValue(() => {
-    const diffY = scrollY.value - prevScrollY.value;
-    if (diffY > SCROLL_HIDE_THRESHOLD) runOnJS(hideTabBar)();
-    else if (diffY < SCROLL_SHOW_THRESHOLD) runOnJS(showTabBar)();
+    const deltaY = scrollY.value - prevScrollY.value;
+    if (deltaY > SCROLL_HIDE_THRESHOLD) runOnJS(hideTabBar)();
+    else if (deltaY < SCROLL_SHOW_THRESHOLD) runOnJS(showTabBar)();
     prevScrollY.value = scrollY.value;
-  });
+  }, []);
 
+  // === Button Animation ===
   const animatedButtonStyle = useAnimatedStyle(() => ({
     opacity: withSpring(isTabBarVisible ? 1 : 0, {
       damping: 20,
@@ -95,19 +89,15 @@ export default function HabitsScreen() {
     ],
   }));
 
-  const onRefreshList = () => {
-    getHabitQuery.refetch();
-  };
-
-  if (!isConnected) return <NoInternet onRefresh={getHabitQuery.refetch} />;
+  // === UI Rendering ===
+  if (!isConnected) return <NoInternet onRefresh={onRefreshList} />;
   if (getHabitQuery.status === "error")
-    return <ServerError onRefresh={getHabitQuery.refetch} />;
+    return <ServerError onRefresh={onRefreshList} />;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <HabitHead
         selectedFilter={selectedFilter}
-        // onChangeFilter={(filterName) => setSelectedFilter(filterName)}
         onPressArchive={() => router.push("/(protected)/archive")}
       />
 
@@ -116,37 +106,30 @@ export default function HabitsScreen() {
         isLoading={
           getHabitQuery.isFetching && !getHabitQuery.isFetchingNextPage
         }
-        habitList={getHabitQuery.data?.pages?.flat() as HabitProp[]} // for pagination
+        isRefreshing={getHabitQuery.isFetchingNextPage}
+        habitList={(getHabitQuery.data?.pages ?? []).flat() as HabitProp[]}
         onRefresh={onRefreshList}
-        isRefreshing={getHabitQuery?.isFetchingNextPage}
         isNextPageAvailable={getHabitQuery.hasNextPage}
         onScrollEnd={getHabitQuery.fetchNextPage}
         isFetchingNextPage={getHabitQuery.isFetchingNextPage}
       />
+
       <AllowPermissionModal
         isModalVisible={showNotificationPermissionModal}
         permissionType="Notifications"
         onClose={() => setShowNotificationPermissionModal(false)}
       />
 
-      {/* Floating Button with Animation */}
+      {/* Floating Add Habit Button */}
       <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
         <TouchableOpacity
           onPress={() => router.push("/(protected)/create-habit")}
-          // style={styles.floatingBtn}
         >
           <LinearGradient
             colors={["#8A2BE2", "#34127E"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            //   style={styles.card}
-            style={{
-              width: horizontalScale(56),
-              height: horizontalScale(56),
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: horizontalScale(50),
-            }}
+            style={styles.floatingBtn}
           >
             <PlusIcon />
           </LinearGradient>
@@ -168,8 +151,10 @@ const styles = StyleSheet.create({
     right: horizontalScale(15),
   },
   floatingBtn: {
-    // padding: horizontalScale(12),
-    // backgroundColor: "rgba(138, 43, 226, 1)",
-    borderRadius: 150,
+    width: horizontalScale(56),
+    height: horizontalScale(56),
+    borderRadius: horizontalScale(50),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

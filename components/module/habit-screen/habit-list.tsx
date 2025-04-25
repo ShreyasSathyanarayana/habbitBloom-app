@@ -14,7 +14,7 @@ import { FlashList, useBlankAreaTracker } from "@shopify/flash-list";
 import HabitEmpty from "./habit-empty";
 import { LegendList } from "@legendapp/list";
 
-type Props = {
+export type HabitListProps = {
   scrollY: SharedValue<number>;
   habitList?: HabitProp[];
   isLoading: boolean;
@@ -34,7 +34,7 @@ const HabitList = ({
   onScrollEnd,
   isNextPageAvailable,
   isFetchingNextPage,
-}: Props) => {
+}: HabitListProps) => {
   const memoizedHabits = useMemo(() => habitList, [habitList]);
   const MemoizedHabitCard = memo(HabitCard);
   const ref = useRef(null);
