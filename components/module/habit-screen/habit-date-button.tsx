@@ -11,6 +11,7 @@ import { HabitProp } from "./habit-card";
 import moment from "moment";
 import { useHabitStore } from "@/store/habit-store";
 import { SheetManager } from "react-native-actions-sheet";
+// import { Skeleton } from "@rneui/base";
 
 type Props = {
   date: string;
@@ -72,10 +73,11 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
       setLocalStatus((prev) => !prev);
 
-      toast.show(
-        !localStatus ? "Marked Successfully" : "Unmarked Successfully",
-        { type: "success" }
-      );
+      localStatus &&
+        toast.show(
+          !localStatus ? "Marked Successfully" : "Unmarked Successfully",
+          { type: "success" }
+        );
     },
   });
 
@@ -107,15 +109,19 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
     return [base, isDimmed && { color: "rgba(179, 179, 179, 0.7)" }];
   }, [localStatus, isToday]);
 
+  if (mutation.isPending) {
+    return (
+      <Skeleton width={horizontalScale(32)} height={horizontalScale(32)} />
+    );
+  }
+
   return (
-    <Skeleton show={mutation.isPending}>
-      <TouchableHighlight
-        onPress={onPress}
-        style={[styles.container, containerStyle]}
-      >
-        <ThemedText style={textStyle}>{day}</ThemedText>
-      </TouchableHighlight>
-    </Skeleton>
+    <TouchableHighlight
+      onPress={onPress}
+      style={[styles.container, containerStyle]}
+    >
+      <ThemedText style={textStyle}>{day}</ThemedText>
+    </TouchableHighlight>
   );
 };
 

@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { getProgressIcon } from "@/assets/progress-icons/get-progress-icon";
-import { Skeleton } from "moti/skeleton";
+// import { Skeleton } from "moti/skeleton";
 
 type Props = {
   completedValue?: number;
@@ -25,9 +25,9 @@ const HabitComplete = ({
   return (
     <View style={styles.container}>
       {ProgressIcon}
-      <Skeleton show={isLoading}>
+      {/* <Skeleton show={isLoading}> */}
         <ThemedText style={styles.text}>{percentage}%</ThemedText>
-      </Skeleton>
+      {/* </Skeleton> */}
     </View>
   );
 };
