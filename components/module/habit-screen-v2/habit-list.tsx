@@ -1,13 +1,12 @@
 import React, { useCallback } from "react";
 import {
-  VirtualizedList,
+  FlatList,
   StyleSheet,
   View,
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import { HabitCardProp, HabitListProps } from "./type";
-import { ThemedText } from "@/components/ui/theme-text";
 import { LegendList } from "@legendapp/list";
 import HabitCard from "./habit-card";
 import { verticalScale } from "@/metric";
@@ -55,11 +54,9 @@ const HabitList = ({
   }
 
   return (
-    <View style={styles.container}>
-      <VirtualizedList
+    <View key={"HabitList"} style={styles.container}>
+      <FlatList
         data={habitList ?? []}
-        getItem={(data, index) => data[index]}
-        getItemCount={(data) => data.length}
         keyExtractor={(_, index) => "HabitCard" + index.toString()}
         renderItem={renderItem}
         ItemSeparatorComponent={() => (
