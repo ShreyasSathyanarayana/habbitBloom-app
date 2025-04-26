@@ -18,6 +18,21 @@ import moment from "moment";
 import { Option } from "@/components/ui/drop-down";
 const _categoriesIconSize = horizontalScale(24);
 
+const iconSize = {
+  width: horizontalScale(24),
+  height: horizontalScale(24),
+};
+
+const iconMap: Record<string, JSX.Element> = {
+  Exercise: <ExerciseIcon {...iconSize} />,
+  Reading: <ReadingIcon {...iconSize} />,
+  Meditation: <MeditationIcon {...iconSize} />,
+  Hydration: <HydrationIcon {...iconSize} />,
+  "Sleep Schedule": <SleepIcon {...iconSize} />,
+  Journaling: <JournalingIcon {...iconSize} />,
+  Others: <OthersIcon {...iconSize} />,
+};
+
 export const goodHabitsCategories = [
   {
     id: 1,
@@ -84,9 +99,10 @@ export const goodHabitsCategories = [
 ];
 
 export const getCategoryByName = (categoryName: string) => {
-  return goodHabitsCategories.find(
-    (category) => category.name === categoryName
-  );
+  // return goodHabitsCategories.find(
+  //   (category) => category.name === categoryName
+  // );
+  return iconMap[categoryName];
 };
 
 export const getCurrentMonthAndYear = () => {

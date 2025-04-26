@@ -1,6 +1,5 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
-import { activeIcons, icons, inactiveIcons } from "@/assets/icon";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,46 +7,59 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import HabitActiveIcon from "@/assets/tab-icons/habits-active.svg";
+import { activeIcons, inactiveIcons } from "@/assets/icon";
 import { getFontSize } from "@/font";
-// import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
-const TabBarButton = (props: BottomTabBarProps | any) => {
-  const { isFocused, label, routeName, color } = props;
-  //   console.log("route Name==>", routeName, isFocused);
+interface TabBarButtonProps {
+  isFocused: boolean;
+  label: string;
+  routeName: string;
+  color: string;
+  onPress: () => void;
+  onLongPress?: () => void;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  accessibilityState?: any;
+}
 
-  const scale = useSharedValue(0);
+const TabBarButton: React.FC<TabBarButtonProps> = ({
+  isFocused,
+  label,
+  routeName,
+  color,
+  onPress,
+  onLongPress,
+  accessibilityLabel,
+  accessibilityRole,
+  accessibilityState,
+}) => {
+  const scale = useSharedValue(isFocused ? 1 : 0);
 
   useEffect(() => {
-    scale.value = withSpring(
-      typeof isFocused === "boolean" ? (isFocused ? 1 : 0) : isFocused,
-      { duration: 350 }
-    );
-  }, [scale, isFocused]);
+    scale.value = withSpring(isFocused ? 1 : 0, { duration: 350 });
+  }, [isFocused]);
 
-  const animatedIconStyle = useAnimatedStyle(() => {
-    const scaleValue = interpolate(scale.value, [0, 1], [1, 1.4]);
-    const top = interpolate(scale.value, [0, 1], [0, 8]);
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(scale.value, [0, 1], [1, 1.4]) }],
+    top: interpolate(scale.value, [0, 1], [0, 8]),
+  }));
 
-    return {
-      // styles
-      transform: [{ scale: scaleValue }],
-      top,
-    };
-  });
-  const animatedTextStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(scale.value, [0, 1], [1, 0]);
+  const animatedTextStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scale.value, [0, 1], [1, 0]),
+  }));
 
-    return {
-      // styles
-      opacity,
-    };
-  });
+  const Icon = isFocused ? activeIcons[routeName] : inactiveIcons[routeName];
+
   return (
-    <Pressable {...props} style={styles.container}>
-      <Animated.View style={[animatedIconStyle]}>
-        {isFocused ? activeIcons[routeName] : inactiveIcons[routeName]}
-      </Animated.View>
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole={accessibilityRole??"button"}
+      accessibilityState={accessibilityState}
+      style={styles.container}
+    >
+      <Animated.View style={animatedIconStyle}>{Icon}</Animated.View>
 
       <Animated.Text
         style={[

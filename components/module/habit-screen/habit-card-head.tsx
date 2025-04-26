@@ -39,7 +39,7 @@ const HabitCardHead = ({
           borderRadius: horizontalScale(8),
         }}
       >
-        {categoryDetails?.icon}
+        {categoryDetails}
       </LinearGradient>
       <ThemedText
         numberOfLines={2}
