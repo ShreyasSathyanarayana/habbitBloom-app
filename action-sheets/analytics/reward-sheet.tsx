@@ -1,5 +1,5 @@
 import ActionSheetContainer from "@/components/ui/action-sheet-container";
-import React from "react";
+import React, { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import SheetHeader from "../sheet-header";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
@@ -8,39 +8,64 @@ import Button from "@/components/ui/button";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
 import RewardIcon from "@/components/module/analytics-screen/rewards/reward-icon";
+import ViewShot, { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 const onclose = () => {
   SheetManager.hide("reward-sheet");
 };
 
 const RewardSheet = (props: SheetProps<"reward-sheet">) => {
   const payload = props.payload;
+
+  const componentRef = useRef<ViewShot | null>(null);
+
+  const onShare = async () => {
+    const uri = await captureRef(componentRef, {
+      result: "tmpfile",
+      format: "png",
+    });
+
+    if (uri) {
+      await Sharing.shareAsync(uri);
+    }
+  };
+
   return (
     <ActionSheetContainer sheetId={props.sheetId}>
       <SheetHeader title="You’ve Earned This!" onClose={onclose} />
       <View style={{ gap: verticalScale(16), paddingTop: verticalScale(16) }}>
-        <View style={styles.rewardContainer}>
-          <View style={{ alignItems: "center" }}>
-            <RewardIcon
-              style={{
-                width: horizontalScale(90),
-                height: horizontalScale(120),
-                zIndex: 1,
-              }}
-              imageUri={payload?.rewardUri ?? ""}
-            />
-            <View style={styles.backgroundCircle} />
+        <ViewShot
+          ref={componentRef}
+          options={{
+            format: "png",
+            quality: 1,
+            fileName: `${payload?.habitName}.png`,
+          }}
+        >
+          <View style={styles.rewardContainer}>
+            <View style={{ alignItems: "center" }}>
+              <RewardIcon
+                style={{
+                  width: horizontalScale(90),
+                  height: horizontalScale(120),
+                  zIndex: 1,
+                }}
+                imageUri={payload?.rewardUri ?? ""}
+              />
+              <View style={styles.backgroundCircle} />
+            </View>
+            <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
+              {payload?.habitName}
+            </ThemedText>
+            <ThemedText style={[styles.textStyle, { textAlign: "center" }]}>
+              Completed a streak day!
+            </ThemedText>
+            <ThemedText style={[styles.textStyle, { textAlign: "center" }]}>
+              Small steps every day lead to big changes
+            </ThemedText>
           </View>
-          <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
-            {payload?.habitName}
-          </ThemedText>
-          <ThemedText style={[styles.textStyle, { textAlign: "center" }]}>
-            Completed a streak day!
-          </ThemedText>
-          <ThemedText style={[styles.textStyle, { textAlign: "center" }]}>
-            Small steps every day lead to big changes
-          </ThemedText>
-        </View>
-        <Button label="Share" onPress={onclose} />
+        </ViewShot>
+        <Button label="Share" onPress={onShare} />
       </View>
     </ActionSheetContainer>
   );
@@ -53,6 +78,8 @@ const styles = StyleSheet.create({
   rewardContainer: {
     alignItems: "center",
     gap: verticalScale(16),
+    backgroundColor: "rgba(28, 28, 30, 1)",
+    padding: horizontalScale(16),
     // flex: 1,
   },
   backgroundCircle: {

@@ -287,6 +287,8 @@ PODS:
     - Yoga
   - ExpoSecureStore (14.0.1):
     - ExpoModulesCore
+  - ExpoSharing (13.0.1):
+    - ExpoModulesCore
   - ExpoSplashScreen (0.29.22):
     - ExpoModulesCore
   - ExpoSQLite (15.1.3):
@@ -1711,6 +1713,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-view-shot (4.0.3):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-webview (13.12.5):
     - DoubleConversion
     - glog
@@ -2363,6 +2386,7 @@ DEPENDENCIES:
   - ExpoLinking (from `../node_modules/expo-linking/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
+  - ExpoSharing (from `../node_modules/expo-sharing/ios`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
@@ -2412,6 +2436,7 @@ DEPENDENCIES:
   - react-native-otp-verify (from `../node_modules/react-native-otp-verify`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2525,6 +2550,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-modules-core"
   ExpoSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
+  ExpoSharing:
+    :path: "../node_modules/expo-sharing/ios"
   ExpoSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
   ExpoSQLite:
@@ -2620,6 +2647,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-view-shot:
+    :path: "../node_modules/react-native-view-shot"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-nativeconfig:
@@ -2730,6 +2759,7 @@ SPEC CHECKSUMS:
   ExpoLinking: 0381341519ca7180a3a057d20edb1cf6a908aaf4
   ExpoModulesCore: 0bcea8c26791a8f0aed1d4a961f1165e1fc657d4
   ExpoSecureStore: d006eea5e316283099d46f80a6b10055b89a6008
+  ExpoSharing: c4540ef2e6615a92e05d2bddf019e1f58f27119e
   ExpoSplashScreen: 643666b96a84e8d97d55fac43926fb4183c692d9
   ExpoSQLite: 2a903f183459e10ae94b44813db91b8ad9ea033f
   ExpoSymbols: b9f255ce49868d46a73f30e12859efeb8117bcad
@@ -2783,6 +2813,7 @@ SPEC CHECKSUMS:
   react-native-otp-verify: b524a7f44b691644bea08376d6a4782a2df57e09
   react-native-pager-view: c89e08cdd49b04c65c108108779c56acc25c2700
   react-native-safe-area-context: 458f6b948437afcb59198016b26bbd02ff9c3b47
+  react-native-view-shot: a643bf261ce8907df3eddf7b66e408bee8ed46f6
   react-native-webview: 40b8823be3fac70f0404016e6aed754ef4307517
   React-nativeconfig: a0ee536f9c1b8f2ba80fdf95aa4f2d6eb9b79510
   React-NativeModulesApple: 7681e640f3bd0d31e88911ccf5630785b3ec0a90
