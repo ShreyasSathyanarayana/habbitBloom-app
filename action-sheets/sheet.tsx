@@ -11,6 +11,7 @@ import SupportAndFeedbackSheet from "./profile/support-and-feedback-sheet";
 import ChangePasswordSheet from "./profile/change-password-sheet";
 import AboutUsSheet from "./profile/about-us-sheet";
 import MarkedHabitSheet from "./habit-screen/marked-habit-sheet";
+import RewardSheet from "./analytics/reward-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -35,6 +36,7 @@ registerSheet("delete-profile-pic", DeleteProfilePicSheet);
 registerSheet("support-and-feedback", SupportAndFeedbackSheet);
 registerSheet("change-password", ChangePasswordSheet);
 registerSheet("about-us", AboutUsSheet);
+registerSheet("reward-sheet", RewardSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -73,5 +75,11 @@ declare module "react-native-actions-sheet" {
     "support-and-feedback": SheetDefinition;
     "change-password": SheetDefinition;
     "about-us": SheetDefinition;
+    "reward-sheet": SheetDefinition<{
+      payload: {
+        rewardUri: string;
+        habitName:string
+      };
+    }>;
   }
 }

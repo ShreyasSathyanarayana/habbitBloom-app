@@ -11,7 +11,7 @@ import { horizontalScale, verticalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PagerView from "react-native-pager-view";
@@ -29,9 +29,9 @@ const Analytics = () => {
     queryFn: () => getHabitById(id as string),
     enabled: !!id,
   });
-  const CategoryIcon = getCategoryByName(
-    getHabitDetailsQuery?.data?.category ?? ""
-  )?.icon;
+  const CategoryIcon = useMemo(() => {
+    return getCategoryByName(getHabitDetailsQuery?.data?.category ?? "");
+  }, [getHabitDetailsQuery?.data?.category]);
 
   if (!isConnected) {
     return <NoInternet onRefresh={() => getHabitDetailsQuery?.refetch()} />;
@@ -79,6 +79,7 @@ const Analytics = () => {
             </View>
             <View key="stats" style={{ flex: 1 }}>
               <StatisticsAnalytics
+                habitName={getHabitDetailsQuery.data?.habit_name ?? ""}
                 habitId={id as string}
                 habitHasEndDate={
                   getHabitDetailsQuery?.data?.end_date ? true : false

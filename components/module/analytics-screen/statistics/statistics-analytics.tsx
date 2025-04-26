@@ -12,10 +12,11 @@ import SuccessFailAnalytics from "./success-fail-analytics";
 type Props = {
   habitId: string;
   habitHasEndDate: boolean;
+  habitName: string;
 };
 const _dividerColor = "rgba(38, 50, 56, 0.7)";
 
-const StatisticsAnalytics = ({ habitId, habitHasEndDate = false }: Props) => {
+const StatisticsAnalytics = ({ habitId, habitHasEndDate = false,habitName }: Props) => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -41,7 +42,7 @@ const StatisticsAnalytics = ({ habitId, habitHasEndDate = false }: Props) => {
         </>
       )}
       <Divider style={styles.dividerStyle} />
-      <StreakChallenge habitId={habitId} />
+      <StreakChallenge habitId={habitId} habitName={habitName} />
     </ScrollView>
   );
 };

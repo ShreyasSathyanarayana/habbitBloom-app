@@ -9,9 +9,10 @@ import { getHabitStats, getStreakChallengeDetails } from "@/api/api";
 import RewardDetail from "../rewards/reward-detail";
 type Props = {
   habitId: string;
+  habitName: string;
 };
 
-const StreakChallenge = ({ habitId }: Props) => {
+const StreakChallenge = ({ habitId,habitName }: Props) => {
   const getStreakChallengeQuery = useQuery({
     queryKey: ["streakChallenge"],
     queryFn: () => {
@@ -54,6 +55,7 @@ const StreakChallenge = ({ habitId }: Props) => {
         renderItem={({ item }) => {
           return (
             <RewardDetail
+              habitName={habitName}
               {...item}
               highest_streak={getHabitStatsQuery?.data?.highestStreak ?? 0}
             />
