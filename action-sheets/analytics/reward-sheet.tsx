@@ -10,12 +10,18 @@ import { getFontSize } from "@/font";
 import RewardIcon from "@/components/module/analytics-screen/rewards/reward-icon";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
+import ConfettieIcon from "@/assets/svg/confettie.svg";
 const onclose = () => {
   SheetManager.hide("reward-sheet");
 };
 
+const _rewardWidth = horizontalScale(150);
+const _rewardHeight = horizontalScale(200);
+const _circleWidth = horizontalScale(190);
+
 const RewardSheet = (props: SheetProps<"reward-sheet">) => {
   const payload = props.payload;
+  
 
   const componentRef = useRef<ViewShot | null>(null);
 
@@ -43,12 +49,13 @@ const RewardSheet = (props: SheetProps<"reward-sheet">) => {
           }}
         >
           <View style={styles.rewardContainer}>
+            <ConfettieIcon style={styles.confeetieStyle} />
             <View style={{ alignItems: "center" }}>
               <RewardIcon
                 style={{
-                  width: horizontalScale(90),
-                  height: horizontalScale(120),
-                  zIndex: 1,
+                  width: _rewardWidth,
+                  height: _rewardHeight,
+                  zIndex: 2,
                 }}
                 imageUri={payload?.rewardUri ?? ""}
               />
@@ -83,13 +90,18 @@ const styles = StyleSheet.create({
     // flex: 1,
   },
   backgroundCircle: {
-    width: horizontalScale(100),
-    height: horizontalScale(100),
-    borderRadius: horizontalScale(50),
+    width: _circleWidth,
+    height: _circleWidth,
+    borderRadius: _circleWidth,
     backgroundColor: "rgba(138, 43, 226, 1)",
     position: "absolute",
     zIndex: 0,
-    top: verticalScale(8),
+    // top: verticalScale(8),
+  },
+  confeetieStyle: {
+    position: "absolute",
+    zIndex: 1,
+    top: verticalScale(10),
   },
 });
 
