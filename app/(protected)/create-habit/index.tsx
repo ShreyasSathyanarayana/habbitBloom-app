@@ -27,7 +27,12 @@ import TimePicker from "@/components/ui/time-picker";
 import TimerIcon from "@/assets/svg/timer-icon.svg";
 import UpDownIcon from "@/assets/svg/up-down.svg";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createOrUpdateHabit, deleteHabit, getHabitById } from "@/api/api";
+import {
+  createOrUpdateHabit,
+  deleteHabit,
+  getHabitById,
+  getHabitNames,
+} from "@/api/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
 import { insertHabit } from "@/database/db";
@@ -70,20 +75,23 @@ const CreateHabit = () => {
       end_date: null,
       description: "",
     },
+    mode: "all",
   });
   const toast = useToast();
   const categoryRef = useRef<FlatList<any>>(null);
   const [isCreatingHabit, setIsCreatingHabit] = useState<boolean>(false);
-  const [isDeletingHabit, setIsDeletingHabit] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const category = watch("category"); // Watch category value
-  const habitDetails = useQuery({
-    queryKey: ["HabitDetailsByid", habitId],
-    queryFn: () => {
-      return getHabitById(habitId);
-    },
-    enabled: !!habitId,
+
+  const getHabitNamesQuery = useQuery({
+    queryKey: ["habitNames"],
+    queryFn: () => getHabitNames(),
   });
+
+  console.log(
+    "Habit Names==>",
+    JSON.stringify(getHabitNamesQuery?.data, null, 2)
+  );
 
   const mutation = useMutation({
     mutationFn: (data: any) => {
@@ -117,44 +125,6 @@ const CreateHabit = () => {
       setIsCreatingHabit(false);
     },
   });
-
-  const deleteMutation = useMutation({
-    mutationKey: ["delehabit"],
-    mutationFn: () => {
-      setIsDeletingHabit(true);
-      return deleteHabit(habitId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habitList"] });
-      router.replace("/(protected)/(tabs)");
-    },
-    onError: (error: any) => {
-      console.log("error", error);
-
-      toast.show(error.message, {
-        type: "warning",
-      });
-    },
-    onSettled: () => {
-      setIsDeletingHabit(false);
-    },
-  });
-
-  useEffect(() => {
-    if (habitId) {
-      // console.log("Habit Details", JSON.stringify(habitDetails.data, null, 2));
-      setValue("category", habitDetails.data?.category);
-      setValue("frequency", habitDetails.data?.frequency);
-      setValue("habitName", habitDetails.data?.habit_name);
-      setValue("notificationEnable", habitDetails.data?.notification_enable);
-      setValue("reminderTime", habitDetails.data?.reminder_time);
-      setValue("habitColor", habitDetails.data?.habit_color);
-      setValue(
-        "googleNotificationEnable",
-        habitDetails.data?.google_notification_enable
-      );
-    }
-  }, [habitDetails.data]);
 
   useEffect(() => {
     if (!categoryRef.current || !category) return;
@@ -193,26 +163,7 @@ const CreateHabit = () => {
 
   return (
     <Container>
-      <Header
-        title="Create Habit"
-        rightIcon={
-          habitId && ( // Only show delete button if habitId is present
-            <TouchableOpacity
-              style={{ width: horizontalScale(50), alignItems: "center" }}
-              onPress={() => !isDeletingHabit && deleteMutation.mutateAsync()}
-            >
-              <ThemedText style={{ fontSize: getFontSize(14) }}>
-                {isDeletingHabit ? (
-                  <ActivityIndicator size={"small"} color={"white"} />
-                ) : (
-                  "Delete"
-                )}
-                {/* Delete */}
-              </ThemedText>
-            </TouchableOpacity>
-          )
-        }
-      />
+      <Header title="Create Habit" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -261,8 +212,14 @@ const CreateHabit = () => {
             control={control}
             rules={{
               required: "Habit Name is required",
-              validate: (val) =>
-                val?.length < 100 || "can contain only 100 character",
+              validate: (val) => {
+                if (val.length > 100) return "Can contain only 100 characters";
+                if (
+                  getHabitNamesQuery?.data?.includes(val.toLowerCase().trim())
+                )
+                  return "Habit name already exists";
+                return true;
+              },
             }}
             render={({
               field: { onChange, onBlur, value },

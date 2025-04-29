@@ -25,6 +25,17 @@ export const getHabitCount = async ()=>{
   return data.length
 }
 
+// this function returns habit names in lowercase..
+export const getHabitNames = async ()=>{
+  const userId = await getUserId();
+  const {data, error} = await supabase.from("habit").select("habit_name").eq("user_id", userId)
+  if(error){
+    console.error("Error fetching habit count:", error);
+    return [];
+  }
+  return data?.map(({ habit_name }) => habit_name?.trim().toLowerCase()) ?? [];
+}
+
 export const createOrUpdateHabit = async (
   formData: CreateHabitSchema,
   habitId?: string // Optional: If provided, update instead of insert
