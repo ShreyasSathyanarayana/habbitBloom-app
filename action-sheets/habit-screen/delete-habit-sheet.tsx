@@ -51,6 +51,7 @@ const DeleteHabitSheet = (props: SheetProps<"delete-habit">) => {
       );
       queryClient.invalidateQueries({ queryKey: ["habitArchive"] });
       queryClient.invalidateQueries({ queryKey: ["completed-habit"] });
+      queryClient.invalidateQueries({ queryKey: ["habitCount"] });
       toast.show("Habit Deleted", {
         type: "success",
       });

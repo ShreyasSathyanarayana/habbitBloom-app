@@ -12,6 +12,7 @@ import ChangePasswordSheet from "./profile/change-password-sheet";
 import AboutUsSheet from "./profile/about-us-sheet";
 import MarkedHabitSheet from "./habit-screen/marked-habit-sheet";
 import RewardSheet from "./analytics/reward-sheet";
+import HabitLimitSheet from "./habit-screen/habit-limit-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -30,6 +31,7 @@ registerSheet("delete-habit", DeleteHabitSheet);
 registerSheet("hide-habit", HideHabitSheet);
 registerSheet("habit-filter", HabitFilterSheet);
 registerSheet("marked-habit", MarkedHabitSheet);
+registerSheet("habit-limit", HabitLimitSheet);
 registerSheet("update-profile-info", UpdateProfileInfoSheet);
 registerSheet("profile-pic", ProfilePicSheet);
 registerSheet("delete-profile-pic", DeleteProfilePicSheet);
@@ -59,6 +61,11 @@ declare module "react-native-actions-sheet" {
       };
     }>;
     "marked-habit": SheetDefinition;
+    "habit-limit": SheetDefinition<{
+      payload: {
+        isPremiumUser: boolean;
+      };
+    }>;
     "update-profile-info": SheetDefinition<{
       payload: {
         id: string;
@@ -78,7 +85,7 @@ declare module "react-native-actions-sheet" {
     "reward-sheet": SheetDefinition<{
       payload: {
         rewardUri: string;
-        habitName:string
+        habitName: string;
       };
     }>;
   }

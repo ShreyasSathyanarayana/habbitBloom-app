@@ -15,6 +15,16 @@ type CreateHabitSchema = {
   description: string;
 };
 
+export const getHabitCount = async ()=>{
+  const userId = await getUserId();
+  const {data, error} = await supabase.from("habit").select("*").eq("user_id", userId)
+  if(error){
+    console.error("Error fetching habit count:", error);
+    return 0;
+  }
+  return data.length
+}
+
 export const createOrUpdateHabit = async (
   formData: CreateHabitSchema,
   habitId?: string // Optional: If provided, update instead of insert

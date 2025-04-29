@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, {
+import {
   runOnJS,
-  useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withSpring,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-
-import PlusIcon from "@/assets/svg/plus-icon.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useTabBar } from "@/context/TabBarContext";
 import { useAuth } from "@/context/AuthProvider";
@@ -25,6 +20,7 @@ import ServerError from "@/components/module/errors/server-error";
 import NoInternet from "@/components/module/errors/no-internet";
 import AllowPermissionModal from "@/components/modal/allow-permission-modal";
 import { HabitProp } from "@/components/module/habit-screen/habit-card";
+import AddButton from "@/components/module/habit-screen-v2/add-button";
 // import HabitList from "@/components/module/habit-screen/habit-list";
 
 const SCROLL_HIDE_THRESHOLD = 10;
@@ -32,7 +28,7 @@ const SCROLL_SHOW_THRESHOLD = -5;
 const HABIT_LIMIT = 5;
 
 export default function HabitsScreen() {
-  const { isTabBarVisible, showTabBar, hideTabBar } = useTabBar();
+  const { showTabBar, hideTabBar } = useTabBar();
   const { isConnected } = useAuth();
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
@@ -73,22 +69,6 @@ export default function HabitsScreen() {
     prevScrollY.value = scrollY.value;
   }, []);
 
-  // === Button Animation ===
-  const animatedButtonStyle = useAnimatedStyle(() => ({
-    opacity: withSpring(isTabBarVisible ? 1 : 0, {
-      damping: 20,
-      stiffness: 150,
-    }),
-    transform: [
-      {
-        translateX: withSpring(isTabBarVisible ? 0 : 50, {
-          damping: 20,
-          stiffness: 150,
-        }),
-      },
-    ],
-  }));
-
   // === UI Rendering ===
   if (!isConnected) return <NoInternet onRefresh={onRefreshList} />;
   if (getHabitQuery.status === "error")
@@ -121,20 +101,7 @@ export default function HabitsScreen() {
       />
 
       {/* Floating Add Habit Button */}
-      <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
-        <TouchableOpacity
-          onPress={() => router.push("/(protected)/create-habit")}
-        >
-          <LinearGradient
-            colors={["#8A2BE2", "#34127E"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.floatingBtn}
-          >
-            <PlusIcon />
-          </LinearGradient>
-        </TouchableOpacity>
-      </Animated.View>
+      <AddButton />
     </View>
   );
 }

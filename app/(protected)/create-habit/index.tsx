@@ -101,6 +101,8 @@ const CreateHabit = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ["habitList"] });
+      queryClient.invalidateQueries({ queryKey: ["habitCount"] });
+
       router.dismissAll();
       router.replace("/(protected)/(tabs)");
     },
