@@ -57,14 +57,16 @@ const AddButton = () => {
       toast.show("Something went wrong", { type: "warning" });
       return;
     }
-    if (!isPremiumUser && getHabitCountQuery?.data == 6) { // this is for free user
+    if (!isPremiumUser && getHabitCountQuery?.data >= 6) {
+      // this is for free user
       // toast.show("You can create only 6 habits", { type: "warning" });
       SheetManager.show("habit-limit", {
         payload: { isPremiumUser: isPremiumUser },
       });
       return;
     }
-    if (isPremiumUser && getHabitCountQuery?.data >= 20) {  // this is for premium user
+    if (isPremiumUser && getHabitCountQuery?.data >= 20) {
+      // this is for premium user
       SheetManager.show("habit-limit", {
         payload: { isPremiumUser: isPremiumUser },
       });

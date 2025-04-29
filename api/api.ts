@@ -15,15 +15,25 @@ type CreateHabitSchema = {
   description: string;
 };
 
-export const getHabitCount = async ()=>{
+
+// this should ignore the completed habits in the count
+export const getHabitCount = async (): Promise<number> => {
   const userId = await getUserId();
-  const {data, error} = await supabase.from("habit").select("*").eq("user_id", userId)
-  if(error){
-    console.error("Error fetching habit count:", error);
+
+  const { data, error } = await supabase
+    .from("habit")
+    .select("*")
+    .eq("user_id", userId)
+    .or("end_date.is.null,end_date.gt.now()"); // exclude completed habits
+
+  if (error) {
+    console.error("Error fetching habit count for user:", userId, error.message);
     return 0;
   }
-  return data.length
-}
+
+  return data?.length ?? 0;
+};
+
 
 // this function returns habit names in lowercase..
 export const getHabitNames = async ()=>{
