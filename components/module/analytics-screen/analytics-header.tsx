@@ -15,17 +15,14 @@ const AnalyticsHeader = ({ title, headerIcon, isLoading }: HeaderProps) => {
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} />
-      <Skeleton show={isLoading}>
-        <View style={styles.titleContainer}>
-          {headerIcon}
-          <ThemedText
-            numberOfLines={1}
-            style={{ fontFamily: "PoppinsSemiBold" }}
-          >
-            {title}
-          </ThemedText>
-        </View>
-      </Skeleton>
+      {/* <Skeleton show={isLoading}> */}
+      <View style={styles.titleContainer}>
+        {headerIcon}
+        <ThemedText numberOfLines={1} style={{ fontFamily: "PoppinsSemiBold" }}>
+          {title}
+        </ThemedText>
+      </View>
+      {/* </Skeleton> */}
       <View
         style={{ width: horizontalScale(20), height: horizontalScale(20) }}
       />

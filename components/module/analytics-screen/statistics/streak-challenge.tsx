@@ -7,71 +7,72 @@ import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats, getStreakChallengeDetails } from "@/api/api";
 import RewardDetail from "../rewards/reward-detail";
+
 type Props = {
   habitId: string;
   habitName: string;
 };
 
-const StreakChallenge = ({ habitId,habitName }: Props) => {
-  const getStreakChallengeQuery = useQuery({
-    queryKey: ["streakChallenge"],
-    queryFn: () => {
-      return getStreakChallengeDetails();
-    },
+const StreakChallenge = ({ habitId, habitName }: Props) => {
+  const { data: streakChallenges, isLoading: isStreakLoading } = useQuery({
+    queryKey: ["streakChallenge", habitId],
+    queryFn: getStreakChallengeDetails,
   });
-  // console.log(
-  //   "Streak Challenge",
-  //   JSON.stringify(getStreakChallengeQuery.data, null, 2)
-  // );
-  const getHabitStatsQuery = useQuery({
+
+  const { data: habitStats } = useQuery({
     queryKey: ["habit-stats", habitId],
-    queryFn: () => {
-      return getHabitStats(habitId);
-    },
+    queryFn: () => getHabitStats(habitId),
     enabled: !!habitId,
   });
 
-  // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
+  const highestStreak = habitStats?.highestStreak ?? 0;
+
+  if (isStreakLoading || !streakChallenges?.length) {
+    return null; // Optional: You can replace with a Loader if needed
+  }
 
   return (
-    <View style={{ gap: verticalScale(16) }}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <StreakChallengeIcon />
-        <ThemedText style={{ fontSize: getFontSize(12) }}>
-          Streak Challenge
-        </ThemedText>
+        <ThemedText style={styles.titleText}>Streak Challenge</ThemedText>
       </View>
+
       <FlatList
-        showsHorizontalScrollIndicator={false}
+        data={streakChallenges}
         horizontal
-        contentContainerStyle={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: horizontalScale(16),
-        }}
-        data={getStreakChallengeQuery?.data}
+        showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => {
-          return (
-            <RewardDetail
-              habitName={habitName}
-              {...item}
-              highest_streak={getHabitStatsQuery?.data?.highestStreak ?? 0}
-            />
-          );
-        }}
+        contentContainerStyle={styles.flatListContent}
+        ItemSeparatorComponent={() => (
+          <View style={{ width: horizontalScale(16) }} />
+        )}
+        renderItem={({ item }) => (
+          <RewardDetail
+            habitName={habitName}
+            {...item}
+            highest_streak={highestStreak}
+          />
+        )}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  awardContainer: {
-    width: horizontalScale(60),
-    height: horizontalScale(60),
-    borderRadius: horizontalScale(8),
-    backgroundColor: "white",
+  container: {
+    gap: verticalScale(16),
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: horizontalScale(8),
+  },
+  titleText: {
+    fontSize: getFontSize(12),
+  },
+  flatListContent: {
+    paddingHorizontal: horizontalScale(8),
   },
 });
 

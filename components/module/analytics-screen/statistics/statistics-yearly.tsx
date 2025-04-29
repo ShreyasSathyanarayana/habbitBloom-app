@@ -1,40 +1,57 @@
-import React, { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import AnalyticsBar from "../analytics-bar";
 import WeeklyGraph from "./weekly-graph";
-import { verticalScale } from "@/metric";
 import MontlyGraph from "./montly-graph";
 import YearlyGraph from "./yearly-graph";
-import PagerView from "react-native-pager-view";
+import { verticalScale } from "@/metric";
+
 type Props = {
   habitId: string;
 };
 
+const MENU_OPTIONS = ["Week", "Month", "Year"];
+
 const StatisticsYearly = ({ habitId }: Props) => {
-  const menu = ["Week", "Month", "Year"];
-  const [selectedMenu, setSeletedMenu] = useState(menu[0]);
-  const data = [
-    <WeeklyGraph habitId={habitId} />,
-    <MontlyGraph habitId={habitId} />,
-    <YearlyGraph habitId={habitId} />,
-  ];
+  const [selectedMenu, setSelectedMenu] = useState(MENU_OPTIONS[0]);
+
+  const handleMenuChange = useCallback((item: string) => {
+    setSelectedMenu(item);
+  }, []);
+
+  const renderGraph = () => {
+    switch (selectedMenu) {
+      case "Week":
+        return <WeeklyGraph habitId={habitId} />;
+      case "Month":
+        return <MontlyGraph habitId={habitId} />;
+      case "Year":
+        return <YearlyGraph habitId={habitId} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <AnalyticsBar
-        menu={menu}
-        onChangeMenu={(item, index) => setSeletedMenu(item)}
+        menu={MENU_OPTIONS}
+        selectedMenu={selectedMenu}
+        onChangeMenu={(item) => handleMenuChange(item)}
       />
-      <View
-        style={{ minHeight: verticalScale(200), justifyContent: "flex-end" }}
-      >
-        {selectedMenu === "Week" && <WeeklyGraph habitId={habitId} />}
-        {selectedMenu === "Month" && <MontlyGraph habitId={habitId} />}
-        {selectedMenu === "Year" && <YearlyGraph habitId={habitId} />}
-      </View>
+      <View style={styles.graphContainer}>{renderGraph()}</View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  graphContainer: {
+    minHeight: verticalScale(200),
+    justifyContent: "flex-end",
+  },
+});
 
 export default StatisticsYearly;

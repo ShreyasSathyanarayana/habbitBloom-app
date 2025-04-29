@@ -35,7 +35,9 @@ const HabitCard = (props: HabitCardProp) => {
       >
         <HabitCardHead habitName={habit_name} category={category} />
         <HabitFrequencyList frequency={props.frequency} />
-        <HabitDateList habitId={props.id} habitProgress={props.progress} />
+        {!archived && (
+          <HabitDateList habitId={props.id} habitProgress={props.progress} />
+        )}
         {/* <MemoziedHabitDateV2
           habitId={props.id}
           habitProgress={props.progress}
@@ -52,6 +54,7 @@ const HabitCard = (props: HabitCardProp) => {
           onPressThreeDot={onPressThreeDot}
           habitId={props.id}
           stats={props.stats}
+          archived={archived}
         />
       </LinearGradient>
     </Pressable>

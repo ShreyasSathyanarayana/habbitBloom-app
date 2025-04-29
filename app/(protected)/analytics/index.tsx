@@ -5,94 +5,100 @@ import CalenderAnalytics from "@/components/module/analytics-screen/calender-ana
 import StatisticsAnalytics from "@/components/module/analytics-screen/statistics/statistics-analytics";
 import NoInternet from "@/components/module/errors/no-internet";
 import Container from "@/components/ui/container";
-
 import { useAuth } from "@/context/AuthProvider";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
-import React, { useMemo, useRef, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useLocalSearchParams } from "expo-router";
 import PagerView from "react-native-pager-view";
-import { LayoutAnimationConfig } from "react-native-reanimated";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+
+const MENU_OPTIONS = ["Calendar", "Statistics"];
 
 const Analytics = () => {
-  const { id, category } = useLocalSearchParams();
-  const [selectedOption, setSelectedOption] = useState(category);
-  const { isConnected } = useAuth();
-  const menu = ["Calendar", "Statistics"];
+  const { id, category } = useLocalSearchParams<{
+    id: string;
+    category: string;
+  }>();
   const pagerRef = useRef<PagerView>(null);
-  const getHabitDetailsQuery = useQuery({
+  const { isConnected } = useAuth();
+
+  const [selectedMenu, setSelectedMenu] = useState(category);
+
+  const {
+    data: habit,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["habitDetails", id],
-    queryFn: () => getHabitById(id as string),
-    enabled: !!id,
+    queryFn: () => getHabitById(id),
+    enabled: Boolean(id),
   });
+
   const CategoryIcon = useMemo(() => {
-    return getCategoryByName(getHabitDetailsQuery?.data?.category ?? "");
-  }, [getHabitDetailsQuery?.data?.category]);
+    return getCategoryByName(habit?.category ?? "");
+  }, [habit?.category]);
+
+  const onChangeMenu = useCallback((item: string, index: number) => {
+    setSelectedMenu(item);
+    pagerRef.current?.setPageWithoutAnimation(index);
+  }, []);
 
   if (!isConnected) {
-    return <NoInternet onRefresh={() => getHabitDetailsQuery?.refetch()} />;
+    return <NoInternet onRefresh={refetch} />;
   }
-
-  // console.log(JSON.stringify(getHabitDetailsQuery?.data, null, 2));
 
   return (
     <Container>
-      {/* <Header isLoading={true} title="Analytics" /> */}
       <AnalyticsHeader
         headerIcon={CategoryIcon}
-        isLoading={getHabitDetailsQuery?.isLoading}
-        title={getHabitDetailsQuery.data?.habit_name}
+        isLoading={isLoading}
+        title={habit?.habit_name ?? ""}
       />
-      <View
-        style={{
-          paddingHorizontal: horizontalScale(16),
-          gap: verticalScale(24),
-          flex: 1,
-        }}
-      >
-        <AnalyticsBar
-          menu={menu}
-          selectedMenu={category as string}
-          onChangeMenu={(item, index) => {
-            // console.log(index);
 
-            setSelectedOption(item);
-            pagerRef.current?.setPageWithoutAnimation(index);
-          }}
+      <View style={styles.contentContainer}>
+        <AnalyticsBar
+          menu={MENU_OPTIONS}
+          selectedMenu={selectedMenu}
+          onChangeMenu={onChangeMenu}
         />
 
-        {
-          <PagerView
-            ref={pagerRef}
-            scrollEnabled={false}
-            initialPage={category === "Calendar" ? 0 : 1}
-            style={{ flex: 1 }}
-            offscreenPageLimit={2}
-            overdrag={true}
-          >
-            <View key="calendar" style={{ flex: 1 }}>
-              <CalenderAnalytics habitId={id as string} />
-            </View>
-            <View key="stats" style={{ flex: 1 }}>
-              <StatisticsAnalytics
-                habitName={getHabitDetailsQuery.data?.habit_name ?? ""}
-                habitId={id as string}
-                habitHasEndDate={
-                  getHabitDetailsQuery?.data?.end_date ? true : false
-                }
-              />
-            </View>
-          </PagerView>
-        }
+        <PagerView
+          ref={pagerRef}
+          style={styles.pagerView}
+          initialPage={selectedMenu === "Calendar" ? 0 : 1}
+          offscreenPageLimit={2}
+          scrollEnabled={false}
+        >
+          <View key="calendar" style={styles.page}>
+            <CalenderAnalytics habitId={id} />
+          </View>
+          <View key="statistics" style={styles.page}>
+            <StatisticsAnalytics
+              habitName={habit?.habit_name ?? ""}
+              habitId={id}
+              habitHasEndDate={Boolean(habit?.end_date)}
+            />
+          </View>
+        </PagerView>
       </View>
     </Container>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: horizontalScale(16),
+    gap: verticalScale(24),
+  },
+  pagerView: {
+    flex: 1,
+  },
+  page: {
+    flex: 1,
+  },
+});
 
 export default Analytics;

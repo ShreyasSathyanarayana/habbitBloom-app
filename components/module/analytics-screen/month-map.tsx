@@ -3,8 +3,8 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale, verticalScale } from "@/metric";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "moti/skeleton";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import React, { useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import { getFontSize } from "@/font";
@@ -15,43 +15,42 @@ type Props = {
 };
 
 const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
-  const markedDates: { [key: string]: any } = {};
-
+  const markedDates: Record<string, any> = {};
   const today = moment().local().format("YYYY-MM-DD");
 
-  data.forEach((item) => {
-    const isToday = item.date === today;
-    if (item.status === true) {
-      markedDates[item.date] = {
+  for (const { date, status } of data) {
+    const isToday = date === today;
+    const baseContainerStyle = {
+      width: horizontalScale(36),
+      height: horizontalScale(36),
+      borderRadius: horizontalScale(8),
+      justifyContent: "center",
+      alignItems: "center",
+    };
+
+    if (status === true) {
+      markedDates[date] = {
         customStyles: {
           container: {
-            width: horizontalScale(36),
-            height: horizontalScale(36),
-            borderRadius: horizontalScale(8), // Rectangular shape
-            backgroundColor: "rgba(131, 191, 146, 0.3)", // Selected habit color
-            justifyContent: "center",
-            alignItems: "center",
+            ...baseContainerStyle,
+            backgroundColor: "rgba(131, 191, 146, 0.3)",
             borderWidth: horizontalScale(2),
             borderColor: "rgba(52, 199, 89, 1)",
           },
           text: {
-            color: "#FFF", // Text color
+            color: "#FFF",
             fontFamily: "PoppinsMedium",
-            includeFontPadding: false,
             fontSize: getFontSize(16),
+            includeFontPadding: false,
           },
         },
       };
-    } else if (item.status === false) {
-      markedDates[item.date] = {
+    } else if (status === false) {
+      markedDates[date] = {
         customStyles: {
           container: {
-            width: horizontalScale(36),
-            height: horizontalScale(36),
-            borderRadius: horizontalScale(8), // Rectangular shape
-            backgroundColor: isToday ? "transparent" : "rgba(255, 59, 48, 0.3)", // Missed habit color
-            justifyContent: "center",
-            alignItems: "center",
+            ...baseContainerStyle,
+            backgroundColor: isToday ? "transparent" : "rgba(255, 59, 48, 0.3)",
             borderWidth: horizontalScale(2),
             borderColor: isToday
               ? "rgba(255, 255, 255, 1)"
@@ -60,36 +59,32 @@ const getMarkedDates = (data: { date: string; status: boolean | null }[]) => {
           text: {
             color: isToday
               ? "rgba(255, 255, 255, 1)"
-              : "rgba(179, 179, 179, 0.7)", // Text color
+              : "rgba(179, 179, 179, 0.7)",
             fontFamily: "PoppinsMedium",
-            includeFontPadding: false,
             fontSize: getFontSize(16),
+            includeFontPadding: false,
           },
         },
       };
-    } else if (item.status === null) {
-      markedDates[item.date] = {
+    } else if (status === null) {
+      markedDates[date] = {
         customStyles: {
           container: {
-            width: horizontalScale(36),
-            height: horizontalScale(36),
-            borderRadius: 5, // Rectangular shape
-            backgroundColor: "rgba(217, 217, 217, 0.2)", // No data color
-            justifyContent: "center",
-            alignItems: "center",
+            ...baseContainerStyle,
+            backgroundColor: "rgba(217, 217, 217, 0.2)",
           },
           text: {
             color: isToday
               ? "rgba(138, 43, 226, 1)"
-              : "rgba(179, 179, 179, 0.7)", // Text color
+              : "rgba(179, 179, 179, 0.7)",
             fontFamily: "PoppinsMedium",
-            includeFontPadding: false,
             fontSize: getFontSize(16),
+            includeFontPadding: false,
           },
         },
       };
     }
-  });
+  }
 
   return markedDates;
 };
@@ -98,18 +93,17 @@ const MonthMap = ({ habitId }: Props) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["monthlyHabitProgress", habitId],
     queryFn: () => fetchHabitProgressFromCreation(habitId),
+    enabled: !!habitId,
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins (optional boost)
+    select: (res) => res?.data ?? [], // Direct data selection
   });
 
-  const [markedDates, setMarkedDates] = useState({});
-
-  useEffect(() => {
-    if (data?.data) {
-      setMarkedDates(getMarkedDates(data.data));
-    }
+  const markedDates = useMemo(() => {
+    return data?.length ? getMarkedDates(data??[]) : {};
   }, [data]);
 
   if (isLoading) {
-    return <Skeleton width={"100%"} height={verticalScale(300)} />;
+    return <Skeleton width="100%" height={verticalScale(300)} />;
   }
 
   if (error) {
@@ -121,32 +115,30 @@ const MonthMap = ({ habitId }: Props) => {
   }
 
   return (
-    <Animated.View
-      key={"calender-view"}
-      entering={FadeInRight.springify().damping(40).stiffness(200)}
-      exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
-      // style={{ marginBottom: verticalScale(20) }}
+    <View
+      key="calendar-view"
+      // entering={FadeInRight.springify().damping(40).stiffness(200)}
+      // exiting={FadeOutLeft.springify().damping(40).stiffness(200)}
     >
       <Calendar
         markedDates={markedDates}
-        markingType="custom" // 👈 Enables custom rectangular styles
+        markingType="custom"
         hideExtraDays
         enableSwipeMonths={false}
         disableMonthChange
         style={styles.calendar}
         theme={{
-          backgroundColor: "#0000",
+          backgroundColor: "transparent",
           calendarBackground: "transparent",
           textSectionTitleColor: "#FFF",
           dayTextColor: "#FFF",
           todayTextColor: "rgba(138, 43, 226, 1)",
           arrowColor: "#FFF",
           monthTextColor: "#FFF",
-          calenderBackground: "#0000",
           textDayHeaderFontFamily: "PoppinsMedium",
         }}
       />
-    </Animated.View>
+    </View>
   );
 };
 
@@ -154,7 +146,6 @@ const styles = StyleSheet.create({
   calendar: {
     backgroundColor: "transparent",
     borderRadius: horizontalScale(16),
-    // padding: 5,
     borderWidth: horizontalScale(1),
     borderColor: "rgba(138, 43, 226, 1)",
   },

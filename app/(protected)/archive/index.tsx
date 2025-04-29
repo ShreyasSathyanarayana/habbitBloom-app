@@ -1,7 +1,8 @@
 import { getAllHabitsArchived } from "@/api/api";
 import NoInternet from "@/components/module/errors/no-internet";
 import ServerError from "@/components/module/errors/server-error";
-import HabitCard from "@/components/module/habit-screen/habit-card";
+import HabitCard from "@/components/module/habit-screen-v2/habit-card";
+// import HabitCard from "@/components/module/habit-screen/habit-card";
 import NoArchiveHabit from "@/components/module/habit-screen/no-archive-habit";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";

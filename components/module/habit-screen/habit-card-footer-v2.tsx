@@ -19,6 +19,7 @@ type Props = {
   isHabitPublic: boolean;
   onPressThreeDot: () => void;
   stats: HabitStats;
+  archived: boolean;
 };
 
 const _iconSize = horizontalScale(20);
@@ -28,6 +29,7 @@ const HabitCardFooterV2 = ({
   isHabitPublic,
   onPressThreeDot,
   stats,
+  archived,
 }: Props) => {
   const [localIsHabitPublic, setLocalIsHabitPublic] = useState(isHabitPublic);
   const toast = useToast();
@@ -76,30 +78,37 @@ const HabitCardFooterV2 = ({
         />
       </View>
       <View style={styles.column}>
-        {localIsHabitPublic && (
-          <TouchableHighlight
-            hitSlop={10}
-            onPress={() =>
-              SheetManager.show("hide-habit", {
-                payload: { habitId: habitId, updateStatus: updateHabitStatus },
-              })
-            }
-            style={styles.iconWrapper}
-          >
-            <OpenEye width={_iconSize} height={_iconSize} />
-          </TouchableHighlight>
-        )}
-        {!localIsHabitPublic && (
-          <TouchableHighlight
-            hitSlop={10}
-            onPress={() => unHideHabitMutation.mutateAsync()}
-            // onPress={() =>
-            //   SheetManager.show("hide-habit", { payload: { habitId: habitId } })
-            // }
-            style={styles.iconWrapper}
-          >
-            <CloseEye width={_iconSize} height={_iconSize} />
-          </TouchableHighlight>
+        {!archived && (
+          <>
+            {localIsHabitPublic && (
+              <TouchableHighlight
+                hitSlop={10}
+                onPress={() =>
+                  SheetManager.show("hide-habit", {
+                    payload: {
+                      habitId: habitId,
+                      updateStatus: updateHabitStatus,
+                    },
+                  })
+                }
+                style={styles.iconWrapper}
+              >
+                <OpenEye width={_iconSize} height={_iconSize} />
+              </TouchableHighlight>
+            )}
+            {!localIsHabitPublic && (
+              <TouchableHighlight
+                hitSlop={10}
+                onPress={() => unHideHabitMutation.mutateAsync()}
+                // onPress={() =>
+                //   SheetManager.show("hide-habit", { payload: { habitId: habitId } })
+                // }
+                style={styles.iconWrapper}
+              >
+                <CloseEye width={_iconSize} height={_iconSize} />
+              </TouchableHighlight>
+            )}
+          </>
         )}
         <TouchableHighlight
           hitSlop={10}

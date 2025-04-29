@@ -21,7 +21,6 @@ const _circleWidth = horizontalScale(190);
 
 const RewardSheet = (props: SheetProps<"reward-sheet">) => {
   const payload = props.payload;
-  
 
   const componentRef = useRef<ViewShot | null>(null);
 
