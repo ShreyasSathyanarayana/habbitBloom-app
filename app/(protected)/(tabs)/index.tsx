@@ -39,13 +39,13 @@ export default function HabitsScreen() {
     useState(false);
 
   // === Notification Permission ===
-  useEffect(() => {
-    const checkPermission = async () => {
-      const { status } = await Notifications.getPermissionsAsync();
-      setShowNotificationPermissionModal(status === "denied");
-    };
-    checkPermission();
-  }, []);
+  // useEffect(() => {
+  //   const checkPermission = async () => {
+  //     const { status } = await Notifications.getPermissionsAsync();
+  //     setShowNotificationPermissionModal(status === "denied");
+  //   };
+  //   checkPermission();
+  // }, []);
 
   // === Data Fetching ===
   const getHabitQuery = useInfiniteQuery({

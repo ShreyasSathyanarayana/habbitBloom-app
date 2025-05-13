@@ -9,9 +9,7 @@ import {
   NativeSyntheticEvent,
   FlatList,
 } from "react-native";
-import PagerView, {
-  PagerViewOnPageSelectedEventData,
-} from "react-native-pager-view";
+import PagerView from "react-native-pager-view";
 import Container from "@/components/ui/container";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { ThemedText } from "@/components/ui/theme-text";
@@ -20,7 +18,6 @@ import { getFontSize } from "@/font";
 import CircleArrow from "@/assets/svg/skip-icon.svg";
 import Animated, {
   FadeInUp,
-  FadeOutDown,
   FadeOutUp,
   interpolate,
   interpolateColor,
@@ -30,9 +27,7 @@ import Animated, {
 import { useRouter } from "expo-router";
 import { useToast } from "react-native-toast-notifications";
 
-const DropShadow = require("@/assets/images/shadow-effect.png");
-
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 // Onboarding Screens Data
 const OnboardingDetails = [
@@ -63,11 +58,9 @@ const InActiveDotWidth = horizontalScale(10);
 
 const Onboarding = () => {
   const [currentPage, setCurrentPage] = useState(0);
-  const pagerRef = useRef<PagerView>(null);
   const flatListRef = useRef<FlatList<any>>(null);
   const scrollX = useSharedValue(0);
   const router = useRouter();
-  const toast = useToast();
 
   const handleNext = () => {
     if (currentPage < OnboardingDetails.length - 1) {
@@ -76,9 +69,6 @@ const Onboarding = () => {
         animated: true,
       });
       setCurrentPage(currentPage + 1);
-      // toast.show("Testing jdsaldjal;djajdadkhashjdkdsjhak", {
-      //   type: "success",
-      // });
     } else {
       router.push("/(not-auth)/(auth)/weclome-screen");
       // add the next page here
@@ -103,42 +93,44 @@ const Onboarding = () => {
     scrollX.value = e.nativeEvent.contentOffset.x;
   };
 
-  const renderItem = ({
+  const OnboardItem = ({
     item,
     index,
   }: {
     item: (typeof OnboardingDetails)[0];
     index: number;
-  }) => (
-    <View style={[styles.page, { width: pageWidth }]}>
-      {currentPage === index && (
-        <>
-          <Image
-            //  key={
-            //    currentPage === index ? `gif-${index}-${Date.now()}` : `gif-${index}`
-            //  }
-            source={item.image}
-            style={styles.image}
-          />
-          {/* <Image
-            source={DropShadow}
-            style={[
-              styles.image,
-              {
-                position: "absolute",
-                width: width * 0.9,
-                height,
-                zIndex: -1,
-              },
-            ]}
-          /> */}
-        </>
-      )}
-      {currentPage !== index && <View style={styles.image} />}
-      <ThemedText style={styles.title}>{item.title}</ThemedText>
-      <ThemedText style={styles.description}>{item.description}</ThemedText>
-    </View>
-  );
+  }) => {
+    const animatedStyle = useAnimatedStyle(() => {
+      const scale = interpolate(
+        scrollX.value / width,
+        [index - 1, index, index + 1],
+        [0.7, 1, 0.7],
+        "clamp"
+      );
+      const opacity = interpolate(
+        scrollX.value / width,
+        [index - 1, index, index + 1],
+        [0, 1, 0],
+        "clamp"
+      );
+      return {
+        transform: [{ scale }],
+        opacity: opacity,
+      };
+    });
+    return (
+      <Animated.View style={[styles.page, { width: pageWidth }, animatedStyle]}>
+        {currentPage === index && (
+          <>
+            <Image source={item.image} style={styles.image} />
+          </>
+        )}
+        {currentPage !== index && <View style={styles.image} />}
+        <ThemedText style={styles.title}>{item.title}</ThemedText>
+        <ThemedText style={styles.description}>{item.description}</ThemedText>
+      </Animated.View>
+    );
+  };
 
   return (
     <Container style={{ paddingHorizontal: horizontalScale(15) }}>
@@ -162,23 +154,6 @@ const Onboarding = () => {
 
       {/* PagerView for Onboarding Screens */}
       <View style={styles.section2}>
-        {/* <PagerView
-          ref={pagerRef}
-          style={styles.pager}
-          initialPage={0}
-          onPageSelected={handlePageChange}
-          overdrag={false}
-        >
-          {OnboardingDetails.map((item, index) => (
-            <View key={index} style={styles.page}>
-              <Image source={item.image} style={styles.image} />
-              <ThemedText style={styles.title}>{item.title}</ThemedText>
-              <ThemedText style={styles.description}>
-                {item.description}
-              </ThemedText>
-            </View>
-          ))}
-        </PagerView> */}
         <FlatList
           ref={flatListRef}
           data={OnboardingDetails}
@@ -187,7 +162,9 @@ const Onboarding = () => {
           showsHorizontalScrollIndicator={false}
           keyExtractor={(_, index) => index.toString()}
           onMomentumScrollEnd={onMomentumScrollEnd}
-          renderItem={renderItem}
+          renderItem={({ item, index }) => (
+            <OnboardItem item={item} index={index} />
+          )}
           onScroll={onScroll}
         />
       </View>
@@ -202,13 +179,6 @@ const Onboarding = () => {
               [InActiveDotWidth, ActiveDotWidth, InActiveDotWidth], // Active dot is wider
               "clamp"
             );
-
-            // const opacityInterpolate = interpolate(
-            //   scrollX.value / width,
-            //   [index - 1, index, index + 1],
-            //   [0.5, 1, 0.5], // Active dot is more visible
-            //   "clamp"
-            // );
 
             const backgroundColorInterpolate = interpolateColor(
               scrollX.value / width,
