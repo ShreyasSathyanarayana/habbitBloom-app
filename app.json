@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "habitBloom",
+    "name": "HabitBloom",
     "slug": "habbitBloom",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/ios-icon.png",
     "scheme": "habitbloom",
@@ -12,10 +12,9 @@
       "supportsTablet": true,
       "jsEngine": "jsc",
       "bundleIdentifier": "com.shreyas8747.habitBloom",
-      "config": {
-        "googleSignIn": {
-          "reservedClientId": "163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd.apps.googleusercontent.com"
-        }
+      "config": {},
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -25,7 +24,9 @@
       "package": "com.shreyas8747.habitBloom",
       "softwareKeyboardLayoutMode": "pan",
       "jsEngine": "hermes",
-      "hermesEnabled": true
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -51,7 +52,7 @@
           "iosUrlScheme": "com.googleusercontent.apps.163765196168-f73c2bhv6d1l1nbj3k3l6qmdg7q8nadd"
         }
       ],
-     [
+      [
         "expo-sqlite",
         {
           "enableFTS": true,
@@ -61,7 +62,9 @@
             "useSQLCipher": false
           },
           "ios": {
-            "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
           }
         }
       ],
@@ -81,7 +84,7 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
-          "cameraPermission":"Allow $(PRODUCT_NAME) to access your camera"
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
         }
       ]
     ],

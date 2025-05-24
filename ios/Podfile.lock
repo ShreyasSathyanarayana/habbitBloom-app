@@ -228,7 +228,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - ExpoAdapterGoogleSignIn (13.2.0):
+  - ExpoAdapterGoogleSignIn (13.3.1):
     - ExpoModulesCore
     - GoogleSignIn (~> 7.1)
     - React-Core
@@ -1594,7 +1594,29 @@ PODS:
     - Yoga
   - react-native-get-random-values (1.11.0):
     - React-Core
-  - react-native-keyboard-controller (1.16.8):
+  - react-native-keyboard-controller (1.17.2):
+    - DoubleConversion
+    - glog
+    - RCT-Folly (= 2024.10.14.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-keyboard-controller/common (= 1.17.2)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-keyboard-controller/common (1.17.2):
     - DoubleConversion
     - glog
     - RCT-Folly (= 2024.10.14.00)
@@ -1637,8 +1659,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
   - react-native-netinfo (11.4.1):
-    - React-Core
-  - react-native-otp-verify (1.1.8):
     - React-Core
   - react-native-pager-view (6.5.1):
     - DoubleConversion
@@ -2151,7 +2171,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNGoogleSignin (13.2.0):
+  - RNGoogleSignin (13.3.1):
     - DoubleConversion
     - glog
     - GoogleSignIn (~> 7.1)
@@ -2458,7 +2478,6 @@ DEPENDENCIES:
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
-  - react-native-otp-verify (from `../node_modules/react-native-otp-verify`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
@@ -2664,8 +2683,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-mmkv"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
-  react-native-otp-verify:
-    :path: "../node_modules/react-native-otp-verify"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -2764,7 +2781,7 @@ SPEC CHECKSUMS:
   expo-dev-launcher: c8caf152ed906a37f10d5e1a0d36990066239e08
   expo-dev-menu: 6ea183bcac9fc7686107b7435c0cec01c6ef6339
   expo-dev-menu-interface: 00dc42302a72722fdecec3fa048de84a9133bcc4
-  ExpoAdapterGoogleSignIn: 2b9d8c002ae5d09042b2fc87448dfc070d0e7a08
+  ExpoAdapterGoogleSignIn: c9eabd7a2986aeb9eb269620cbebbf0d81bae1e4
   ExpoAsset: 0687fe05f5d051c4a34dd1f9440bd00858413cfe
   ExpoBlur: 567af66164e3043a9a30069594aed1ddf0a88d97
   ExpoCrypto: 1eaf79360c8135af1f2ebb133394fd3513ca9a3d
@@ -2828,10 +2845,9 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 6efad4a606c1fae7e4a93385ee096681ef0300dc
   React-microtasksnativemodule: 252ac3840dc5e527cf5baf5067ce281846538eda
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
-  react-native-keyboard-controller: a5ec50491ed93d3f19327b429d47849ee0c8fcf3
+  react-native-keyboard-controller: 70cbaca52ee55f9861c11d95f4cf1770167a8b59
   react-native-mmkv: 0c2b6de623690798e0e57608e183f67646c66de7
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
-  react-native-otp-verify: b524a7f44b691644bea08376d6a4782a2df57e09
   react-native-pager-view: 90ecb19376320fdf709dfa2ad719fe6a17e77bfe
   react-native-safe-area-context: 34cef0fd4d0f832e156e56cf64cfb9bc38cec70c
   react-native-view-shot: 4d4194c209a705477ffa3ee202396c6a3313b619
@@ -2867,7 +2883,7 @@ SPEC CHECKSUMS:
   RNDateTimePicker: fb17d1175fc8f2fa87eb0914e5fa1fa85f23a3b1
   RNFlashList: 63cbaa824130a69c5cdf71c428a78476f4b9d943
   RNGestureHandler: 0617cd5f39593b2812d036d925cbeca159154999
-  RNGoogleSignin: 3c2a548c634ba2d71c92d218fc8834b3af5be247
+  RNGoogleSignin: 64b258ad0e97418b25ce144bf3f13b1eff9ecd83
   RNReanimated: ff27010c0c7f4ccb6147a8817f2dcb973ac0c6f9
   RNScreens: 86e62302435b082d76d4f0a76c4b3a0dba0e4b1d
   RNSVG: 7f98b6cb499e348bb93052eee193cbcb7a7dbf31
@@ -2878,6 +2894,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: feb4910aba9742cfedc059e2b2902e22ffe9954a
 
-PODFILE CHECKSUM: 4e7919a367c39d9685a11b9b4ebd54384235b24e
+PODFILE CHECKSUM: 46c3fa0306187c931d79ad78caca41c6c8a11fcd
 
 COCOAPODS: 1.16.2

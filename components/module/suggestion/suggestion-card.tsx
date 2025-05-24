@@ -1,8 +1,5 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-
-import { ListItem } from "@rneui/themed";
-import { Button, Icon } from "@rneui/base";
 import { horizontalScale, verticalScale } from "@/metric";
 import { getFontSize } from "@/font";
 import { ThemedText } from "@/components/ui/theme-text";
@@ -11,9 +8,7 @@ import CardSwipeContainer from "./ui/card-swipe-container";
 import CategoryChip from "./ui/category-chip";
 import TimeAgoOrToday from "./ui/TimeAgoOrToday";
 import Status from "./ui/status";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSuggestionById } from "@/api/api";
-import { useToast } from "react-native-toast-notifications";
+
 
 interface SuggestionCardProps {
   id: string;

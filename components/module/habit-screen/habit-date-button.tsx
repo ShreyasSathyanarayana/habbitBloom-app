@@ -11,7 +11,7 @@ import { HabitProp } from "./habit-card";
 import moment from "moment";
 import { useHabitStore } from "@/store/habit-store";
 import { SheetManager } from "react-native-actions-sheet";
-// import { Skeleton } from "@rneui/base";
+
 
 type Props = {
   date: string;

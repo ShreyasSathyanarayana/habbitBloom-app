@@ -10,12 +10,7 @@ import BackButton from "@/components/ui/back-button";
 import { globalStyles } from "./weclome-screen";
 import { getFontSize } from "@/font";
 import { OtpInput, OtpInputRef, OtpInputProps } from "react-native-otp-entry";
-import {
-  getHash,
-  removeListener,
-  startOtpListener,
-  useOtpVerify,
-} from "react-native-otp-verify";
+
 import Animated, {
   LayoutAnimationConfig,
   useAnimatedKeyboard,
@@ -34,8 +29,7 @@ const VerifyOtp = () => {
   const toast = useToast();
   const [enteredWrongNumber, setEnteredWrongNumber] = useState<boolean>(false);
 
-  const { hash, otp, message, timeoutError, stopListener, startListener } =
-    useOtpVerify({ numberOfDigits: 6 });
+ 
 
   const keyboard = useAnimatedKeyboard();
   // useEffect(() => {
@@ -46,23 +40,7 @@ const VerifyOtp = () => {
     height: withTiming(keyboard.height.value, { duration: 300 }),
   }));
 
-  // using methods
-  useEffect(() => {
-    getHash()
-      .then((hash) => {
-        // use this hash in the message.
-      })
-      .catch(console.log);
-
-    startOtpListener((message) => {
-      // extract the otp using regex e.g. the below regex extracts 4 digit otp from message
-      const match = /(\d{4})/g.exec(message);
-      const otp = match ? match[1] : "";
-      otpRef.current?.setValue(otp);
-      setOtpValue(otp);
-    });
-    return () => removeListener();
-  }, []);
+  
 
   async function handleVerifyOtp() {
     if (otpValue.length !== 6) {
