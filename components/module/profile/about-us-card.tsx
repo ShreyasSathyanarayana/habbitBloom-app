@@ -24,7 +24,7 @@ const AboutUsCard = ({ profile_bio, email, full_name, profile_pic }: Props) => {
         style={{
           fontSize: getFontSize(12),
           textAlign: "center",
-          fontFamily: "PoppinsMedium",
+          fontFamily: "PoppinsItalic",
         }}
       >
         {profile_bio}

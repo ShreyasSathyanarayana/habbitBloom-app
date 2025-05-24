@@ -203,9 +203,9 @@ const ChangePasswordSheet = (props: SheetProps<"change-password">) => {
           </TouchableOpacity>
         </View>
         <AlertButton
-          firstBtnLabel="Reset"
+          firstBtnLabel="Cancel"
           secondBtnLabel="Save"
-          firstBtnAction={() => reset()}
+          firstBtnAction={closeSheet}
           secondBtnLoading={mutation.isPending}
           secondBtnAction={handleSubmit(onSubmit)}
         />

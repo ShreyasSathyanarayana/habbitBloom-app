@@ -78,6 +78,7 @@ const HabitList = ({
           ) : null
         }
         showsVerticalScrollIndicator={false}
+        onEndReachedThreshold={0.6}
       />
     </View>
   );

@@ -64,6 +64,7 @@ const HabitDetailsSheet = (props: SheetProps<"habit-details">) => {
       toast.show(`${payload?.habit_name?.trim()} Archived`, {
         type: "success",
       });
+      router.push("/(protected)/archive");
     },
     onError: () => {
       toast.show("Something went wrong", {

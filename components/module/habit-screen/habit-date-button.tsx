@@ -36,9 +36,9 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
     onSuccess: async () => {
       const updatedStats = await getHabitStats(habitId);
 
-      if (!localStatus) {
-        SheetManager.show("marked-habit");
-      }
+      // if (!localStatus) {
+      //   SheetManager.show("marked-habit");
+      // }
 
       queryClient.setQueryData(
         ["habitList", true, selectedFilter],
@@ -73,11 +73,10 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
       setLocalStatus((prev) => !prev);
 
-      localStatus &&
-        toast.show(
-          !localStatus ? "Marked Successfully" : "Unmarked Successfully",
-          { type: "success" }
-        );
+      toast.show(
+        !localStatus ? "Marked Successfully" : "Unmarked Successfully",
+        { type: "success" }
+      );
     },
   });
 
