@@ -1516,12 +1516,14 @@ export const getAvatarImages = async () => {
   return data;
 };
 
-export const updateProfilePic = async (imageUrl: string) => {
+export const updateProfilePic = async (imageUrl: string,isAvatar=true) => {
   const userId = await getUserId();
+  await deleteOldProfilePic(); // Delete old profile picture if exists
   const { data, error } = await supabase
     .from("profile")
     .update({
       profile_pic: imageUrl,
+      isAvatar:isAvatar
     })
     .eq("id", userId)
     .single();
@@ -1531,12 +1533,32 @@ export const updateProfilePic = async (imageUrl: string) => {
   return data;
 };
 
+const deleteOldProfilePic = async () => {
+  const userId = await getUserId();
+  const { data: userData, error: userError } = await supabase.from('profile').select('profile_pic,isAvatar').eq('id', userId).single();
+  if(userError){
+    throw new Error(userError.message);
+  }
+  if(!userData?.isAvatar){
+    const fileName = userData?.profile_pic?.split('/').pop() || '';
+    const filePath = `${userId}/${fileName}`;
+      const { error } = await supabase.storage.from('avatars').remove([filePath]);
+
+  if (error) {
+    console.error('Image delete failed:', error.message);
+    throw error;
+  }
+  }
+}
+
 export const deleteProfilePic = async () => {
   const userId = await getUserId();
+  await deleteOldProfilePic(); // Delete old profile picture if exists
   const { data, error } = await supabase
     .from("profile")
     .update({
       profile_pic: null,
+      isAvatar:true
     })
     .eq("id", userId)
     .single();
@@ -1711,3 +1733,5 @@ export const getSuggestionCount = async () => {
 
   return count ?? 0;
 };
+
+
