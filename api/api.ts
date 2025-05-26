@@ -1735,3 +1735,59 @@ export const getSuggestionCount = async () => {
 };
 
 
+
+
+//************************ Streak Challenge Api *********************************** */
+
+
+export type UserStreak = {
+  user_id: string;
+  habit_id: string;
+  habit_name: string;
+  current_streak: number;
+  best_streak: number;
+  last_date: string; // ISO date string
+  rank: number;
+  full_name: string;
+  email: string;
+  profile_pic: string;
+  profile_created_at: string; // ISO timestamp
+};
+
+export async function getUserStreaks(): Promise<UserStreak[]> {
+  const { data, error } = await supabase
+    .rpc('get_user_streaks');
+
+  if (error) {
+    console.error('Error fetching streaks:', error);
+    return [];
+  }
+
+  return data ?? [];
+}
+
+export type TopCompletedHabit = {
+  user_id: string;
+  habit_id: string;
+  habit_name: string;
+  total_completions: number;
+  best_streak: number;
+  last_date: string; // ISO date string
+  rank: number;
+  full_name: string;
+  email: string;
+  profile_pic: string;
+  profile_created_at: string; // ISO timestamp
+};
+
+export async function getHighestCompletedHabitList(): Promise<TopCompletedHabit[]> {
+  const { data, error } = await supabase
+    .rpc('get_user_top_completed_habit_with_streak');
+
+  if (error) {
+    console.error('Error fetching highest completed habits:', error);
+    return [];
+  }
+
+  return data ?? [];
+}
