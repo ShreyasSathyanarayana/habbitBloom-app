@@ -7,17 +7,17 @@ import { getUserId } from "@/utils/persist-storage";
 export const pickImage =
   async (): Promise<ImagePicker.ImagePickerAsset | null> => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
-      quality: 0.5,
+      quality: 1,
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      console.log("Image picked:", JSON.stringify(result.assets[0],null,2));
-      
+      console.log("Image picked:", JSON.stringify(result.assets[0], null, 2));
+
       return result.assets[0]; // Single image asset
     }
-    
+
     return null;
   };
 
@@ -31,9 +31,9 @@ export const takePhoto =
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
-      quality: 0.5,
+      quality: 1,
     });
 
     if (!result.canceled && result.assets.length > 0) {
@@ -68,7 +68,7 @@ export const uploadProfileImage = async (image: { uri: string }) => {
 
   const { error } = await supabase.storage
     .from("avatars") // your bucket name
-    .upload(filePath,newFormData);
+    .upload(filePath, newFormData);
 
   if (error) throw error;
 

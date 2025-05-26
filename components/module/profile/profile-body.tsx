@@ -26,6 +26,7 @@ import { router } from "expo-router";
 import SupportFeedback from "./support-feedback";
 import { ThemedText } from "@/components/ui/theme-text";
 import { appVersion } from "@/utils/app-constant";
+import Constants from "expo-constants";
 const _iconSize = horizontalScale(24);
 
 const ProfileBody = () => {
@@ -110,7 +111,7 @@ const ProfileBody = () => {
           color: "rgba(179, 179, 179, 1)",
         }}
       >
-        Version {appVersion}
+        Version {Constants.expoConfig?.version}
       </ThemedText>
     </View>
   );

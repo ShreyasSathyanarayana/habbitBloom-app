@@ -63,7 +63,7 @@ const ProfileHead = (props: UserProfile) => {
         </ThemedText>
         {props?.profile_bio && (
           <ThemedText
-            style={{ textAlign: "center", fontSize: getFontSize(14) }}
+            style={{ textAlign: "center", fontSize: getFontSize(14),fontFamily:'PoppinsItalic' }}
           >
             {props.profile_bio}
           </ThemedText>

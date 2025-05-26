@@ -53,9 +53,9 @@ const ProfilePicSheet = (props: SheetProps<"profile-pic">) => {
         const profilePicUrl = await updateProfilePic(profilePic, false);
         queryClient.invalidateQueries({ queryKey: ["userDetails"] });
         // setProfilePicLoading(false);
-        toast.show("Profile picture updated successfully", {
-          type: "success",
-        });
+        // toast.show("Profile picture updated successfully", {
+        //   type: "success",
+        // });
       }
     },
     onError: (error) => {
@@ -91,9 +91,9 @@ const ProfilePicSheet = (props: SheetProps<"profile-pic">) => {
         const profilePicUrl = await updateProfilePic(profilePic, false);
         queryClient.invalidateQueries({ queryKey: ["userDetails"] });
         // setProfilePicLoading(false);
-        toast.show("Profile picture updated successfully", {
-          type: "success",
-        });
+        // toast.show("Profile picture updated successfully", {
+        //   type: "success",
+        // });
       }
     },
     onError: (error) => {
