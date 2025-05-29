@@ -1,5 +1,11 @@
 import React from "react";
-import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import ProfileEditIcon from "@/assets/svg/profile-edit-icon.svg";
 import PremiumProfileIcon from "@/assets/svg/premium-profile-icon.svg";
 import { horizontalScale } from "@/metric";
@@ -11,6 +17,7 @@ const _premiumIconSize = horizontalScale(40);
 type Props = {
   profilePic: string | null;
   isSubscribed?: boolean;
+  isLoading: boolean;
 };
 
 const _defautIconSize = horizontalScale(120);
@@ -19,67 +26,80 @@ const avatar = require("@/assets/images/avatar.png");
 
 const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 
-const ProfilePic = ({ profilePic, isSubscribed }: Props) => {
+const ProfilePic = ({ profilePic, isSubscribed, isLoading }: Props) => {
   const onPress = () => {
-    if (!profilePic) {
-      router.push(`/(protected)/change-profile-pic`);
-      return;
-    }
+    // if (!profilePic) {
+    //   router.push(`/(protected)/change-profile-pic`);
+    //   return;
+    // }
     SheetManager.show("profile-pic", {
       payload: { profile_pic: profilePic },
     });
   };
   return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.container, isSubscribed && styles.premiumStyle]}
-    >
-      {isSubscribed && (
-        <PremiumProfileIcon
-          style={styles.premiumIconStyle}
-          width={_premiumIconSize}
-          height={_premiumIconSize}
+    <>
+      {isLoading && (
+        <ActivityIndicator
+          style={{ position: "absolute", top: "20%", zIndex: 2 }}
+          color={"white"}
+          size={"large"}
         />
       )}
-      {profilePic === null && (
-        <View
-          style={{
-            flex: 1,
-            overflow: "hidden",
-            borderRadius: horizontalScale(120),
-          }}
-        >
-          <Image
+      <Pressable
+        onPress={onPress}
+        style={[
+          styles.container,
+          isSubscribed && styles.premiumStyle,
+          isLoading && { opacity: 0.5 },
+        ]}
+      >
+        {isSubscribed && (
+          <PremiumProfileIcon
+            style={styles.premiumIconStyle}
+            width={_premiumIconSize}
+            height={_premiumIconSize}
+          />
+        )}
+        {profilePic === null && (
+          <View
             style={{
               flex: 1,
+              overflow: "hidden",
+              borderRadius: horizontalScale(120),
             }}
-            source={require("@/assets/images/default-profile.png")}
-          />
-        </View>
-      )}
-      <Pressable onPress={onPress} style={styles.editBtnStyle}>
-        <ProfileEditIcon width={_iconSize} height={_iconSize} />
+          >
+            <Image
+              style={{
+                flex: 1,
+              }}
+              source={require("@/assets/images/default-profile.png")}
+            />
+          </View>
+        )}
+        <Pressable onPress={onPress} style={styles.editBtnStyle}>
+          <ProfileEditIcon width={_iconSize} height={_iconSize} />
+        </Pressable>
+        {profilePic && (
+          <View
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              borderRadius: horizontalScale(120),
+            }}
+          >
+            <Image
+              style={{
+                flex: 1,
+              }}
+              // source={avatar}
+              placeholder={{ blurhash }}
+              source={profilePic}
+              // transition={1000}
+            />
+          </View>
+        )}
       </Pressable>
-      {profilePic && (
-        <View
-          style={{
-            flex: 1,
-            overflow: "hidden",
-            borderRadius: horizontalScale(120),
-          }}
-        >
-          <Image
-            style={{
-              flex: 1,
-            }}
-            // source={avatar}
-            placeholder={{ blurhash }}
-            source={profilePic}
-            // transition={1000}
-          />
-        </View>
-      )}
-    </Pressable>
+    </>
   );
 };
 

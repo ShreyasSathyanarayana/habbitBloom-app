@@ -8,6 +8,7 @@ import { IsoDateUtils } from "@/utils/constants";
 import ProfilePic from "./profile-pic";
 import { SheetManager } from "react-native-actions-sheet";
 import { getUserRole, isUserSubscribed } from "@/utils/persist-storage";
+import { useProfileStore } from "@/store/profile-store";
 type UserProfile = {
   id: string;
   full_name: string;
@@ -21,6 +22,7 @@ type UserProfile = {
 
 const ProfileHead = (props: UserProfile) => {
   const isSubscribed = isUserSubscribed();
+  const isProfilePicLoading = useProfileStore((state) => state.isLoading);
   return (
     <ProfileHeadContainer>
       <View
@@ -49,6 +51,7 @@ const ProfileHead = (props: UserProfile) => {
         style={{ alignItems: "center", width: "100%", gap: verticalScale(16) }}
       >
         <ProfilePic
+          isLoading={isProfilePicLoading}
           profilePic={props?.profile_pic}
           isSubscribed={isSubscribed}
         />
@@ -60,7 +63,7 @@ const ProfileHead = (props: UserProfile) => {
         </ThemedText>
         {props?.profile_bio && (
           <ThemedText
-            style={{ textAlign: "center", fontSize: getFontSize(14) }}
+            style={{ textAlign: "center", fontSize: getFontSize(14),fontFamily:'PoppinsItalic' }}
           >
             {props.profile_bio}
           </ThemedText>
