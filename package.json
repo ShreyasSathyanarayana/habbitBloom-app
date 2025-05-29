@@ -19,6 +19,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@legendapp/list": "^1.0.0",
     "@legendapp/state": "^3.0.0-beta.26",
+    "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-google-signin/google-signin": "^13.2.0",

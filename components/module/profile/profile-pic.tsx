@@ -12,6 +12,7 @@ import { horizontalScale } from "@/metric";
 import { SheetManager } from "react-native-actions-sheet";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import { useImage } from "@/context/ImageContext";
 const _iconSize = horizontalScale(32);
 const _premiumIconSize = horizontalScale(40);
 type Props = {
@@ -27,11 +28,18 @@ const avatar = require("@/assets/images/avatar.png");
 const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 
 const ProfilePic = ({ profilePic, isSubscribed, isLoading }: Props) => {
+  const { showImage } = useImage();
   const onPress = () => {
-    // if (!profilePic) {
-    //   router.push(`/(protected)/change-profile-pic`);
-    //   return;
-    // }
+    if (!profilePic) {
+      SheetManager.show("profile-pic", {
+        payload: { profile_pic: profilePic },
+      });
+      return;
+    }
+    showImage(profilePic);
+  };
+
+  const handleEditPress = () => {
     SheetManager.show("profile-pic", {
       payload: { profile_pic: profilePic },
     });
@@ -76,7 +84,7 @@ const ProfilePic = ({ profilePic, isSubscribed, isLoading }: Props) => {
             />
           </View>
         )}
-        <Pressable onPress={onPress} style={styles.editBtnStyle}>
+        <Pressable onPress={handleEditPress} style={styles.editBtnStyle}>
           <ProfileEditIcon width={_iconSize} height={_iconSize} />
         </Pressable>
         {profilePic && (
