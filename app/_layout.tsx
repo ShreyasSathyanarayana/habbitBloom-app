@@ -45,6 +45,8 @@ import "react-native-reanimated";
 import "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
 import { storage } from "@/utils/storage";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ImageProvider from "@/context/ImageContext";
 
 SplashScreen.preventAutoHideAsync();
 Notifications.setNotificationHandler({
@@ -141,48 +143,52 @@ TextInput.defaultProps.allowFontScaling = false;
 export const RootLayoutWrapper = () => {
   return (
     <KeyboardProvider>
-      <Providers>
-        <ToastProvider
-          placement="top"
-          duration={5000}
-          animationType="slide-in"
-          animationDuration={400}
-          successColor="green"
-          dangerColor="red"
-          warningColor="orange"
-          normalColor="gray"
-          // icon={<Icon />}
-          successIcon={
-            <AntDesign size={24} color={"white"} name="checkcircle" />
-          }
-          dangerIcon={
-            <AntDesign size={24} color={"white"} name="closecircle" />
-          }
-          // warningIcon={<WarningIcon />}
-          textStyle={{ fontSize: getFontSize(16) }}
-          offset={10} // offset for both top and bottom toasts
-          offsetTop={10}
-          offsetBottom={40}
-          swipeEnabled={true}
-          renderToast={(toast) =>
-            useMemo(
-              () => (
-                <CustomToast
-                  message={toast.message}
-                  type={toast.type as unknown as ToastType}
-                  id={toast.id}
-                />
-              ),
-              []
-            )
-          }
-        >
-          <SheetProvider>
-            {/* <StatusBar hidden={true} /> */}
-            <RootLayout />
-          </SheetProvider>
-        </ToastProvider>
-      </Providers>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ImageProvider>
+          <Providers>
+            <ToastProvider
+              placement="top"
+              duration={5000}
+              animationType="slide-in"
+              animationDuration={400}
+              successColor="green"
+              dangerColor="red"
+              warningColor="orange"
+              normalColor="gray"
+              // icon={<Icon />}
+              successIcon={
+                <AntDesign size={24} color={"white"} name="checkcircle" />
+              }
+              dangerIcon={
+                <AntDesign size={24} color={"white"} name="closecircle" />
+              }
+              // warningIcon={<WarningIcon />}
+              textStyle={{ fontSize: getFontSize(16) }}
+              offset={10} // offset for both top and bottom toasts
+              offsetTop={10}
+              offsetBottom={40}
+              swipeEnabled={true}
+              renderToast={(toast) =>
+                useMemo(
+                  () => (
+                    <CustomToast
+                      message={toast.message}
+                      type={toast.type as unknown as ToastType}
+                      id={toast.id}
+                    />
+                  ),
+                  []
+                )
+              }
+            >
+              <SheetProvider>
+                {/* <StatusBar hidden={true} /> */}
+                <RootLayout />
+              </SheetProvider>
+            </ToastProvider>
+          </Providers>
+        </ImageProvider>
+      </GestureHandlerRootView>
     </KeyboardProvider>
   );
 };
@@ -407,12 +413,15 @@ async function registerForPushNotificationsAsync() {
   let token;
 
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("habitBloomNotificationChannel", {
-      name: "A channel is needed for the permissions prompt to appear",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
-    });
+    await Notifications.setNotificationChannelAsync(
+      "habitBloomNotificationChannel",
+      {
+        name: "A channel is needed for the permissions prompt to appear",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      }
+    );
   }
 
   if (Device.isDevice) {
