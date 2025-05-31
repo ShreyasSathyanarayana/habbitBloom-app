@@ -2,11 +2,13 @@ import React, {
   createContext,
   forwardRef,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
 import {
+  BackHandler,
   Dimensions,
   Platform,
   StyleSheet,
@@ -53,23 +55,37 @@ const ImageView = forwardRef((props, ref) => {
   const [show, setShow] = useState(false);
   const imageUriRef = useRef("");
 
+  const hide = () => {
+    setShow(false);
+    imageUriRef.current = "";
+  };
+
   useImperativeHandle(ref, () => ({
-    hide: () => {
-      imageUriRef.current = "";
-      setShow(false);
-    },
+    hide,
     show: (uri = "") => {
       imageUriRef.current = uri;
       setShow(true);
     },
   }));
 
-  if (!show) return null;
+  // 🔙 BackHandler to intercept back button press
+  useEffect(() => {
+    if (!show) return;
 
-  const hide = () => {
-    setShow(false);
-    imageUriRef.current = "";
-  };
+    const onBackPress = () => {
+      hide();
+      return true; // prevent default back action
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => subscription.remove();
+  }, [show]);
+
+  if (!show) return null;
 
   return (
     <View style={styles.overlayContainer}>
@@ -84,7 +100,6 @@ const ImageView = forwardRef((props, ref) => {
         </TouchableOpacity>
         <Zoomable isDoubleTapEnabled>
           <Image
-            // entering={ZoomIn.springify().damping(100).stiffness(200)}
             source={{ uri: imageUriRef.current }}
             contentFit="contain"
             style={styles.fullScreenImage}

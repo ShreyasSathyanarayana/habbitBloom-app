@@ -44,9 +44,9 @@ const HabitCardFooterV2 = ({
     },
     onSuccess: () => {
       updateHabitStatus(true);
-      toast.show("Habit visible again!", {
-        type: "success",
-      });
+      // toast.show("Habit visible again!", {
+      //   type: "success",
+      // });
     },
     onError: () => {
       toast.show("Something went worng while updating public status", {

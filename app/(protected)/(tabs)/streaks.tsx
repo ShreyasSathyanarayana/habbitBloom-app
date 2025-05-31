@@ -2,7 +2,7 @@ import { getHighestCompletedHabitList, getUserStreaks } from "@/api/api";
 import { ThemedText } from "@/components/ui/theme-text";
 import { useQuery } from "@tanstack/react-query";
 import React, { useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import LeaderBoardIcon from "@/assets/svg/leader-board.svg";
 import LeaderBoardIcon1 from "@/assets/svg/leader-board1.svg";
 import { horizontalScale, verticalScale } from "@/metric";
@@ -11,30 +11,20 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";
+import PagerView from "react-native-pager-view";
+import CurrentStreak from "@/components/module/streaks/current-streak";
+import CompletedStreak from "@/components/module/streaks/completed-streak";
 const MENU_OPTIONS = ["Current Streak", "Completed Streak"];
 
 const Streaks = () => {
   const insets = useSafeAreaInsets();
+  const pagerRef = React.useRef<PagerView>(null);
   const [selectedMenu, setSelectedMenu] = React.useState(MENU_OPTIONS[0]);
-  const getUserStreakQuery = useQuery({
-    queryKey: ["getUserStreak"],
-    queryFn: () => getUserStreaks(),
-  });
-
-  const getCompletedStreakQuery = useQuery({
-    queryKey: ["getCompletedStreak"],
-    queryFn: () => getHighestCompletedHabitList(),
-  });
 
   const onChangeMenu = useCallback((item: string, index: number) => {
     setSelectedMenu(item);
-    // pagerRef.current?.setPageWithoutAnimation(index);
+    pagerRef.current?.setPageWithoutAnimation(index);
   }, []);
-
-  console.log(
-    "getUserStreakQuery",
-    JSON.stringify(getUserStreakQuery.data, null, 2)
-  );
 
   // console.log(
   //   "getCompletedStreakQuery",
@@ -45,7 +35,10 @@ const Streaks = () => {
     <View
       style={[
         styles.container,
-        { paddingTop: insets.top, gap: verticalScale(16) },
+        {
+          paddingTop: insets.top + verticalScale(20),
+          gap: verticalScale(16),
+        },
       ]}
     >
       {/* <ThemedText>streaks</ThemedText> */}
@@ -55,7 +48,15 @@ const Streaks = () => {
         selectedMenu={selectedMenu}
         onChangeMenu={onChangeMenu}
       />
-      <LeaderBoardIcon1 width={horizontalScale(349)}  />
+      <PagerView scrollEnabled={false} ref={pagerRef} style={{ flex: 1 }}>
+        <View key="1" style={{ flex: 1 }}>
+          <CurrentStreak />
+        </View>
+        <View key="2" style={{ flex: 1 }}>
+          <CompletedStreak />
+        </View>
+      </PagerView>
+      {/* <LeaderBoardIcon1 width={horizontalScale(349)}  /> */}
     </View>
   );
 };

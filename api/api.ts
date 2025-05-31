@@ -1740,7 +1740,7 @@ export const getSuggestionCount = async () => {
 //************************ Streak Challenge Api *********************************** */
 
 
-export type UserStreak = {
+export type TopStreakUser = {
   user_id: string;
   habit_id: string;
   habit_name: string;
@@ -1754,7 +1754,7 @@ export type UserStreak = {
   profile_created_at: string; // ISO timestamp
 };
 
-export async function getUserStreaks(): Promise<UserStreak[]> {
+export async function getUserStreaks(): Promise<TopStreakUser[]> {
   const { data, error } = await supabase
     .rpc('get_user_streaks');
 
@@ -1766,7 +1766,7 @@ export async function getUserStreaks(): Promise<UserStreak[]> {
   return data ?? [];
 }
 
-export type TopCompletedHabit = {
+export type TopCompletedUser = {
   user_id: string;
   habit_id: string;
   habit_name: string;
@@ -1780,7 +1780,7 @@ export type TopCompletedHabit = {
   profile_created_at: string; // ISO timestamp
 };
 
-export async function getHighestCompletedHabitList(): Promise<TopCompletedHabit[]> {
+export async function getHighestCompletedHabitList(): Promise<TopCompletedUser[]> {
   const { data, error } = await supabase
     .rpc('get_user_top_completed_habit_with_streak');
 
@@ -1790,4 +1790,21 @@ export async function getHighestCompletedHabitList(): Promise<TopCompletedHabit[
   }
 
   return data ?? [];
+}
+
+export async function getNearestRewardBadge(streakDay: number) {
+  const { data, error } = await supabase
+    .from('rewards')
+    .select('reward_image_url')
+    .lte('day', streakDay) // <= streakDay
+    .order('day', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error('Error fetching reward badge:', error.message);
+    return null;
+  }
+
+  return data; // returns { id, day, reward_image_url, created_at }
 }
