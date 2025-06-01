@@ -1,10 +1,17 @@
 import { TopCompletedUser, TopStreakUser } from "@/api/api";
 import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import LeaderBoardIcon from "@/assets/svg/leader-board1.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import Avatar from "./ui/avatar";
 import { ThemedText } from "@/components/ui/theme-text";
+import { router } from "expo-router";
 type LeaderBoardProps = {
   userDetails: TopStreakUser[] | TopCompletedUser[];
   cardType: "current" | "completed";
@@ -21,13 +28,20 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
   return (
     <View>
       <View style={styles.row}>
-        <View
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/(protected)/other-user-view",
+              params: { userId: userDetails?.[1]?.user_id },
+            })
+          }
           style={[
             styles.avatarContainer,
             { transform: [{ translateY: _SECOND_TRANSLATE_Y }] },
           ]}
         >
           <Avatar
+            badgeEnabled={false}
             style={{ width: _SECOND_AVATAR_SIZE, height: _SECOND_AVATAR_SIZE }}
             uri={userDetails?.[1]?.profile_pic}
             rank={userDetails?.[1]?.rank}
@@ -41,9 +55,18 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             {cardType === "completed" &&
               userDetails?.[1]?.total_completions + " Days 🎯"}
           </ThemedText>
-        </View>
-        <View style={styles.avatarContainer}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/(protected)/other-user-view",
+              params: { userId: userDetails?.[0]?.user_id },
+            })
+          }
+          style={styles.avatarContainer}
+        >
           <Avatar
+            badgeEnabled={false}
             style={{ width: _FIRST_AVATAR_SIZE, height: _FIRST_AVATAR_SIZE }}
             uri={userDetails?.[0]?.profile_pic}
             rank={userDetails?.[0]?.rank}
@@ -57,14 +80,21 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             {cardType === "completed" &&
               userDetails?.[0]?.total_completions + " Days 🎯"}
           </ThemedText>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/(protected)/other-user-view",
+              params: { userId: userDetails?.[2]?.user_id },
+            })
+          }
           style={[
             styles.avatarContainer,
             { transform: [{ translateY: _THIRD_TRANSLATE_Y }] },
           ]}
         >
           <Avatar
+            badgeEnabled={false}
             style={{ width: _THIRD_AVATAR_SIZE, height: _THIRD_AVATAR_SIZE }}
             uri={userDetails?.[2]?.profile_pic}
             rank={userDetails?.[2]?.rank}
@@ -78,7 +108,7 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             {cardType === "completed" &&
               userDetails?.[2]?.total_completions + " Days 🎯"}
           </ThemedText>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <LeaderBoardIcon width={horizontalScale(349)} />

@@ -9,9 +9,16 @@ type AvatarProps = {
   style?: StyleProp<ViewStyle>;
   rank?: number;
   badgeStyle?: StyleProp<ViewStyle>;
+  badgeEnabled?: boolean;
 };
 
-const Avatar = ({ uri, style, rank,badgeStyle }: AvatarProps) => {
+const Avatar = ({
+  uri,
+  style,
+  rank,
+  badgeStyle,
+  badgeEnabled = true,
+}: AvatarProps) => {
   //  source={require("@/assets/images/default-profile.png")}
   return (
     <View style={[styles.container, style]}>
@@ -21,7 +28,7 @@ const Avatar = ({ uri, style, rank,badgeStyle }: AvatarProps) => {
           uri ? { uri: uri } : require("@/assets/images/default-profile.png")
         }
       />
-      {rank && (
+      {badgeEnabled && rank && (
         <View style={[styles.badge, badgeStyle]}>
           <ThemedText style={{ fontSize: getFontSize(13) }}>{rank}</ThemedText>
         </View>

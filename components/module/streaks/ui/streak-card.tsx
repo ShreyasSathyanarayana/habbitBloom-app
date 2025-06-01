@@ -11,6 +11,7 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import RewardIcon from "../../analytics-screen/rewards/reward-icon";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 
 type StreakCardProps = {
   userDetails: TopStreakUser | TopCompletedUser;
@@ -27,6 +28,10 @@ const StreakCard = ({ userDetails, cardType }: StreakCardProps) => {
 
   const onPress = () => {
     console.log("User Details Pressed", JSON.stringify(userDetails, null, 2));
+    router.push({
+      pathname: "/(protected)/other-user-view",
+      params: { userId: userDetails?.user_id },
+    });
   };
 
   return (

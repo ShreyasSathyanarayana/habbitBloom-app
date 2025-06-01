@@ -93,7 +93,7 @@ const ImageView = forwardRef((props, ref) => {
       <View style={styles.overlayContent}>
         <TouchableOpacity
           hitSlop={10}
-          style={styles.closeButton}
+          style={[styles.closeButton]}
           onPress={hide}
         >
           <CancelIcon width={_iconSize} height={_iconSize} />
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: "absolute",
-    top: Platform.OS == "ios" ? verticalScale(50) : verticalScale(30),
+    top: verticalScale(50),
     right: horizontalScale(5),
     // padding: 5,
     // backgroundColor: "#007AFF",

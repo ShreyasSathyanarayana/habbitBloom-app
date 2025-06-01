@@ -3,28 +3,23 @@ import { horizontalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import HabitCompletedTagIcon from "@/assets/svg/habit-completed-tag.svg";
-import RewardIcon from "../analytics-screen/rewards/reward-icon";
+import RightArrowIcon from "@/assets/svg/right-arrow.svg";
+
 type Props = {
   habitName: string;
   category: string;
-  completed?: boolean;
-  rewardUri?: string;
+  onPress?: () => void;
 };
 const _iconSize = horizontalScale(40);
 
-const HabitCardHead = ({
-  habitName,
-  category,
-  completed,
-  rewardUri,
-}: Props) => {
+const HabitTrackCard = ({ habitName, category, onPress }: Props) => {
   const categoryDetails = useMemo(() => {
     return getCategoryByName(category);
   }, [category]);
   return (
-    <View style={styles.container}>
+    <TouchableOpacity onPress={onPress} style={styles.container}>
       <LinearGradient
         colors={["#8A2BE2", "#34127E"]}
         start={{ x: 0, y: 0 }}
@@ -46,26 +41,11 @@ const HabitCardHead = ({
       >
         {habitName}
       </ThemedText>
-      {completed && (
-        <View>
-          <RewardIcon
-            style={{ top: horizontalScale(-15), zIndex: 1 }}
-            imageUri={rewardUri ?? ""}
-          />
-
-          <HabitCompletedTagIcon
-            style={{
-              position: "absolute",
-              right: horizontalScale(-4),
-              zIndex: 0,
-              top: horizontalScale(-22),
-            }}
-            width={_iconSize}
-            height={_iconSize}
-          />
-        </View>
-      )}
-    </View>
+      <RightArrowIcon
+        width={horizontalScale(18)}
+        height={horizontalScale(18)}
+      />
+    </TouchableOpacity>
   );
 };
 
@@ -77,4 +57,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HabitCardHead;
+export default HabitTrackCard;
