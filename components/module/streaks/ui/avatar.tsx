@@ -4,6 +4,7 @@ import { horizontalScale } from "@/metric";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { blurhash } from "../../profile/avatar-image";
 type AvatarProps = {
   uri: string;
   style?: StyleProp<ViewStyle>;
@@ -27,6 +28,7 @@ const Avatar = ({
         source={
           uri ? { uri: uri } : require("@/assets/images/default-profile.png")
         }
+        placeholder={{blurhash}}
       />
       {badgeEnabled && rank && (
         <View style={[styles.badge, badgeStyle]}>

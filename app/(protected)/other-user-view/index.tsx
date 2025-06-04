@@ -1,4 +1,5 @@
 import { getOtherUserHabits, getOtherUserProfile } from "@/api/api";
+import ServerError from "@/components/module/errors/server-error";
 import HabitTrackList from "@/components/module/other-user-view/habit-track-list";
 import ProfilePic from "@/components/module/other-user-view/ui/profile-pic";
 import Container from "@/components/ui/container";
@@ -23,6 +24,11 @@ const Index = () => {
     queryFn: () => getOtherUserHabits(userId as string),
   });
 
+  const onRefreshPage = () => {
+    otherUserDetailsQuery.refetch();
+    otherUserHabitTrackQuery.refetch();
+  };
+
   //   console.log(
   //     "otherUserDetailsQuery",
   //     JSON.stringify(otherUserHabitTrackQuery?.data, null, 2)
@@ -34,16 +40,27 @@ const Index = () => {
   //   if (!otherUserDetailsQuery.data) {
   //     return null;
   //   }
+  if (
+    otherUserDetailsQuery?.status == "error" ||
+    otherUserHabitTrackQuery?.status == "error"
+  ) {
+    return <ServerError onRefresh={onRefreshPage} />;
+  }
 
   return (
     <Container>
       <Header title={otherUserDetailsQuery?.data?.full_name ?? ""} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          {otherUserDetailsQuery?.data && (
-            <ProfilePic {...otherUserDetailsQuery.data} />
-          )}
-          <HabitTrackList habits={otherUserHabitTrackQuery?.data ?? []} />
+          <ProfilePic
+            userDetails={otherUserDetailsQuery?.data}
+            isLoading={otherUserDetailsQuery.isLoading}
+          />
+
+          <HabitTrackList
+            habits={otherUserHabitTrackQuery?.data ?? []}
+            isLoading={otherUserHabitTrackQuery.isLoading}
+          />
         </View>
       </ScrollView>
     </Container>

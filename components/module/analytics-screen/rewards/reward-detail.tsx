@@ -26,7 +26,7 @@ const RewardDetail = ({
       payload: { rewardUri: reward_image_url, habitName: habitName },
     });
   };
-  console.log("RewardDetail Rendered", otherUser);
+  // console.log("RewardDetail Rendered", otherUser);
 
   return (
     <TouchableOpacity

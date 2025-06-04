@@ -8,6 +8,9 @@ import LeaderBoard from "./leader-board";
 import StreakCard from "./ui/streak-card";
 import { useFocusEffect } from "expo-router";
 import { Divider } from "@rneui/base";
+import ServerError from "../errors/server-error";
+import { useAuth } from "@/context/AuthProvider";
+import NoInternet from "../errors/no-internet";
 
 const CurrentStreak = () => {
   const getUserStreakQuery = useQuery({
@@ -15,6 +18,7 @@ const CurrentStreak = () => {
     queryFn: () => getUserStreaks(),
     refetchOnWindowFocus: "always",
   });
+  const { isConnected } = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -26,6 +30,14 @@ const CurrentStreak = () => {
   //   "getUserStreakQuery",
   //   JSON.stringify(getUserStreakQuery.data?.slice(3), null, 2)
   // );
+
+  if (!isConnected) {
+    return <NoInternet onRefresh={() => getUserStreakQuery?.refetch()} />;
+  }
+
+  if (getUserStreakQuery?.status == "error") {
+    return <ServerError onRefresh={() => getUserStreakQuery?.refetch()} />;
+  }
   if (getUserStreakQuery?.isLoading) {
     return null;
   }

@@ -8,6 +8,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import PremiumIcon from "@/assets/svg/premium-icon.svg";
+import { blurhash } from "../../profile/avatar-image";
+import { Skeleton } from "moti/skeleton";
 
 const _defaultImage = require("@/assets/images/default_other_profile.png");
 
@@ -20,19 +22,25 @@ const _withoutImageGradient: [string, string] = [
   "rgba(255, 255, 255, 0.1)",
 ];
 
-const ProfilePic = (props: OtherUserProfile) => {
+type Props={
+  userDetails?: OtherUserProfile|null;
+  isLoading?: boolean;
+}
+
+const ProfilePic = ({userDetails,isLoading}: Props) => {
   const { showImage } = useImage();
   return (
+    <Skeleton show={isLoading}>
     <TouchableOpacity
       onPress={() => {
-        if (props?.profile_pic) {
-          showImage(props.profile_pic);
+        if (userDetails?.profile_pic) {
+          showImage(userDetails?.profile_pic);
         }
       }}
-      style={[styles.container, !props?.profile_pic && styles.emptyImage]}
+      style={[styles.container, !userDetails?.profile_pic && styles.emptyImage]}
     >
       <LinearGradient
-        colors={props?.profile_pic ? _withImageGradient : _withoutImageGradient}
+        colors={userDetails?.profile_pic ? _withImageGradient : _withoutImageGradient}
         start={{ x: 0.5, y: 0.5 }} // 68.67%
         end={{ x: 0.5, y: 1 }} // 100%
         style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
@@ -40,23 +48,25 @@ const ProfilePic = (props: OtherUserProfile) => {
 
       <Image
         style={styles.imageStyle}
+        placeholder={{blurhash}}
         // contentFit="cover"
-        source={props?.profile_pic ? { uri: props.profile_pic } : _defaultImage}
+        source={userDetails?.profile_pic ? { uri: userDetails.profile_pic } : _defaultImage}
       />
       <View style={styles.textContainer}>
-        <ThemedText style={styles.userNameStyle}>{props?.full_name}</ThemedText>
+        <ThemedText style={styles.userNameStyle}>{userDetails?.full_name}</ThemedText>
         <ThemedText numberOfLines={3} style={{ fontSize: getFontSize(12) }}>
-          {props?.profile_bio}
+          {userDetails?.profile_bio}
         </ThemedText>
       </View>
       {/**Premium Icon */}
-      {props?.role === "admin" && (
+      {userDetails?.role === "admin" && (
         <View style={styles.premiumContainer}>
           <PremiumIcon width={horizontalScale(16)} height={verticalScale(16)} />
           <ThemedText style={{ fontSize: getFontSize(12) }}>Premium</ThemedText>
         </View>
       )}
     </TouchableOpacity>
+    </Skeleton>
   );
 };
 

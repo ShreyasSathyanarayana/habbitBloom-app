@@ -6,14 +6,19 @@ import { FlatList, StyleSheet, View } from "react-native";
 import LeaderBoard from "./leader-board";
 import StreakCard from "./ui/streak-card";
 import { Divider } from "@rneui/base";
-import { verticalScale } from "@/metric";
+import { horizontalScale, verticalScale } from "@/metric";
 import { useFocusEffect } from "expo-router";
+import ServerError from "../errors/server-error";
+import { getFontSize } from "@/font";
+import { useAuth } from "@/context/AuthProvider";
+import NoInternet from "../errors/no-internet";
 
 const CompletedStreak = () => {
   const getCompletedStreakQuery = useQuery({
     queryKey: ["getCompletedStreak"],
     queryFn: () => getHighestCompletedHabitList(),
   });
+  const { isConnected } = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -25,6 +30,14 @@ const CompletedStreak = () => {
   //   "getUserStreakQuery",
   //   JSON.stringify(getCompletedStreakQuery.data, null, 2)
   // );
+
+  if (!isConnected) {
+    return <NoInternet onRefresh={() => getCompletedStreakQuery?.refetch()} />;
+  }
+
+  if (getCompletedStreakQuery?.status === "error") {
+    return <ServerError onRefresh={() => getCompletedStreakQuery?.refetch()} />;
+  }
 
   if (getCompletedStreakQuery?.isLoading) {
     return null;
@@ -48,7 +61,10 @@ const CompletedStreak = () => {
           <StreakCard userDetails={item} cardType="completed" />
         )}
         ListHeaderComponent={
-          <LeaderBoard userDetails={data} cardType="completed" />
+          <>
+            <IndicationText />
+            <LeaderBoard userDetails={data} cardType="completed" />
+          </>
         }
         contentContainerStyle={{ paddingBottom: verticalScale(100) }}
       />
@@ -56,6 +72,26 @@ const CompletedStreak = () => {
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  indicationScreen: {
+    flexDirection: "row",
+    paddingHorizontal: horizontalScale(16),
+    paddingVertical: verticalScale(8),
+    backgroundColor: "rgba(138, 43, 226, 0.38)",
+    borderWidth: horizontalScale(1),
+    borderColor: "rgba(138, 43, 226, 1)",
+    borderRadius: horizontalScale(16),
+  },
+});
 
 export default CompletedStreak;
+
+const IndicationText = () => {
+  return (
+    <View style={styles.indicationScreen}>
+      <ThemedText style={{ fontSize: getFontSize(14), textAlign: "center" }}>
+        Shows total days users completed their tasks.
+      </ThemedText>
+    </View>
+  );
+};

@@ -21,8 +21,8 @@ const _AVATAR_CONTAINER_SIZE = (width - horizontalScale(32)) / 3;
 const _SECOND_AVATAR_SIZE = horizontalScale(70);
 const _FIRST_AVATAR_SIZE = horizontalScale(100);
 const _THIRD_AVATAR_SIZE = horizontalScale(70);
-const _SECOND_TRANSLATE_Y = verticalScale(50);
-const _THIRD_TRANSLATE_Y = verticalScale(70);
+const _SECOND_TRANSLATE_Y = verticalScale(40);
+const _THIRD_TRANSLATE_Y = verticalScale(55);
 
 const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
   return (
@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
   },
   userNameStyle: {
     fontSize: horizontalScale(14),
+    textAlign: "center",
   },
   streakStyle: {
     fontSize: horizontalScale(12),

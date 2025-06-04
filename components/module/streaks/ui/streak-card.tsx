@@ -27,7 +27,7 @@ const StreakCard = ({ userDetails, cardType }: StreakCardProps) => {
   // console.log("getBadgeQuery", getBadgeQuery.data?.reward_image_url);
 
   const onPress = () => {
-    console.log("User Details Pressed", JSON.stringify(userDetails, null, 2));
+    // console.log("User Details Pressed", JSON.stringify(userDetails, null, 2));
     router.push({
       pathname: "/(protected)/other-user-view",
       params: { userId: userDetails?.user_id },

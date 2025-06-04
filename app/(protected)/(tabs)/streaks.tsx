@@ -1,13 +1,7 @@
-import { getHighestCompletedHabitList, getUserStreaks } from "@/api/api";
-import { ThemedText } from "@/components/ui/theme-text";
-import { useQuery } from "@tanstack/react-query";
 import React, { useCallback } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
-import LeaderBoardIcon from "@/assets/svg/leader-board.svg";
-import LeaderBoardIcon1 from "@/assets/svg/leader-board1.svg";
 import { horizontalScale, verticalScale } from "@/metric";
 import {
-  SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import AnalyticsBar from "@/components/module/analytics-screen/analytics-bar";

@@ -55,7 +55,7 @@ const Analytics = () => {
     return <NoInternet onRefresh={refetch} />;
   }
 
-  console.log("Other User View:", Boolean(otherUserView));
+  // console.log("Other User View:", Boolean(otherUserView));
   
 
   return (
