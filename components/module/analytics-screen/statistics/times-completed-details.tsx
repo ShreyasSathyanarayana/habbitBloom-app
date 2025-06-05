@@ -7,16 +7,11 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 type Props = {
   habitId: string;
+  getCompletedDetailsQuery:any
 };
 
-const TimesCompletedDetails = ({ habitId }: Props) => {
-  const getCompletedDetailsQuery = useQuery({
-    queryKey: ["completed-details", habitId],
-    queryFn: () => {
-      return getCompletedHabitStats(habitId);
-    },
-    enabled: !!habitId,
-  });
+const TimesCompletedDetails = ({ habitId,getCompletedDetailsQuery }: Props) => {
+ 
   // console.log(
   //   "completed details",
   //   JSON.stringify(getCompletedDetailsQuery.data, null, 2)

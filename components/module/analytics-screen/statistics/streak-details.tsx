@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
 import StreakValue from "../streak-value";
 import { Divider } from "@rneui/base";
+import { Skeleton } from "moti/skeleton";
 type Props = {
   habitId: string;
 };
@@ -21,50 +22,52 @@ const StreakDetails = ({ habitId }: Props) => {
     enabled: !!habitId,
   });
   return (
-    <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: horizontalScale(8),
-          paddingBottom: verticalScale(16),
-        }}
-      >
-        <StreakIcon />
-        <ThemedText style={{ fontSize: getFontSize(12) }}>Streak</ThemedText>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          // justifyContent: "space-around",
-          justifyContent: "center",
-          paddingBottom: verticalScale(16),
-        }}
-      >
-        <View style={styles.column}>
-          <ThemedText style={styles.title}>Current</ThemedText>
-          <StreakValue streakDays={getHabitStatsQuery?.data?.streak ?? 0} />
-        </View>
-
-        <Divider
-        // color="rgba(138, 43, 226, 0.24)"
+    <Skeleton show={getHabitStatsQuery.isLoading}>
+      <View style={styles.container}>
+        <View
           style={{
-            // backgroundColor: "red",
-            width: verticalScale(90),
-            transform: [{ rotate: "90deg" }],
-            // backgroundColor: "rgba(138, 43, 226, 0.24)",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: horizontalScale(8),
+            paddingBottom: verticalScale(16),
           }}
-        />
+        >
+          <StreakIcon />
+          <ThemedText style={{ fontSize: getFontSize(12) }}>Streak</ThemedText>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            // justifyContent: "space-around",
+            justifyContent: "center",
+            paddingBottom: verticalScale(16),
+          }}
+        >
+          <View style={styles.column}>
+            <ThemedText style={styles.title}>Current</ThemedText>
+            <StreakValue streakDays={getHabitStatsQuery?.data?.streak ?? 0} />
+          </View>
 
-        <View style={styles.column}>
-          <ThemedText style={styles.title}>Best</ThemedText>
-          <StreakValue
-            streakDays={getHabitStatsQuery?.data?.highestStreak ?? 0}
+          <Divider
+            // color="rgba(138, 43, 226, 0.24)"
+            style={{
+              // backgroundColor: "red",
+              width: verticalScale(90),
+              transform: [{ rotate: "90deg" }],
+              // backgroundColor: "rgba(138, 43, 226, 0.24)",
+            }}
           />
+
+          <View style={styles.column}>
+            <ThemedText style={styles.title}>Best</ThemedText>
+            <StreakValue
+              streakDays={getHabitStatsQuery?.data?.highestStreak ?? 0}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </Skeleton>
   );
 };
 

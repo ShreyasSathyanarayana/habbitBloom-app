@@ -29,7 +29,7 @@ const HabitLimitSheet = (props: SheetProps<"habit-limit">) => {
           {!payload?.isPremiumUser &&
             "You can create up to 6 habits with the free plan. Upgrade to unlock up to 20 habits and more features!"}
           {payload?.isPremiumUser &&
-            "You’ve created 20 habits — the maximum allowed. To add more, manage or delete existing ones first."}
+            "You've reached the limit of 20 habits. To add a new one, please delete or manage your existing habits."}
         </ThemedText>
         {/**  This is for free user  */}
         {!payload?.isPremiumUser && (

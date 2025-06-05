@@ -12,6 +12,7 @@ import { horizontalScale, verticalScale } from "@/metric";
 import Avatar from "./ui/avatar";
 import { ThemedText } from "@/components/ui/theme-text";
 import { router } from "expo-router";
+import { getUserLabelById } from "@/utils/constants";
 type LeaderBoardProps = {
   userDetails: TopStreakUser[] | TopCompletedUser[];
   cardType: "current" | "completed";
@@ -47,7 +48,10 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             rank={userDetails?.[1]?.rank}
           />
           <ThemedText style={styles.userNameStyle}>
-            {userDetails?.[1]?.full_name}
+            {getUserLabelById(
+              userDetails?.[1]?.user_id,
+              userDetails?.[1]?.full_name
+            )}
           </ThemedText>
           <ThemedText style={styles.streakStyle}>
             {cardType === "current" &&
@@ -72,7 +76,10 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             rank={userDetails?.[0]?.rank}
           />
           <ThemedText style={styles.userNameStyle}>
-            {userDetails?.[0]?.full_name}
+            {getUserLabelById(
+              userDetails?.[0]?.user_id,
+              userDetails?.[0]?.full_name
+            )}
           </ThemedText>
           <ThemedText style={styles.streakStyle}>
             {cardType === "current" &&
@@ -100,7 +107,10 @@ const LeaderBoard = ({ userDetails, cardType }: LeaderBoardProps) => {
             rank={userDetails?.[2]?.rank}
           />
           <ThemedText style={styles.userNameStyle}>
-            {userDetails?.[2]?.full_name}
+            {getUserLabelById(
+              userDetails?.[2]?.user_id,
+              userDetails?.[2]?.full_name
+            )}
           </ThemedText>
           <ThemedText style={styles.streakStyle}>
             {cardType === "current" &&

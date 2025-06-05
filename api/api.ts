@@ -1506,7 +1506,10 @@ export const updateUserProfileInfo = async (
 };
 
 export const getAvatarImages = async () => {
-  const { data, error } = await supabase.from("avatars").select("*");
+ const { data, error } = await supabase
+  .from("avatars")
+  .select("*")
+  .order("id", { ascending: true }); // use false for descending
 
   if (error) {
     console.error("Error listing avatars:", error.message);

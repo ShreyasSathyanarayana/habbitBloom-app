@@ -12,6 +12,7 @@ import { getFontSize } from "@/font";
 import RewardIcon from "../../analytics-screen/rewards/reward-icon";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
+import { getUserLabelById } from "@/utils/constants";
 
 type StreakCardProps = {
   userDetails: TopStreakUser | TopCompletedUser;
@@ -34,6 +35,7 @@ const StreakCard = ({ userDetails, cardType }: StreakCardProps) => {
     });
   };
 
+
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={styles.row}>
@@ -45,7 +47,7 @@ const StreakCard = ({ userDetails, cardType }: StreakCardProps) => {
         />
         <View style={{ gap: verticalScale(8) }}>
           <ThemedText numberOfLines={1} style={styles.userNameStyle}>
-            {userDetails?.full_name}
+            {getUserLabelById(userDetails?.user_id, userDetails?.full_name)}
           </ThemedText>
           <ThemedText numberOfLines={1} style={styles.streakStyle}>
             {cardType === "current" && userDetails?.current_streak + " Days ⏳"}

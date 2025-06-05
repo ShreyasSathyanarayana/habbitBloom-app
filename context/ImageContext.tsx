@@ -10,7 +10,6 @@ import React, {
 import {
   BackHandler,
   Dimensions,
-  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -18,7 +17,13 @@ import {
 import { Image } from "expo-image";
 import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import CancelIcon from "@/assets/svg/cancel-icon.svg";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { horizontalScale, verticalScale } from "@/metric";
 
 const _iconSize = horizontalScale(30);
@@ -55,9 +60,15 @@ const ImageView = forwardRef((props, ref) => {
   const [show, setShow] = useState(false);
   const imageUriRef = useRef("");
 
+  const translateY = useSharedValue(0);
+  const scale = useSharedValue(1);
+
   const hide = () => {
-    setShow(false);
-    imageUriRef.current = "";
+    setTimeout(() => {
+      setShow(false);
+      imageUriRef.current = "";
+      translateY.value = 0;
+    }, 200);
   };
 
   useImperativeHandle(ref, () => ({
@@ -68,13 +79,12 @@ const ImageView = forwardRef((props, ref) => {
     },
   }));
 
-  // 🔙 BackHandler to intercept back button press
   useEffect(() => {
     if (!show) return;
 
     const onBackPress = () => {
       hide();
-      return true; // prevent default back action
+      return true;
     };
 
     const subscription = BackHandler.addEventListener(
@@ -85,6 +95,25 @@ const ImageView = forwardRef((props, ref) => {
     return () => subscription.remove();
   }, [show]);
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: 1 - Math.min(Math.abs(translateY.value) / 300, 0.8),
+  }));
+
+  const dragGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      if (scale.value <= 1.05) {
+        translateY.value = e.translationY;
+      }
+    })
+    .onEnd((e) => {
+      if (Math.abs(e.translationY) > 100) {
+        runOnJS(hide)();
+      } else {
+        translateY.value = withSpring(0);
+      }
+    });
+
   if (!show) return null;
 
   return (
@@ -93,18 +122,28 @@ const ImageView = forwardRef((props, ref) => {
       <View style={styles.overlayContent}>
         <TouchableOpacity
           hitSlop={10}
-          style={[styles.closeButton]}
+          style={styles.closeButton}
           onPress={hide}
         >
           <CancelIcon width={_iconSize} height={_iconSize} />
         </TouchableOpacity>
-        <Zoomable isDoubleTapEnabled>
-          <Image
-            source={{ uri: imageUriRef.current }}
-            contentFit="contain"
-            style={styles.fullScreenImage}
-          />
-        </Zoomable>
+
+        <GestureDetector gesture={dragGesture}>
+          <Animated.View style={animatedStyle}>
+            <Zoomable
+              isDoubleTapEnabled
+              // onZoomEnd={(zoomScale) => {
+              //   scale.value = zoomScale;
+              // }}
+            >
+              <Image
+                source={{ uri: imageUriRef.current }}
+                contentFit="contain"
+                style={styles.fullScreenImage}
+              />
+            </Zoomable>
+          </Animated.View>
+        </GestureDetector>
       </View>
     </View>
   );
@@ -121,7 +160,6 @@ const styles = StyleSheet.create({
   },
   overlayBackground: {
     ...StyleSheet.absoluteFillObject,
-    // backgroundColor: "rgba(90, 90, 90, 0.5)",
     backgroundColor: "black",
   },
   overlayContent: {
@@ -134,15 +172,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: verticalScale(50),
     right: horizontalScale(5),
-    // padding: 5,
-    // backgroundColor: "#007AFF",
-    // borderRadius: 20,
     zIndex: 100001,
-  },
-  closeIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "#FFFFFF",
   },
   fullScreenImage: {
     width: Dimensions.get("window").width,

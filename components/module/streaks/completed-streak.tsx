@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     borderWidth: horizontalScale(1),
     borderColor: "rgba(138, 43, 226, 1)",
     borderRadius: horizontalScale(16),
+    marginBottom: verticalScale(8),
   },
 });
 
