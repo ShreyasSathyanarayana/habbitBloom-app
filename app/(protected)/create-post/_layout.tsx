@@ -7,17 +7,16 @@ const Layout = () => {
     <Stack
       screenOptions={{
         headerShown: false,
+        // presentation: "modal",
         // animation: "ios_from_right",
         // animationDuration: 300,
-        animation: "slide_from_bottom",
       }}
     >
-      <Stack.Screen name="index" options={{ title: "habbits" }} />
       <Stack.Screen
-        name="habit-instruction"
+        name="index"
         options={{
-          title: "Habit instruction",
-          presentation: Platform.OS == "ios" ? "modal" : "transparentModal",
+          title: "Create Post",
+          presentation: Platform.OS == "ios" ?"card" : "transparentModal",
         }}
       />
     </Stack>

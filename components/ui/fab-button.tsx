@@ -19,17 +19,14 @@ import { getHabitCount } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
 import { isUserSubscribed } from "@/utils/persist-storage";
 import { SheetManager } from "react-native-actions-sheet";
-import FabButton from "@/components/ui/fab-button";
 
-const AddButton = () => {
+type FabButtonProps = {
+  onPress?: () => void;
+  isLoading?: boolean;
+};
+
+const FabButton = ({ onPress, isLoading = false }: FabButtonProps) => {
   const { isTabBarVisible } = useTabBar();
-  const toast = useToast();
-  const getHabitCountQuery = useQuery({
-    queryKey: ["habitCount"],
-    queryFn: () => getHabitCount(),
-    // staleTime: 60000,
-  });
-  const isPremiumUser = isUserSubscribed();
 
   // === Button Animation ===
   const animatedButtonStyle = useAnimatedStyle(() => ({
@@ -47,37 +44,20 @@ const AddButton = () => {
     ],
   }));
 
-  const onPress = () => {
-    console.log("habit Count ==>", getHabitCountQuery?.data);
-    console.log("isPremiumUser ==>", isPremiumUser);
-
-    if (
-      getHabitCountQuery?.status == "error" ||
-      getHabitCountQuery?.status == "pending"
-    ) {
-      toast.show("Something went wrong", { type: "warning" });
-      return;
-    }
-    if (!isPremiumUser && getHabitCountQuery?.data >= 6) {
-      // this is for free user
-      // toast.show("You can create only 6 habits", { type: "warning" });
-      SheetManager.show("habit-limit", {
-        payload: { isPremiumUser: isPremiumUser },
-      });
-      return;
-    }
-    if (isPremiumUser && getHabitCountQuery?.data >= 20) {
-      // this is for premium user
-      SheetManager.show("habit-limit", {
-        payload: { isPremiumUser: isPremiumUser },
-      });
-      return;
-    }
-    router.push("/(protected)/create-habit");
-  };
-
   return (
-    <FabButton onPress={onPress} isLoading={getHabitCountQuery?.isLoading} />
+    <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
+      <TouchableOpacity disabled={isLoading} onPress={onPress}>
+        <LinearGradient
+          colors={["#8A2BE2", "#34127E"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.floatingBtn}
+        >
+          {!isLoading && <PlusIcon />}
+          {isLoading && <ActivityIndicator color={"white"} size={"small"} />}
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -96,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddButton;
+export default FabButton;
