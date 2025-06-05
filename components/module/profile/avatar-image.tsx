@@ -11,7 +11,7 @@ type Props = {
   isSubscribed?: boolean;
 };
 
-const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
+export const blurhash = "L-MZj?s..TNI%Lj[t7aeTKa}%1oJ";
 const AvatarImage = ({
   imageType,
   imageUri,
@@ -41,7 +41,7 @@ const AvatarImage = ({
         ]}
       >
         <Image
-          source={imageUri}
+          source={imageUri ?? require("@/assets/images/default-profile.png")}
           style={{ flex: 1 }}
           placeholder={{ blurhash }}
           // transition={1000}

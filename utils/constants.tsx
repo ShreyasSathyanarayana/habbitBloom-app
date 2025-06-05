@@ -16,6 +16,7 @@ import OthersIcon from "@/assets/svg/others.svg";
 import { horizontalScale } from "@/metric";
 import moment from "moment";
 import { Option } from "@/components/ui/drop-down";
+import { getUserId } from "./persist-storage";
 const _categoriesIconSize = horizontalScale(24);
 
 const iconSize = {
@@ -275,3 +276,11 @@ export const statusValues = [
     label: "In Progress",
   },
 ];
+
+export const getUserLabelById = (id: string, userName: string) => {
+  const userId = getUserId();
+  if (id === userId) {
+    return "You";
+  }
+  return userName || "Unknown User";
+};

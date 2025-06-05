@@ -2,13 +2,14 @@ import React, {
   createContext,
   forwardRef,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
 import {
+  BackHandler,
   Dimensions,
-  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -16,7 +17,13 @@ import {
 import { Image } from "expo-image";
 import { Zoomable } from "@likashefqet/react-native-image-zoom";
 import CancelIcon from "@/assets/svg/cancel-icon.svg";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { horizontalScale, verticalScale } from "@/metric";
 
 const _iconSize = horizontalScale(30);
@@ -53,23 +60,61 @@ const ImageView = forwardRef((props, ref) => {
   const [show, setShow] = useState(false);
   const imageUriRef = useRef("");
 
-  useImperativeHandle(ref, () => ({
-    hide: () => {
-      imageUriRef.current = "";
+  const translateY = useSharedValue(0);
+  const scale = useSharedValue(1);
+
+  const hide = () => {
+    setTimeout(() => {
       setShow(false);
-    },
+      imageUriRef.current = "";
+      translateY.value = 0;
+    }, 200);
+  };
+
+  useImperativeHandle(ref, () => ({
+    hide,
     show: (uri = "") => {
       imageUriRef.current = uri;
       setShow(true);
     },
   }));
 
-  if (!show) return null;
+  useEffect(() => {
+    if (!show) return;
 
-  const hide = () => {
-    setShow(false);
-    imageUriRef.current = "";
-  };
+    const onBackPress = () => {
+      hide();
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => subscription.remove();
+  }, [show]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: 1 - Math.min(Math.abs(translateY.value) / 300, 0.8),
+  }));
+
+  const dragGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      if (scale.value <= 1.05) {
+        translateY.value = e.translationY;
+      }
+    })
+    .onEnd((e) => {
+      if (Math.abs(e.translationY) > 100) {
+        runOnJS(hide)();
+      } else {
+        translateY.value = withSpring(0);
+      }
+    });
+
+  if (!show) return null;
 
   return (
     <View style={styles.overlayContainer}>
@@ -82,14 +127,23 @@ const ImageView = forwardRef((props, ref) => {
         >
           <CancelIcon width={_iconSize} height={_iconSize} />
         </TouchableOpacity>
-        <Zoomable isDoubleTapEnabled>
-          <Image
-            // entering={ZoomIn.springify().damping(100).stiffness(200)}
-            source={{ uri: imageUriRef.current }}
-            contentFit="contain"
-            style={styles.fullScreenImage}
-          />
-        </Zoomable>
+
+        <GestureDetector gesture={dragGesture}>
+          <Animated.View style={animatedStyle}>
+            <Zoomable
+              isDoubleTapEnabled
+              // onZoomEnd={(zoomScale) => {
+              //   scale.value = zoomScale;
+              // }}
+            >
+              <Image
+                source={{ uri: imageUriRef.current }}
+                contentFit="contain"
+                style={styles.fullScreenImage}
+              />
+            </Zoomable>
+          </Animated.View>
+        </GestureDetector>
       </View>
     </View>
   );
@@ -106,7 +160,6 @@ const styles = StyleSheet.create({
   },
   overlayBackground: {
     ...StyleSheet.absoluteFillObject,
-    // backgroundColor: "rgba(90, 90, 90, 0.5)",
     backgroundColor: "black",
   },
   overlayContent: {
@@ -117,17 +170,9 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: "absolute",
-    top: Platform.OS == "ios" ? verticalScale(50) : verticalScale(30),
+    top: verticalScale(50),
     right: horizontalScale(5),
-    // padding: 5,
-    // backgroundColor: "#007AFF",
-    // borderRadius: 20,
     zIndex: 100001,
-  },
-  closeIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "#FFFFFF",
   },
   fullScreenImage: {
     width: Dimensions.get("window").width,

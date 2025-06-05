@@ -15,10 +15,10 @@ const Layout = () => {
       <Stack.Screen name="index" options={{ title: "habbits" }} />
       <Stack.Screen
         name="habit-instruction"
-        // options={{
-        //   title: "Habit instruction",
-        //   presentation: Platform.OS == "ios" ? "modal" : "transparentModal",
-        // }}
+        options={{
+          title: "Habit instruction",
+          presentation: Platform.OS == "ios" ? "modal" : "transparentModal",
+        }}
       />
     </Stack>
   );

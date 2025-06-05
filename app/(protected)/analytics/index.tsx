@@ -17,9 +17,15 @@ import { StyleSheet, View } from "react-native";
 const MENU_OPTIONS = ["Calendar", "Statistics"];
 
 const Analytics = () => {
-  const { id, category } = useLocalSearchParams<{
+  const {
+    id,
+    category,
+    otherUserView, // this will be used to determine if the view is for another user
+    // if otherUserView is present, we can handle the logic accordingly
+  } = useLocalSearchParams<{
     id: string;
     category: string;
+    otherUserView?: string;
   }>();
   const pagerRef = useRef<PagerView>(null);
   const { isConnected } = useAuth();
@@ -49,6 +55,9 @@ const Analytics = () => {
     return <NoInternet onRefresh={refetch} />;
   }
 
+  // console.log("Other User View:", Boolean(otherUserView));
+  
+
   return (
     <Container>
       <AnalyticsHeader
@@ -76,6 +85,7 @@ const Analytics = () => {
           </View>
           <View key="statistics" style={styles.page}>
             <StatisticsAnalytics
+              otherUser={Boolean(otherUserView)}
               habitName={habit?.habit_name ?? ""}
               habitId={id}
               habitHasEndDate={Boolean(habit?.end_date)}

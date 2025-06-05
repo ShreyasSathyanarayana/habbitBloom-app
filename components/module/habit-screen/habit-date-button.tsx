@@ -73,10 +73,10 @@ const HabitDateButton = ({ date, status, habitId }: Props) => {
 
       setLocalStatus((prev) => !prev);
 
-      toast.show(
-        !localStatus ? "Marked Successfully" : "Unmarked Successfully",
-        { type: "success" }
-      );
+      // toast.show(
+      //   !localStatus ? "Marked Successfully" : "Unmarked Successfully",
+      //   { type: "success" }
+      // );
     },
   });
 

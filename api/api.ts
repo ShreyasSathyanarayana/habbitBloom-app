@@ -238,13 +238,13 @@ export const getHabitStreak = async (habitId: string) => {
 };
 
 export const getHabitStats = async (habitId: string) => {
-  const userId = await getUserId();
+  // const userId = await getUserId();
 
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at, frequency, end_date")
     .eq("id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .single();
 
   if (habitError || !habitData) {
@@ -267,7 +267,7 @@ export const getHabitStats = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .order("date", { ascending: true });
 
   if (progressError) {
@@ -285,7 +285,7 @@ export const getHabitStats = async (habitId: string) => {
     .from("habit_archive_log")
     .select("action, action_date")
     .eq("habit_id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .order("action_date", { ascending: true });
 
   if (archiveError) {
@@ -585,11 +585,11 @@ export const unarchiveHabit = async (habitId: string): Promise<boolean> => {
 };
 
 export const getHabitById = async (habitId: string) => {
-  const userId = await getUserId();
+  // const userId = await getUserId();
   const { data, error } = await supabase
     .from("habit")
     .select("*")
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .eq("id", habitId)
     .single(); // Ensures only one habit is returned
 
@@ -973,14 +973,14 @@ export const fetchHabitProgressFromCreation = async (
 };
 
 export const getCompletedHabitStats = async (habitId: string) => {
-  const userId = await getUserId();
+  // const userId = await getUserId();
 
   // Fetch habit progress directly from habit_progress table
   const { data: progressData, error: fetchError } = await supabase
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .order("date", { ascending: true });
 
   if (fetchError) {
@@ -1377,14 +1377,14 @@ export const getHabitCompletionStats = async (habitId: string) => {
 };
 
 export const getCompletedAndPendingDays = async (habitId: string) => {
-  const userId = await getUserId();
+  // const userId = await getUserId();
 
   // 1. Fetch habit metadata
   const { data: habitData, error: habitError } = await supabase
     .from("habit")
     .select("created_at, end_date, frequency")
     .eq("id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .single();
 
   if (habitError || !habitData) {
@@ -1403,7 +1403,7 @@ export const getCompletedAndPendingDays = async (habitId: string) => {
     .from("habit_progress")
     .select("date, status")
     .eq("habit_id", habitId)
-    .eq("user_id", userId)
+    // .eq("user_id", userId)
     .gte("date", start.clone().utc().format())
     .lte("date", end.clone().utc().format());
 
@@ -1506,7 +1506,10 @@ export const updateUserProfileInfo = async (
 };
 
 export const getAvatarImages = async () => {
-  const { data, error } = await supabase.from("avatars").select("*");
+ const { data, error } = await supabase
+  .from("avatars")
+  .select("*")
+  .order("id", { ascending: true }); // use false for descending
 
   if (error) {
     console.error("Error listing avatars:", error.message);
@@ -1740,7 +1743,7 @@ export const getSuggestionCount = async () => {
 //************************ Streak Challenge Api *********************************** */
 
 
-export type UserStreak = {
+export type TopStreakUser = {
   user_id: string;
   habit_id: string;
   habit_name: string;
@@ -1754,7 +1757,7 @@ export type UserStreak = {
   profile_created_at: string; // ISO timestamp
 };
 
-export async function getUserStreaks(): Promise<UserStreak[]> {
+export async function getUserStreaks(): Promise<TopStreakUser[]> {
   const { data, error } = await supabase
     .rpc('get_user_streaks');
 
@@ -1766,7 +1769,7 @@ export async function getUserStreaks(): Promise<UserStreak[]> {
   return data ?? [];
 }
 
-export type TopCompletedHabit = {
+export type TopCompletedUser = {
   user_id: string;
   habit_id: string;
   habit_name: string;
@@ -1780,7 +1783,7 @@ export type TopCompletedHabit = {
   profile_created_at: string; // ISO timestamp
 };
 
-export async function getHighestCompletedHabitList(): Promise<TopCompletedHabit[]> {
+export async function getHighestCompletedHabitList(): Promise<TopCompletedUser[]> {
   const { data, error } = await supabase
     .rpc('get_user_top_completed_habit_with_streak');
 
@@ -1790,4 +1793,85 @@ export async function getHighestCompletedHabitList(): Promise<TopCompletedHabit[
   }
 
   return data ?? [];
+}
+
+export async function getNearestRewardBadge(streakDay: number) {
+  const { data, error } = await supabase
+    .from('rewards')
+    .select('reward_image_url')
+    .lte('day', streakDay) // <= streakDay
+    .order('day', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error('Error fetching reward badge:', error.message);
+    return null;
+  }
+
+  return data; // returns { id, day, reward_image_url, created_at }
+}
+
+
+
+/***************************************** Other User View *****************************************/
+
+export type OtherUserProfile ={
+  id: string;
+  full_name: string;
+  mobile: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+  profile_pic: string;
+  profile_bio: string;
+  role: 'admin' | 'user'; // update if more roles exist
+  isAvatar: boolean;
+}
+
+// Function to get other user profile by ID
+export async function getOtherUserProfile(userId: string): Promise<OtherUserProfile | null> {
+  const { data, error } = await supabase
+    .from('profile')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching other user profile:', error);
+    return null;
+  }
+
+  return data;
+}
+
+// Define the type for a Habit
+export interface OtherUserHabit {
+  id: string;
+  user_id: string;
+  habit_name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+  public: boolean;
+  category: string;
+  // Add other fields if your table has them
+}
+
+// Function to get public habits for another user
+export async function getOtherUserHabits(userId: string): Promise<OtherUserHabit[]|null> {
+  const { data, error } = await supabase
+    .from('habit')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('archived', false) // Assuming you want only active habits
+    .eq('public', true)
+    .order('habit_name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching other user habits:', error);
+    return [];
+  }
+
+  return data || [];
 }

@@ -20,10 +20,10 @@ const AboutUsSheet = (props: SheetProps<"about-us">) => {
       return getAboutUs();
     },
   });
-//   console.log(
-//     "About use Sheet ==>",
-//     JSON.stringify(getAboutUsQuery.data, null, 2)
-//   );
+  // console.log(
+  //   "About use Sheet ==>",
+  //   JSON.stringify(getAboutUsQuery.data, null, 2)
+  // );
 
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
@@ -51,6 +51,7 @@ const AboutUsSheet = (props: SheetProps<"about-us">) => {
           renderItem={({ item }) => {
             return (
               <AboutUsCard
+                id={item?.id}
                 profile_bio={item?.profile_bio}
                 profile_pic={item?.profile_pic}
                 email={item?.email}

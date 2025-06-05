@@ -7,6 +7,7 @@ import { getFontSize } from "@/font";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitStats } from "@/api/api";
 import StreakValue from "./streak-value";
+import { Skeleton } from "moti/skeleton";
 type Props = {
   habitId: string;
 };
@@ -22,20 +23,21 @@ const CurrentStreak = ({ habitId }: Props) => {
   // console.log("habit stats", JSON.stringify(getHabitStatsQuery.data, null, 2));
 
   return (
-    <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: horizontalScale(8),
-        }}
-      >
-        <StreaksIcon width={_iconSize} height={_iconSize} />
-        <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
-          Current Streak
-        </ThemedText>
-      </View>
-      {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
+    <Skeleton show={getHabitStatsQuery.isLoading}>
+      <View style={styles.container}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: horizontalScale(8),
+          }}
+        >
+          <StreaksIcon width={_iconSize} height={_iconSize} />
+          <ThemedText style={{ fontFamily: "PoppinsSemiBold" }}>
+            Current Streak
+          </ThemedText>
+        </View>
+        {/* <ThemedText style={{ fontSize: getFontSize(14) }}>
         <ThemedText
           style={{ fontSize: getFontSize(24), fontFamily: "PoppinsSemiBold" }}
         >
@@ -44,8 +46,9 @@ const CurrentStreak = ({ habitId }: Props) => {
         {"  "}
         Days
       </ThemedText> */}
-      <StreakValue streakDays={getHabitStatsQuery.data?.streak ?? 0} />
-    </View>
+        <StreakValue streakDays={getHabitStatsQuery.data?.streak ?? 0} />
+      </View>
+    </Skeleton>
   );
 };
 

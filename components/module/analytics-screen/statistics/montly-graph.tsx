@@ -89,6 +89,7 @@ const MontlyGraph = ({ habitId }: Props) => {
       </View>
       <FlatList
         ref={flatListRef}
+        scrollEnabled={false}
         horizontal
         contentContainerStyle={{
           paddingTop: verticalScale(16),

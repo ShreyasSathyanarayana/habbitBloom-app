@@ -11,9 +11,10 @@ import RewardDetail from "../rewards/reward-detail";
 type Props = {
   habitId: string;
   habitName: string;
+  otherUser?: boolean; // Optional prop for other user view
 };
 
-const StreakChallenge = ({ habitId, habitName }: Props) => {
+const StreakChallenge = ({ habitId, habitName,otherUser }: Props) => {
   const { data: streakChallenges, isLoading: isStreakLoading } = useQuery({
     queryKey: ["streakChallenge", habitId],
     queryFn: getStreakChallengeDetails,
@@ -52,6 +53,7 @@ const StreakChallenge = ({ habitId, habitName }: Props) => {
             habitName={habitName}
             {...item}
             highest_streak={highestStreak}
+            otherUser={otherUser} // Pass the otherUser prop to RewardDetail
           />
         )}
       />

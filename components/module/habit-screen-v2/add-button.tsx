@@ -19,6 +19,7 @@ import { getHabitCount } from "@/api/api";
 import { useToast } from "react-native-toast-notifications";
 import { isUserSubscribed } from "@/utils/persist-storage";
 import { SheetManager } from "react-native-actions-sheet";
+import FabButton from "@/components/ui/fab-button";
 
 const AddButton = () => {
   const { isTabBarVisible } = useTabBar();
@@ -76,24 +77,7 @@ const AddButton = () => {
   };
 
   return (
-    <Animated.View style={[styles.floatingBtnContainer, animatedButtonStyle]}>
-      <TouchableOpacity
-        disabled={getHabitCountQuery?.isLoading}
-        onPress={onPress}
-      >
-        <LinearGradient
-          colors={["#8A2BE2", "#34127E"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.floatingBtn}
-        >
-          {!getHabitCountQuery?.isLoading && <PlusIcon />}
-          {getHabitCountQuery?.isLoading && (
-            <ActivityIndicator color={"white"} size={"small"} />
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
+    <FabButton onPress={onPress} isLoading={getHabitCountQuery?.isLoading} />
   );
 };
 

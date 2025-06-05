@@ -1,6 +1,13 @@
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  StyleProp,
+  ViewProps,
+  ViewStyle,
+} from "react-native";
 import BackButton from "./back-button";
 import { ThemedText } from "./theme-text";
 
@@ -11,11 +18,12 @@ type HeaderProps = {
   title: string;
   rightIcon?: React.ReactNode;
   headerIcon?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
 };
 
-const Header = ({ title, rightIcon, headerIcon }: HeaderProps) => {
+const Header = ({ title, rightIcon, headerIcon, style }: HeaderProps) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <BackButton style={styles.backButton} />
       <View style={styles.titleContainer}>
         {headerIcon}

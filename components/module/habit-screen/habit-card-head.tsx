@@ -2,9 +2,8 @@ import { ThemedText } from "@/components/ui/theme-text";
 import { horizontalScale } from "@/metric";
 import { getCategoryByName } from "@/utils/constants";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import CompletedHabitIcon from "@/assets/svg/completed-badge.svg";
 import HabitCompletedTagIcon from "@/assets/svg/habit-completed-tag.svg";
 import RewardIcon from "../analytics-screen/rewards/reward-icon";
 type Props = {

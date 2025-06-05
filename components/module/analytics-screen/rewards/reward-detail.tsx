@@ -13,17 +13,24 @@ const RewardDetail = ({
   reward_image_url,
   highest_streak,
   habitName,
-}: Reward & { highest_streak: number; habitName: string }) => {
+  otherUser,
+}: Reward & {
+  highest_streak: number;
+  habitName: string;
+  otherUser?: boolean;
+}) => {
   const handleRewardPress = () => {
+    if (otherUser) return;
     if (day > highest_streak) return; // Only show rewards for completed days
     SheetManager.show("reward-sheet", {
       payload: { rewardUri: reward_image_url, habitName: habitName },
     });
   };
+  // console.log("RewardDetail Rendered", otherUser);
 
   return (
     <TouchableOpacity
-      disabled={day > highest_streak}
+      disabled={day > highest_streak || otherUser}
       onPress={handleRewardPress}
     >
       <RewardDetailContainer>
