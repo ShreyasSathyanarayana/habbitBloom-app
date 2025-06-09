@@ -1,3 +1,5 @@
+import { uploadPostImage } from "@/camera-function/camera-picker";
+import { PostForm } from "@/store/post-store";
 import { supabase } from "@/utils/SupaLegend";
 import { DateUtils } from "@/utils/constants";
 import { getUserId, getUserRole } from "@/utils/persist-storage";
@@ -1874,4 +1876,224 @@ export async function getOtherUserHabits(userId: string): Promise<OtherUserHabit
   }
 
   return data || [];
+}
+
+
+/****************************************** Create or edit Post    **************************************/
+
+
+
+
+export async function createPost({habitId=null,description,images}:PostForm){
+  const userId = await getUserId();
+   // Upload all images and get public URLs
+  let imageUrls: string[] = [];
+  if(images?.length!==0){
+      imageUrls = await Promise.all(
+      images.map(async (uri) => await uploadPostImage(uri))
+  );
+  }
+  const { data, error } = await supabase
+    .from("posts")
+    .insert([
+      {
+        user_id: userId,
+        habit_id: habitId,
+        content: description,
+        image_urls: imageUrls,
+      },
+    ])
+    .select()
+    .single();
+
+    if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true };
+
+}
+
+
+
+
+//******************************************  Insights   **************************************/
+
+
+type PostComment = {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+};
+
+type Profile = {
+  id: string;
+  full_name: string | null;
+  profile_pic: string | null;
+};
+
+export type PostWithDetails = {
+  id: string;
+  content: string;
+  image_urls: string[] | null;
+  created_at: string;
+  comment_enable: boolean;
+  user_id: string;
+  habit_id: string | null;
+  likeCount: number;
+  commentCount: number;
+  latestComment?: PostComment | null;
+  likedByCurrentUser: boolean;
+  user: {
+    full_name: string | null;
+    profile_pic: string | null;
+  };
+};
+
+export async function getPostsWithDetails({
+  page = 1,
+  pageSize = 10,
+  // currentUserId,
+}: {
+  page?: number;
+  pageSize?: number;
+  // currentUserId: string;
+}): Promise<PostWithDetails[]> {
+  const currentUserId = await getUserId()
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // ✅ Clean select (NO aggregate + field mix)
+  const { data: posts, error: postError } = await supabase
+    .from("posts")
+    .select(`
+      id,
+      content,
+      image_urls,
+      comment_enable,
+      created_at,
+      user_id,
+      habit_id,
+      post_likes(user_id),
+      post_comments (
+        id,
+        content,
+        created_at,
+        user_id
+      )
+    `)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (postError || !posts) {
+    console.error("Error fetching posts:", postError);
+    return [];
+  }
+
+  const userIds = [...new Set(posts.map((p: any) => p.user_id))];
+
+  const { data: profiles, error: profileError } = await supabase
+    .from("profile")
+    .select("id, full_name, profile_pic")
+    .in("id", userIds);
+
+  if (profileError || !profiles) {
+    console.error("Error fetching profiles:", profileError);
+    return [];
+  }
+
+  const profileMap = new Map<string, Profile>(
+    profiles.map((p) => [p.id, p])
+  );
+
+  return posts.map((post: any): PostWithDetails => {
+    const actualComments = (post.post_comments ?? []).filter(
+      (c: any) => typeof c === "object" && "id" in c
+    ) as PostComment[];
+
+    const latestComment = actualComments.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    )[0];
+
+    const likeCount = post.post_likes?.length ?? 0;
+    const commentCount = actualComments.length ?? 0;
+
+    const likedByCurrentUser = post.post_likes?.some(
+      (like: { user_id: string }) => like.user_id === currentUserId
+    ) ?? false;
+
+    const userProfile = profileMap.get(post.user_id);
+
+    return {
+      id: post.id,
+      content: post.content,
+      image_urls: post.image_urls,
+      created_at: post.created_at,
+      comment_enable: post.comment_enable,
+      user_id: post.user_id,
+      habit_id: post.habit_id,
+      likeCount,
+      commentCount,
+      latestComment: latestComment ?? null,
+      likedByCurrentUser,
+      user: {
+        full_name: userProfile?.full_name ?? null,
+        profile_pic: userProfile?.profile_pic ?? null,
+      },
+    };
+  });
+}
+
+
+
+export async function toggleLikePost(postId: string): Promise<"liked" | "unliked" | "error"> {
+  const userId = await getUserId()
+  // Step 1: Check if the like already exists
+  const { data: existingLike, error: fetchError } = await supabase
+    .from("post_likes")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", userId)
+    .single(); // Only one should exist due to unique constraint
+
+  if (fetchError && fetchError.code !== "PGRST116") {
+    console.error("Failed to check like status:", fetchError.message);
+    return "error";
+  }
+
+  // Step 2: If exists → Unlike (delete it)
+  if (existingLike) {
+    const { error: deleteError } = await supabase
+      .from("post_likes")
+      .delete()
+      .eq("post_id", postId)
+      .eq("user_id", userId);
+
+    if (deleteError) {
+      console.error("Failed to unlike post:", deleteError.message);
+      return "error";
+    }
+
+    return "unliked";
+  }
+
+  // Step 3: If not exists → Like (insert)
+  const { error: insertError } = await supabase
+    .from("post_likes")
+    .insert([
+      {
+        post_id: postId,
+        user_id: userId,
+        liked_at: new Date().toISOString(),
+      },
+    ]);
+
+  if (insertError) {
+    console.error("Failed to like post:", insertError.message);
+    return "error";
+  }
+
+  return "liked";
 }

@@ -8,7 +8,7 @@ import React, { useCallback } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-const MENU_OPTIONS = ["Current Streak", "Completed Streak"];
+const MENU_OPTIONS = ["All Posts ", "My Posts"];
 
 const Insights = () => {
   const insets = useSafeAreaInsets();
@@ -21,13 +21,15 @@ const Insights = () => {
   }, []);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[styles.container, { paddingTop: insets.top + verticalScale(20) }]}
+    >
       <AnalyticsBar
         menu={MENU_OPTIONS}
         selectedMenu={selectedMenu}
         onChangeMenu={onChangeMenu}
       />
-      <PagerView style={{ flex: 1 }} ref={pagerRef}>
+      <PagerView style={{ flex: 1 }} ref={pagerRef} scrollEnabled={false}>
         <View key="1" style={{ flex: 1 }}>
           <AllPost />
         </View>
@@ -43,8 +45,9 @@ const Insights = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: horizontalScale(16),
+    padding: horizontalScale(16),
     backgroundColor: "black",
+    // paddingTop: verticalScale(16),
   },
   floatingBtnContainer: {
     position: "absolute",

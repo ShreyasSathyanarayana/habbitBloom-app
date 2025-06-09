@@ -1,7 +1,7 @@
 import Button from "@/components/ui/button";
 import { horizontalScale, verticalScale } from "@/metric";
 import React from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 type Props = {
   firstBtnLabel: string;
   secondBtnLabel: string;
@@ -10,6 +10,7 @@ type Props = {
   secondBtnLoading?: boolean;
   firstBtnLoading?: boolean;
   style?: ViewStyle;
+  secondLabelStyle?: StyleProp<ViewStyle>;
 };
 const AlertButton = ({
   firstBtnAction,
@@ -19,6 +20,7 @@ const AlertButton = ({
   secondBtnLoading = false,
   firstBtnLoading = false,
   style,
+  secondLabelStyle,
 }: Props) => {
   return (
     <View
@@ -46,7 +48,7 @@ const AlertButton = ({
         isLoading={secondBtnLoading}
         label={secondBtnLabel}
         onPress={secondBtnAction}
-        style={{ flex: 1 }}
+        style={[{ flex: 1 }, secondLabelStyle]}
       />
     </View>
   );

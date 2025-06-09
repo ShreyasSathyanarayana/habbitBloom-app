@@ -14,12 +14,20 @@ type Props = {
   title: string;
   isLoading?: boolean;
   disablePostButton?: boolean;
+  onClickCancel: () => void;
+  onClickOnPost: () => void;
 };
 
-const PostHeader = ({ title, disablePostButton, isLoading }: Props) => {
+const PostHeader = ({
+  title,
+  disablePostButton,
+  isLoading,
+  onClickCancel,
+  onClickOnPost,
+}: Props) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()}>
+      <TouchableOpacity onPress={onClickCancel}>
         <ThemedText style={styles.buttonTextStyle}>Cancel</ThemedText>
       </TouchableOpacity>
       <ThemedText
@@ -29,6 +37,7 @@ const PostHeader = ({ title, disablePostButton, isLoading }: Props) => {
       </ThemedText>
       <TouchableOpacity
         disabled={disablePostButton || isLoading}
+        onPress={onClickOnPost}
         style={{
           width: horizontalScale(40),
           justifyContent: "center",

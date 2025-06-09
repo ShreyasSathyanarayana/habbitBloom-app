@@ -13,6 +13,10 @@ import AboutUsSheet from "./profile/about-us-sheet";
 import MarkedHabitSheet from "./habit-screen/marked-habit-sheet";
 import RewardSheet from "./analytics/reward-sheet";
 import HabitLimitSheet from "./habit-screen/habit-limit-sheet";
+import ExitConfirmationSheet from "./create-or-edit-post/exit-confirmation-sheet";
+import MoreOptionSheet from "./insights/more-option-sheet";
+import { PostWithDetails } from "@/api/api";
+import DeletePostSheet from "./insights/delete-post-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -39,6 +43,9 @@ registerSheet("support-and-feedback", SupportAndFeedbackSheet);
 registerSheet("change-password", ChangePasswordSheet);
 registerSheet("about-us", AboutUsSheet);
 registerSheet("reward-sheet", RewardSheet);
+registerSheet("exit-confirmation", ExitConfirmationSheet);
+registerSheet("post-more-option", MoreOptionSheet);
+registerSheet("delete-post", DeletePostSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -88,5 +95,12 @@ declare module "react-native-actions-sheet" {
         habitName: string;
       };
     }>;
+    "exit-confirmation": SheetDefinition;
+    "post-more-option": SheetDefinition<{
+      payload: {
+        postDetails: PostWithDetails;
+      };
+    }>;
+    "delete-post": SheetDefinition;
   }
 }

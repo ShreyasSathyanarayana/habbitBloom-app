@@ -284,3 +284,26 @@ export const getUserLabelById = (id: string, userName: string) => {
   }
   return userName || "Unknown User";
 };
+
+export function formatLikeCount(num: number): string {
+  if (num >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B";
+  }
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  }
+  return num.toString();
+}
+
+export const reportList = [
+  "It’s a spam",
+  "False information",
+  "Harassment or hate speech",
+  "Nudity or sexual content",
+  "Violent or graphic content",
+  "Scams or fraud",
+  "Something else",
+];
