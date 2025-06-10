@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components/ui/theme-text";
 import React from "react";
 import {
   ActivityIndicator,
@@ -6,17 +5,18 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import EmptyPost from "./empty-post";
-import { useMyPosts } from "./useCurrentUserPost";
+import { useMyPosts } from "../insights-screen/useCurrentUserPost";
+import EmptyPost from "../insights-screen/empty-post";
 import { verticalScale } from "@/metric";
 import { Divider } from "@rneui/base";
 import PostCard from "../insights/post-card";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { getUserId } from "@/utils/persist-storage";
 
+type Props = {
+  userId: string;
+};
 
-const MyPost = () => {
-  const userId = getUserId();
+const PostList = ({ userId }: Props) => {
   const {
     data,
     fetchNextPage,
@@ -26,12 +26,13 @@ const MyPost = () => {
     isRefetching,
     refetch,
   } = useMyPosts({ userId: userId ?? "" });
+
   if (data?.pages?.length == 0) {
     // Replace with No posts condition
     return <EmptyPost />;
   }
   return (
-    <View style={styles.container}>
+    <View>
       <Animated.FlatList
         key={"all-post-list"}
         itemLayoutAnimation={LinearTransition}
@@ -40,6 +41,7 @@ const MyPost = () => {
           paddingTop: verticalScale(16),
           paddingBottom: verticalScale(100),
         }}
+        scrollEnabled={false}
         keyExtractor={(item) => item.id}
         data={data?.pages?.flat()}
         renderItem={({ item }) => {
@@ -70,10 +72,6 @@ const MyPost = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const styles = StyleSheet.create({});
 
-export default MyPost;
+export default PostList;

@@ -36,7 +36,7 @@ import { usePostStore } from "@/store/post-store";
 import { router, useFocusEffect } from "expo-router";
 import { SheetManager } from "react-native-actions-sheet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createPost } from "@/api/api";
+import { createPost, editPost } from "@/api/api";
 
 const { height: windowHeight } = Dimensions.get("window");
 const charLimit = 1500;
@@ -95,13 +95,14 @@ const Index = () => {
     removeImage(index);
   };
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const createPostMutation = useMutation({
     mutationKey: ["createPost"],
     mutationFn: () => createPost(form),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["my-posts"] });
       resetForm();
       router.back();
     },
@@ -114,6 +115,35 @@ const Index = () => {
     },
     // in this case you need to add the post to the cache
   });
+
+  const editPostMutation = useMutation({
+    mutationKey: ["editPost"],
+    mutationFn: () => editPost(form),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-posts"] });
+      resetForm();
+      router.back();
+      toast.show("Post updated successfully", {
+        type: "success",
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
+
+  const handlePost = () => {
+    if (form.editMode) {
+      editPostMutation.mutateAsync();
+      // console.log("edit form details==>",form);
+    } else {
+      createPostMutation.mutateAsync();
+      // console.log("create form details==>",form);
+    }
+  };
 
   const postButtonEnabled =
     form.description?.length > 0 ||
@@ -150,10 +180,12 @@ const Index = () => {
           >
             <PostHeader
               title={"Create Post"}
-              isLoading={createPostMutation?.isPending}
+              isLoading={
+                createPostMutation?.isPending || editPostMutation?.isPending
+              }
               disablePostButton={!postButtonEnabled}
               onClickCancel={onBackPress}
-              onClickOnPost={() => createPostMutation.mutateAsync()}
+              onClickOnPost={handlePost}
             />
             <View
               style={{
@@ -184,6 +216,7 @@ const Index = () => {
               <ImageList
                 images={form.images ?? []}
                 onRemoveImage={handleRemoveImage}
+                editMode={form.editMode}
               />
               {form.images?.length >= 4 && (
                 <ThemedText

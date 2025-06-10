@@ -1914,7 +1914,25 @@ export async function createPost({habitId=null,description,images}:PostForm){
 }
 
 
+export async function editPost({habitId=null,postId,description,images}:PostForm){
+  const userId = await getUserId()
+  const { error: updateError } = await supabase
+    .from("posts")
+    .update({
+      habit_id: habitId,
+      content: description,
+      image_urls: images, // this is key
+    })
+    .eq("id", postId)
+    .eq("user_id", userId);
 
+  if (updateError) {
+    console.error("Post update failed:", updateError.message);
+    return { success: false, error: updateError.message };
+  }
+
+  return { success: true };
+}
 
 //******************************************  Insights   **************************************/
 
@@ -2047,6 +2065,102 @@ export async function getPostsWithDetails({
 }
 
 
+export async function getCurrentUserPostsWithDetails({
+  page = 1,
+  pageSize = 10,
+  currentUserId,
+}: {
+  page?: number;
+  pageSize?: number;
+  currentUserId: string;
+}): Promise<PostWithDetails[]> {
+  // const currentUserId = await getUserId()
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // ✅ Clean select (NO aggregate + field mix)
+  const { data: posts, error: postError } = await supabase
+    .from("posts")
+    .select(`
+      id,
+      content,
+      image_urls,
+      comment_enable,
+      created_at,
+      user_id,
+      habit_id,
+      post_likes(user_id),
+      post_comments (
+        id,
+        content,
+        created_at,
+        user_id
+      )
+    `)
+    .eq('user_id', currentUserId)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (postError || !posts) {
+    console.error("Error fetching posts:", postError);
+    return [];
+  }
+
+  const userIds = [...new Set(posts.map((p: any) => p.user_id))];
+
+  const { data: profiles, error: profileError } = await supabase
+    .from("profile")
+    .select("id, full_name, profile_pic")
+    .in("id", userIds);
+
+  if (profileError || !profiles) {
+    console.error("Error fetching profiles:", profileError);
+    return [];
+  }
+
+  const profileMap = new Map<string, Profile>(
+    profiles.map((p) => [p.id, p])
+  );
+
+  return posts.map((post: any): PostWithDetails => {
+    const actualComments = (post.post_comments ?? []).filter(
+      (c: any) => typeof c === "object" && "id" in c
+    ) as PostComment[];
+
+    const latestComment = actualComments.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    )[0];
+
+    const likeCount = post.post_likes?.length ?? 0;
+    const commentCount = actualComments.length ?? 0;
+
+    const likedByCurrentUser = post.post_likes?.some(
+      (like: { user_id: string }) => like.user_id === currentUserId
+    ) ?? false;
+
+    const userProfile = profileMap.get(post.user_id);
+
+    return {
+      id: post.id,
+      content: post.content,
+      image_urls: post.image_urls,
+      created_at: post.created_at,
+      comment_enable: post.comment_enable,
+      user_id: post.user_id,
+      habit_id: post.habit_id,
+      likeCount,
+      commentCount,
+      latestComment: latestComment ?? null,
+      likedByCurrentUser,
+      user: {
+        full_name: userProfile?.full_name ?? null,
+        profile_pic: userProfile?.profile_pic ?? null,
+      },
+    };
+  });
+}
 
 export async function toggleLikePost(postId: string): Promise<"liked" | "unliked" | "error"> {
   const userId = await getUserId()
@@ -2096,4 +2210,78 @@ export async function toggleLikePost(postId: string): Promise<"liked" | "unliked
   }
 
   return "liked";
+}
+
+
+export async function setCommentEnabled(postId: string, enabled: boolean) {
+  const { data, error } = await supabase
+    .from("posts")
+    .update({ comment_enable: enabled })
+    .eq("id", postId)
+    .select(); // optional: returns updated row(s)
+
+  if (error) {
+    console.error("Error updating comment status:", error.message);
+    throw error;
+  }
+
+  return data; // optional
+}
+
+
+
+
+// Helper to extract path from public URL
+function getStoragePathFromUrl(url: string): string {
+  const match = url.match(/\/post-images\/(.+)$/);
+  return match?.[1] ?? "";
+}
+
+export async function deletePost(postId: string) {
+  console.log("the post id==>",postId);
+  const userId = await getUserId()
+  
+  // Step 1: Fetch image URLs from the post
+  const { data: post, error: fetchError } = await supabase
+    .from("posts")
+    .select("image_urls")
+    .eq("id", postId)
+    .single();
+
+  if (fetchError) {
+    console.error("Failed to fetch post:", fetchError.message);
+    throw fetchError;
+  }
+
+  // Step 2: Delete images from storage if any
+  if (post?.image_urls?.length) {
+    const pathsToDelete = post.image_urls.map(getStoragePathFromUrl);
+    // console.log("pathsToDelete==>",pathsToDelete);
+    
+
+    const { error: deleteError,data } = await supabase
+      .storage
+      .from("post-images")
+      .remove(pathsToDelete);
+    // console.log("deleted data==>",data);
+    
+    if (deleteError) {
+      console.error("Failed to delete images:", deleteError.message);
+      throw deleteError;
+    }
+  }
+
+  // Step 3: Delete the post itself
+  const { error: deletePostError } = await supabase
+    .from("posts")
+    .delete()
+    .eq("id", postId)
+    .eq('user_id',userId);
+
+  if (deletePostError) {
+    console.error("Failed to delete post:", deletePostError.message);
+    throw deletePostError;
+  }
+
+  return true;
 }

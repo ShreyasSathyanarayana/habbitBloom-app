@@ -34,6 +34,25 @@ const PostCard = ({
     mutationFn: () => toggleLikePost(id),
     onSuccess: (result) => {
       // Update the specific post in the infinite query
+      queryClient.setQueryData(["my-posts"], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any[]) =>
+            page.map((post) => {
+              if (post.id !== id) return post;
+
+              return {
+                ...post,
+                likeCount:
+                  result === "liked" ? post.likeCount + 1 : post.likeCount - 1,
+                likedByCurrentUser: result === "liked",
+              };
+            })
+          ),
+        };
+      });
       queryClient.setQueryData(["all-posts"], (oldData: any) => {
         if (!oldData) return oldData;
 

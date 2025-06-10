@@ -7,6 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { horizontalScale } from "@/metric";
+import { useEffect } from "react";
 const _iconSize = horizontalScale(24);
 
 type Prop = {
@@ -15,7 +16,11 @@ type Prop = {
 };
 
 const LikeButton = ({ isLiked, onClick }: Prop) => {
-  const liked = useSharedValue(isLiked ? 1 : 0);
+  const liked = useSharedValue(0);
+
+  useEffect(() => {
+    liked.value = isLiked ? 1 : 0;
+  }, [isLiked]);
 
   const outlineStyle = useAnimatedStyle(() => {
     return {

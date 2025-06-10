@@ -101,6 +101,10 @@ declare module "react-native-actions-sheet" {
         postDetails: PostWithDetails;
       };
     }>;
-    "delete-post": SheetDefinition;
+    "delete-post": SheetDefinition<{
+      payload: {
+        postId: string;
+      };
+    }>;
   }
 }

@@ -16,8 +16,16 @@ import EditPostIcon from "@/assets/svg/edit-post-icon.svg";
 import { getUserId } from "@/utils/persist-storage";
 import { reportList } from "@/utils/constants";
 import { router } from "expo-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { setCommentEnabled } from "@/api/api";
+import { useToast } from "react-native-toast-notifications";
+import { usePostStore } from "@/store/post-store";
 
 const _iconSize = horizontalScale(20);
+
+const closeSheet = () => {
+  SheetManager.hide("post-more-option");
+};
 
 const MoreOptionSheet = (props: SheetProps<"post-more-option">) => {
   const payload = props?.payload?.postDetails;
@@ -25,8 +33,16 @@ const MoreOptionSheet = (props: SheetProps<"post-more-option">) => {
   const isMyPost = payload?.user_id == userId;
   return (
     <ActionSheetContainer1 sheetId={props.sheetId}>
-      {!isMyPost && <OtherUserView />}
-      {isMyPost && <CurrentUseView />}
+      {!isMyPost && <OtherUserView userId={payload?.user_id ?? ""} />}
+      {isMyPost && (
+        <CurrentUseView
+          postId={payload?.id ?? ""}
+          commentEnable={payload?.comment_enable ?? false}
+          description={payload?.content ?? ""}
+          habitId={payload?.habit_id ?? null}
+          images={payload?.image_urls ?? []}
+        />
+      )}
     </ActionSheetContainer1>
   );
 };
@@ -44,7 +60,11 @@ const styles = StyleSheet.create({
 
 export default MoreOptionSheet;
 
-const OtherUserView = () => {
+type OtherUserViewProp = {
+  userId: string;
+};
+
+const OtherUserView = ({ userId }: OtherUserViewProp) => {
   const [reportScreenOpen, setReportScreenOpen] = useState(false);
 
   const handleReportItem = (reportName: string) => {
@@ -52,6 +72,15 @@ const OtherUserView = () => {
     SheetManager.hide("post-more-option");
     router.push("/(protected)/create-post/report-completed-screen");
   };
+
+  const handleProfileView = () => {
+    closeSheet();
+    router.push({
+      pathname: "/(protected)/other-user-view",
+      params: { userId: userId },
+    });
+  };
+
   return (
     <View style={{ gap: verticalScale(24) }}>
       {!reportScreenOpen && (
@@ -59,6 +88,7 @@ const OtherUserView = () => {
           <ActionSheetButton
             leftIcon={<ViewProfileIcon width={_iconSize} height={_iconSize} />}
             buttonName={"View Profile"}
+            onPress={handleProfileView}
           />
           <ActionSheetButton
             leftIcon={<ReportIcon width={_iconSize} height={_iconSize} />}
@@ -95,14 +125,81 @@ const OtherUserView = () => {
   );
 };
 
-const CurrentUseView = () => {
+type CurrentUserProps = {
+  postId: string;
+  commentEnable: boolean;
+  description: string;
+  images: string[];
+  habitId: string | null;
+};
+
+const CurrentUseView = ({
+  postId,
+  commentEnable,
+  description,
+  images,
+  habitId,
+}: CurrentUserProps) => {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const { updatePostForm } = usePostStore();
+  const setCommentEnableMutation = useMutation({
+    mutationKey: ["setCommentEnable"],
+    mutationFn: () => setCommentEnabled(postId, commentEnable),
+    onSuccess: () => {
+      // Update the cached data manually
+      closeSheet();
+      queryClient.invalidateQueries({ queryKey: ["my-posts"] });
+      queryClient.setQueryData(["all-posts"], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any[]) =>
+            page.map((post) =>
+              post.id === postId
+                ? { ...post, comment_enable: !commentEnable }
+                : post
+            )
+          ),
+        };
+      });
+    },
+    onError: () => {
+      toast.show("Something went wrong", {
+        type: "warning",
+      });
+    },
+  });
+
+  const handleEditPost = () => {
+    updatePostForm({
+      description,
+      images,
+      habitId,
+      editMode: true,
+      postId,
+    });
+    closeSheet();
+    router.push("/(protected)/create-post");
+  };
+
   return (
     <View style={{ gap: verticalScale(24) }}>
       <ActionSheetButton
-        leftIcon={<HideCommentIcon width={_iconSize} height={_iconSize} />}
-        buttonName={"Turn off comments"}
+        leftIcon={
+          commentEnable ? (
+            <HideCommentIcon width={_iconSize} height={_iconSize} />
+          ) : (
+            <CommentIcon width={_iconSize} height={_iconSize} />
+          )
+        }
+        buttonName={commentEnable ? "Turn off comments" : "Turn on comments"}
+        onPress={() => setCommentEnableMutation.mutateAsync()}
+        isLoading={setCommentEnableMutation.isPending}
       />
       <ActionSheetButton
+        onPress={handleEditPost}
         leftIcon={<EditPostIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Edit post"}
       />
@@ -110,7 +207,9 @@ const CurrentUseView = () => {
         leftIcon={<DeletePostIcon width={_iconSize} height={_iconSize} />}
         buttonName={"Delete post"}
         labelStyle={{ color: "rgba(255, 59, 48, 1)" }}
-        onPress={() => SheetManager.show("delete-post")}
+        onPress={() =>
+          SheetManager.show("delete-post", { payload: { postId: postId } })
+        }
       />
     </View>
   );

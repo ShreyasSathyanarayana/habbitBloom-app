@@ -3,7 +3,9 @@ import { create } from "zustand";
 export type PostForm = {
   description: string;
   images: string[];
-  habitId: string|null
+  habitId: string|null;
+  editMode:boolean;
+  postId:string|null
 };
 
 type PostStore = {
@@ -13,13 +15,16 @@ type PostStore = {
   removeImage: (index: number) => void;
   resetForm: () => void;
   hasUnSavedChanges: () => boolean
+  updatePostForm : (form:PostForm) => void
 };
 
 export const usePostStore = create<PostStore>((set,get) => ({
   form: {
     description: "",
     images: [],
-    habitId: null
+    habitId: null,
+    editMode:false,
+    postId:null
   },
   setDescription: (desc) =>
     set((state) => ({ form: { ...state.form, description: desc } })),
@@ -37,11 +42,14 @@ export const usePostStore = create<PostStore>((set,get) => ({
       form: {
         description: "",
         images: [],
-        habitId: null
+        habitId: null,
+        editMode:false,
+        postId:null
       },
     })),
    hasUnSavedChanges: () => {
     const { description, images,habitId } = get().form;
     return description.trim().length > 0 || images.length > 0 || habitId !== null;
   },
+  updatePostForm:(form:PostForm) => set(() => ({ form }))
 }));

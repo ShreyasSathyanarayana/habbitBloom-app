@@ -1,6 +1,7 @@
 import { horizontalScale } from "@/metric";
 import React from "react";
 import {
+  ActivityIndicator,
   StyleProp,
   StyleSheet,
   TextStyle,
@@ -18,6 +19,7 @@ type Props = {
   onPress?: () => void;
   selected?: boolean;
   labelStyle?: TextStyle;
+  isLoading?: boolean;
 };
 
 const ActionSheetButton = ({
@@ -26,14 +28,21 @@ const ActionSheetButton = ({
   onPress,
   selected,
   labelStyle,
+  isLoading = false,
 }: Props) => {
   return (
-    <TouchableOpacity hitSlop={20} onPress={onPress} style={styles.container}>
+    <TouchableOpacity
+      disabled={isLoading}
+      hitSlop={20}
+      onPress={onPress}
+      style={[styles.container, { opacity: isLoading ? 0.5 : 1 }]}
+    >
       {leftIcon && leftIcon}
       <ThemedText style={[{ fontSize: getFontSize(14), flex: 1 }, labelStyle]}>
         {buttonName}
       </ThemedText>
       {selected && <View style={styles.dot} />}
+      {isLoading && <ActivityIndicator size={"small"} color={"white"} />}
     </TouchableOpacity>
   );
 };

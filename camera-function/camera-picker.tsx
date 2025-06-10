@@ -76,27 +76,26 @@ export const uploadProfileImage = async (image: { uri: string }) => {
   return data.publicUrl;
 };
 
-
-export const uploadPostImage = async (uri:string) =>{
+export const uploadPostImage = async (uri: string) => {
   const userId = await getUserId(); // your logic to get authenticated user's ID
   const fileExt = uri.split(".").pop();
   const contentType = mime.getType(uri) || "image/jpeg";
 
   const fileName = `${Date.now()}.${fileExt}`;
   const filePath = `${userId}/${fileName}`; // <-- upload into folder named after userId
-   const newFormData = new FormData();
-   newFormData.append("file", {
-     uri: uri,
-     name: fileName,
-     type: contentType,
-   });
+  const newFormData = new FormData();
+  newFormData.append("file", {
+    uri: uri,
+    name: fileName,
+    type: contentType,
+  });
 
-   const { error } = await supabase.storage
-     .from("post-images") // your bucket name
-     .upload(filePath, newFormData);
+  const { error } = await supabase.storage
+    .from("post-images") // your bucket name
+    .upload(filePath, newFormData, { upsert: true });
 
-   if (error) throw error;
+  if (error) throw error;
 
-   const { data } = supabase.storage.from("post-images").getPublicUrl(filePath);
-   return data.publicUrl;
-}
+  const { data } = supabase.storage.from("post-images").getPublicUrl(filePath);
+  return data.publicUrl;
+};

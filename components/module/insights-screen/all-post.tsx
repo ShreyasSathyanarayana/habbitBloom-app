@@ -7,6 +7,7 @@ import PostCard from "../insights/post-card";
 import { Divider } from "@rneui/base";
 import { verticalScale } from "@/metric";
 import { RefreshControl } from "react-native-gesture-handler";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 const AllPost = () => {
   const {
@@ -19,7 +20,7 @@ const AllPost = () => {
     refetch,
   } = usePosts();
 
-  console.log("data", JSON.stringify(data?.pages?.flat(), null, 2));
+  // console.log("data", JSON.stringify(data?.pages?.flat(), null, 2));
 
   if (data?.pages?.length == 0) {
     // Replace with No posts condition
@@ -27,7 +28,9 @@ const AllPost = () => {
   }
   return (
     <View style={styles.container}>
-      <FlatList
+      <Animated.FlatList
+        key={"all-post-list"}
+        itemLayoutAnimation={LinearTransition}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: verticalScale(16),

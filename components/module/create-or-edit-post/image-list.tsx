@@ -16,9 +16,10 @@ const _iconSize = horizontalScale(18);
 type ImageListProps = {
   images: string[];
   onRemoveImage: (index: number) => void;
+  editMode: boolean;
 };
 
-const ImageList = ({ images, onRemoveImage }: ImageListProps) => {
+const ImageList = ({ images, onRemoveImage, editMode }: ImageListProps) => {
   if (!images || images.length === 0) {
     return null; // Return null if there are no images to display
   }
@@ -40,13 +41,15 @@ const ImageList = ({ images, onRemoveImage }: ImageListProps) => {
         ItemSeparatorComponent={() => <View style={{ width: _spacing }} />}
         renderItem={({ item, index }) => (
           <View style={styles.container}>
-            <TouchableOpacity
-              hitSlop={10}
-              onPress={() => onRemoveImage(index)}
-              style={styles.removeIcon}
-            >
-              <RemoveImageIcon width={_iconSize} height={_iconSize} />
-            </TouchableOpacity>
+            {!editMode && (
+              <TouchableOpacity
+                hitSlop={10}
+                onPress={() => onRemoveImage(index)}
+                style={styles.removeIcon}
+              >
+                <RemoveImageIcon width={_iconSize} height={_iconSize} />
+              </TouchableOpacity>
+            )}
             <Image
               style={styles.image}
               source={item}

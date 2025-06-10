@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import LikeIcon from "@/assets/svg/like-icon.svg";
 import CommentIcon from "@/assets/svg/comment-icon.svg";
 import ShareIcon from "@/assets/svg/post-share-icon.svg";
+import HideCommentIcon from "@/assets/svg/hide-comment-icon.svg";
 import { horizontalScale } from "@/metric";
 import { ThemedText } from "@/components/ui/theme-text";
 import { formatLikeCount } from "@/utils/constants";
@@ -10,6 +11,7 @@ import { getFontSize } from "@/font";
 import LikeButton from "@/components/ui/like-button";
 
 const _iconSize = horizontalScale(24);
+const _hideCommentSize = horizontalScale(20);
 
 type Props = {
   likeCount: number;
@@ -50,10 +52,21 @@ const PostFooter = ({
           style={styles.btnStyle}
           onPress={onClickComment}
         >
-          <CommentIcon width={_iconSize} height={_iconSize} />
-          <ThemedText style={styles.countTextStyle}>
-            {formatLikeCount(commentCount ?? 0)}
-          </ThemedText>
+          {commentEnable && (
+            <>
+              <CommentIcon width={_iconSize} height={_iconSize} />
+              <ThemedText style={styles.countTextStyle}>
+                {formatLikeCount(commentCount ?? 0)}
+              </ThemedText>
+            </>
+          )}
+          {!commentEnable && (
+            <HideCommentIcon
+              width={_hideCommentSize}
+              height={_hideCommentSize}
+              style={{ opacity: 0.7 }}
+            />
+          )}
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.btnStyle} onPress={onClickShare}>
