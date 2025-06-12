@@ -43,7 +43,12 @@ const PostFooter = ({
         </TouchableOpacity> */}
         <View style={styles.btnStyle}>
           <LikeButton isLiked={likedByCurrentUser} onClick={onClickLike} />
-          <ThemedText style={styles.countTextStyle}>
+          <ThemedText
+            style={[
+              styles.countTextStyle,
+              likedByCurrentUser && { color: "red" },
+            ]}
+          >
             {formatLikeCount(likeCount ?? 0)}
           </ThemedText>
         </View>
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   countTextStyle: {
-    fontSize: getFontSize(14),
+    fontSize: getFontSize(12),
   },
 });
 

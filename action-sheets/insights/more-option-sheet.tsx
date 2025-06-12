@@ -41,6 +41,8 @@ const MoreOptionSheet = (props: SheetProps<"post-more-option">) => {
           description={payload?.content ?? ""}
           habitId={payload?.habit_id ?? null}
           images={payload?.image_urls ?? []}
+          habitName={payload?.habit_name ?? ""}
+          reward_post={payload?.reward_post ?? false}
         />
       )}
     </ActionSheetContainer1>
@@ -131,6 +133,8 @@ type CurrentUserProps = {
   description: string;
   images: string[];
   habitId: string | null;
+  habitName: string;
+  reward_post: boolean;
 };
 
 const CurrentUseView = ({
@@ -139,6 +143,8 @@ const CurrentUseView = ({
   description,
   images,
   habitId,
+  habitName,
+  reward_post,
 }: CurrentUserProps) => {
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -149,7 +155,6 @@ const CurrentUseView = ({
     onSuccess: () => {
       // Update the cached data manually
       closeSheet();
-      queryClient.invalidateQueries({ queryKey: ["my-posts"] });
       queryClient.setQueryData(["all-posts"], (oldData: any) => {
         if (!oldData) return oldData;
 
@@ -179,6 +184,8 @@ const CurrentUseView = ({
       habitId,
       editMode: true,
       postId,
+      habitName,
+      rewardPostMode: reward_post,
     });
     closeSheet();
     router.push("/(protected)/create-post");

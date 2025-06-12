@@ -14,16 +14,22 @@ const RewardDetail = ({
   highest_streak,
   habitName,
   otherUser,
+  habitId,
 }: Reward & {
   highest_streak: number;
   habitName: string;
   otherUser?: boolean;
+  habitId: string;
 }) => {
   const handleRewardPress = () => {
     if (otherUser) return;
     if (day > highest_streak) return; // Only show rewards for completed days
     SheetManager.show("reward-sheet", {
-      payload: { rewardUri: reward_image_url, habitName: habitName },
+      payload: {
+        rewardUri: reward_image_url,
+        habitName: habitName,
+        habitId: habitId,
+      },
     });
   };
   // console.log("RewardDetail Rendered", otherUser);

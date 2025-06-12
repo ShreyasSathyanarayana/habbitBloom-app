@@ -1884,11 +1884,13 @@ export async function getOtherUserHabits(userId: string): Promise<OtherUserHabit
 
 
 
-export async function createPost({habitId=null,description,images}:PostForm){
+export async function createPost({habitId=null,description,images,rewardPostMode}:PostForm){
   const userId = await getUserId();
+  // console.log("post details ==>", {habitId,description,images,rewardPostMode});
+  
    // Upload all images and get public URLs
   let imageUrls: string[] = [];
-  if(images?.length!==0){
+  if(images?.length!==0&&!rewardPostMode){
       imageUrls = await Promise.all(
       images.map(async (uri) => await uploadPostImage(uri))
   );
@@ -1900,15 +1902,20 @@ export async function createPost({habitId=null,description,images}:PostForm){
         user_id: userId,
         habit_id: habitId,
         content: description,
-        image_urls: imageUrls,
+        image_urls: rewardPostMode?images: imageUrls,
+        reward_post: rewardPostMode
       },
     ])
     .select()
     .single();
 
     if (error) {
+      console.log("Post creation failed:", error.message);
+      
     return { success: false, error: error.message };
   }
+  // console.log("Post created successfully:", data);
+  
   return { success: true };
 
 }
@@ -1955,6 +1962,8 @@ export type PostWithDetails = {
   content: string;
   image_urls: string[] | null;
   created_at: string;
+  reward_post: boolean;
+  habit_name:string;
   comment_enable: boolean;
   user_id: string;
   habit_id: string | null;
@@ -1989,9 +1998,11 @@ export async function getPostsWithDetails({
       content,
       image_urls,
       comment_enable,
+      reward_post,
       created_at,
       user_id,
       habit_id,
+       habit(habit_name),
       post_likes(user_id),
       post_comments (
         id,
@@ -2048,7 +2059,9 @@ export async function getPostsWithDetails({
       id: post.id,
       content: post.content,
       image_urls: post.image_urls,
+      reward_post: post.reward_post,
       created_at: post.created_at,
+      habit_name: post.habit?.habit_name ?? null,
       comment_enable: post.comment_enable,
       user_id: post.user_id,
       habit_id: post.habit_id,
@@ -2085,10 +2098,12 @@ export async function getCurrentUserPostsWithDetails({
       id,
       content,
       image_urls,
+      reward_post,
       comment_enable,
       created_at,
       user_id,
       habit_id,
+       habit(habit_name),
       post_likes(user_id),
       post_comments (
         id,
@@ -2147,7 +2162,9 @@ export async function getCurrentUserPostsWithDetails({
       content: post.content,
       image_urls: post.image_urls,
       created_at: post.created_at,
+      reward_post: post.reward_post,
       comment_enable: post.comment_enable,
+      habit_name: post.habit?.habit_name??null,
       user_id: post.user_id,
       habit_id: post.habit_id,
       likeCount,

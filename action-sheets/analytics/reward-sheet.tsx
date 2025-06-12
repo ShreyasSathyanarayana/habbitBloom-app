@@ -11,6 +11,8 @@ import RewardIcon from "@/components/module/analytics-screen/rewards/reward-icon
 import ViewShot, { captureRef } from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import ConfettieIcon from "@/assets/svg/confettie.svg";
+import { usePostStore } from "@/store/post-store";
+import { router } from "expo-router";
 const onclose = () => {
   SheetManager.hide("reward-sheet");
 };
@@ -21,6 +23,7 @@ const _circleWidth = horizontalScale(190);
 
 const RewardSheet = (props: SheetProps<"reward-sheet">) => {
   const payload = props.payload;
+  const { updateHabitDetails, addImage, updatePostForm } = usePostStore();
 
   const componentRef = useRef<ViewShot | null>(null);
 
@@ -33,6 +36,22 @@ const RewardSheet = (props: SheetProps<"reward-sheet">) => {
     if (uri) {
       await Sharing.shareAsync(uri);
     }
+  };
+
+  const handlePostFeed = () => {
+    // addImage(payload?.rewardUri ?? "");
+    // updateHabitDetails(payload?.habitId ?? "", payload?.habitName ?? "");
+    updatePostForm({
+      images: [payload?.rewardUri ?? ""],
+      habitName: payload?.habitName ?? "",
+      habitId: payload?.habitId ?? "",
+      description: "", // Provide a default or meaningful description
+      editMode: false, // Set to false or appropriate value
+      postId: "", // Provide a default or meaningful postId
+      rewardPostMode: true,
+    });
+    onclose();
+    router.push("/(protected)/create-post");
   };
 
   return (
@@ -71,7 +90,17 @@ const RewardSheet = (props: SheetProps<"reward-sheet">) => {
             </ThemedText>
           </View>
         </ViewShot>
-        <Button label="Share" onPress={onShare} />
+        <View style={{ gap: verticalScale(16) }}>
+          <Button label="Share" onPress={onShare} />
+          <Button
+            onPress={handlePostFeed}
+            label="Post to Feed"
+            style={{
+              backgroundColor: "transparent",
+              borderColor: "transparent",
+            }}
+          />
+        </View>
       </View>
     </ActionSheetContainer>
   );

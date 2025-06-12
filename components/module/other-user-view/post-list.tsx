@@ -11,6 +11,7 @@ import { verticalScale } from "@/metric";
 import { Divider } from "@rneui/base";
 import PostCard from "../insights/post-card";
 import Animated, { LinearTransition } from "react-native-reanimated";
+import { FlatList } from "react-native";
 
 type Props = {
   userId: string;
@@ -32,43 +33,41 @@ const PostList = ({ userId }: Props) => {
     return <EmptyPost />;
   }
   return (
-    <View>
-      <Animated.FlatList
-        key={"all-post-list"}
-        itemLayoutAnimation={LinearTransition}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: verticalScale(16),
-          paddingBottom: verticalScale(100),
-        }}
-        scrollEnabled={false}
-        keyExtractor={(item) => item.id}
-        data={data?.pages?.flat()}
-        renderItem={({ item }) => {
-          return <PostCard {...item} />;
-        }}
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        }}
-        ItemSeparatorComponent={() => (
-          <Divider
-            color="rgba(255, 255, 255, 0.18)"
-            style={{ marginVertical: verticalScale(16) }}
-          />
-        )}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isFetchingNextPage ? (
-            <ActivityIndicator size="small" color="#888" />
-          ) : null
+    <FlatList
+      key={"all-post-list"}
+      // itemLayoutAnimation={LinearTransition}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingTop: verticalScale(16),
+        paddingBottom: verticalScale(100),
+      }}
+      scrollEnabled={false}
+      keyExtractor={(item) => item.id}
+      data={data?.pages?.flat()}
+      renderItem={({ item }) => {
+        return <PostCard {...item} />;
+      }}
+      onEndReached={() => {
+        if (hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
-        }
-      />
-    </View>
+      }}
+      ItemSeparatorComponent={() => (
+        <Divider
+          color="rgba(255, 255, 255, 0.18)"
+          style={{ marginVertical: verticalScale(16) }}
+        />
+      )}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        isFetchingNextPage ? (
+          <ActivityIndicator size="small" color="#888" />
+        ) : null
+      }
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+      }
+    />
   );
 };
 

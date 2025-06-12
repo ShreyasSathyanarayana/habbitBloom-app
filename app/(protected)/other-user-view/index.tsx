@@ -62,32 +62,28 @@ const Index = () => {
     <Container>
       <Header title={otherUserDetailsQuery?.data?.full_name ?? ""} />
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flex: 1 }}
+        contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={true}
       >
-        <View style={styles.container}>
-          <ProfilePic
-            userDetails={otherUserDetailsQuery?.data}
-            isLoading={otherUserDetailsQuery.isLoading}
-          />
-          <AnalyticsBar
-            menu={MENU_OPTIONS}
-            selectedMenu={selectedMenu}
-            onChangeMenu={onChangeMenu}
-          />
+        <ProfilePic
+          userDetails={otherUserDetailsQuery?.data}
+          isLoading={otherUserDetailsQuery.isLoading}
+        />
+        <AnalyticsBar
+          menu={MENU_OPTIONS}
+          selectedMenu={selectedMenu}
+          onChangeMenu={onChangeMenu}
+        />
 
-          {selectedMenu === MENU_OPTIONS[0] && (
-            <PostList userId={userId ?? ""} />
-          )}
+        {selectedMenu === MENU_OPTIONS[0] && <PostList userId={userId ?? ""} />}
 
-          {selectedMenu === MENU_OPTIONS[1] && (
-            <HabitTrackList
-              habits={otherUserHabitTrackQuery?.data ?? []}
-              isLoading={otherUserHabitTrackQuery.isLoading}
-            />
-          )}
-        </View>
+        {selectedMenu === MENU_OPTIONS[1] && (
+          <HabitTrackList
+            habits={otherUserHabitTrackQuery?.data ?? []}
+            isLoading={otherUserHabitTrackQuery.isLoading}
+          />
+        )}
       </ScrollView>
     </Container>
   );
@@ -95,7 +91,7 @@ const Index = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     padding: horizontalScale(16),
     gap: verticalScale(24),
   },

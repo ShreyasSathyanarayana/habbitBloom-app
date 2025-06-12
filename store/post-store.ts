@@ -5,7 +5,9 @@ export type PostForm = {
   images: string[];
   habitId: string|null;
   editMode:boolean;
-  postId:string|null
+  postId:string|null;
+  habitName:string;
+  rewardPostMode:boolean
 };
 
 type PostStore = {
@@ -16,6 +18,8 @@ type PostStore = {
   resetForm: () => void;
   hasUnSavedChanges: () => boolean
   updatePostForm : (form:PostForm) => void
+  updateHabitDetails : (habitId:string,habitName:string) => void
+  resetHabitDetails:()=>void
 };
 
 export const usePostStore = create<PostStore>((set,get) => ({
@@ -24,7 +28,9 @@ export const usePostStore = create<PostStore>((set,get) => ({
     images: [],
     habitId: null,
     editMode:false,
-    postId:null
+    postId:null,
+    habitName:'',
+    rewardPostMode:false
   },
   setDescription: (desc) =>
     set((state) => ({ form: { ...state.form, description: desc } })),
@@ -44,12 +50,16 @@ export const usePostStore = create<PostStore>((set,get) => ({
         images: [],
         habitId: null,
         editMode:false,
-        postId:null
+        postId:null,
+        habitName:'',
+        rewardPostMode:false
       },
     })),
    hasUnSavedChanges: () => {
     const { description, images,habitId } = get().form;
     return description.trim().length > 0 || images.length > 0 || habitId !== null;
   },
-  updatePostForm:(form:PostForm) => set(() => ({ form }))
+  updatePostForm:(form:PostForm) => set(() => ({ form })),
+  updateHabitDetails:(habitId,habitName)=>set(() => ({ form: { ...get().form, habitId,habitName } })),
+  resetHabitDetails:()=>set(() => ({ form: { ...get().form, habitId: null,habitName:'' } })),
 }));

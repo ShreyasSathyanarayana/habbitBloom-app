@@ -2,7 +2,7 @@ import PostHeader from "@/components/module/create-or-edit-post/post-header";
 import Container from "@/components/ui/container";
 import { getFontSize } from "@/font";
 import { horizontalScale, verticalScale } from "@/metric";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   BackHandler,
@@ -37,15 +37,19 @@ import { router, useFocusEffect } from "expo-router";
 import { SheetManager } from "react-native-actions-sheet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPost, editPost } from "@/api/api";
+import CancelIcon from "@/assets/svg/cancel-icon.svg";
+import ExitPermissionModal from "@/components/modal/exit-permission-modal";
 
 const { height: windowHeight } = Dimensions.get("window");
 const charLimit = 1500;
 const _iconSize = horizontalScale(26);
+const _cancelSize = horizontalScale(18);
 
 const Index = () => {
   const scrollRef = useRef<ScrollView>(null);
   const { top: paddingTop } = useSafeAreaInsets();
   const toast = useToast();
+  const [openDiscardModal, setOpenDiscardModal] = useState(false);
 
   const {
     form,
@@ -54,6 +58,7 @@ const Index = () => {
     removeImage,
     hasUnSavedChanges,
     resetForm,
+    resetHabitDetails,
   } = usePostStore();
 
   useFocusEffect(
@@ -66,7 +71,10 @@ const Index = () => {
 
   const onBackPress = () => {
     if (hasUnSavedChanges()) {
-      SheetManager.show("exit-confirmation");
+      Platform.OS === "android"
+        ? SheetManager.show("exit-confirmation")
+        : setOpenDiscardModal(true);
+
       return true;
     } else {
       router.back();
@@ -213,10 +221,24 @@ const Index = () => {
                 // }}
               />
 
+              {form.habitId && (
+                <View style={{ flexDirection: "row" }}>
+                  <View style={styles.hashTagContainer}>
+                    <ThemedText style={{ fontSize: getFontSize(12) }}>
+                      #{form.habitName}
+                    </ThemedText>
+                   {!form.rewardPostMode&& <TouchableOpacity hitSlop={10} onPress={resetHabitDetails}>
+                      <CancelIcon width={_cancelSize} height={_cancelSize} />
+                    </TouchableOpacity>}
+                  </View>
+                </View>
+              )}
+
               <ImageList
                 images={form.images ?? []}
                 onRemoveImage={handleRemoveImage}
-                editMode={form.editMode}
+                editMode={form.editMode || form.rewardPostMode} // I don't want to remove images in edit mode and reward mode
+                rewardMode={form.rewardPostMode}
               />
               {form.images?.length >= 4 && (
                 <ThemedText
@@ -229,28 +251,43 @@ const Index = () => {
                   You can upload up to 3 images
                 </ThemedText>
               )}
+
               <View style={styles.row}>
-                <TouchableOpacity
-                  onPress={onGallerySelect}
-                  style={styles.btnStyle}
+                {(!form.editMode && !form.rewardPostMode)&& (
+                  <>
+                    <TouchableOpacity
+                      onPress={onGallerySelect}
+                      style={styles.btnStyle}
+                      hitSlop={10}
+                    >
+                      <GalleryIcon width={_iconSize} height={_iconSize} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={onCameraSelect}
+                      style={styles.btnStyle}
+                      hitSlop={10}
+                    >
+                      <CameraIcon width={_iconSize} height={_iconSize} />
+                    </TouchableOpacity>
+                  </>
+                )}
+               { !form.rewardPostMode&& <TouchableOpacity
                   hitSlop={10}
-                >
-                  <GalleryIcon width={_iconSize} height={_iconSize} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={onCameraSelect}
                   style={styles.btnStyle}
-                  hitSlop={10}
+                  onPress={() =>
+                    router.push("/(protected)/create-post/habit-list")
+                  }
                 >
-                  <CameraIcon width={_iconSize} height={_iconSize} />
-                </TouchableOpacity>
-                <TouchableOpacity>
                   <HashTagIcon width={_iconSize} height={_iconSize} />
-                </TouchableOpacity>
+                </TouchableOpacity>}
               </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+        <ExitPermissionModal
+          isModalVisible={openDiscardModal}
+          onClose={() => setOpenDiscardModal(false)}
+        />
       </View>
       <KeyboardToolbar />
     </>
@@ -283,6 +320,19 @@ const styles = StyleSheet.create({
   },
   btnStyle: {
     // padding: horizontalScale(10),
+  },
+  hashTagContainer: {
+    flexDirection: "row",
+    gap: horizontalScale(8),
+    alignItems: "center",
+    backgroundColor: "rgba(138, 43, 226, 0.24)",
+    padding: horizontalScale(6),
+    borderRadius: horizontalScale(16),
+    borderColor: "rgba(255, 255, 255, 1)",
+    borderWidth: horizontalScale(1),
+    paddingHorizontal: horizontalScale(8),
+    marginTop: verticalScale(16),
+    justifyContent: "space-between",
   },
 });
 

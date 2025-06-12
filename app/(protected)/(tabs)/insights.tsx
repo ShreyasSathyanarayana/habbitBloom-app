@@ -21,10 +21,9 @@ const Insights = () => {
   }, []);
 
   return (
-    <View
-      style={[styles.container, { paddingTop: insets.top + verticalScale(20) }]}
-    >
-      <AnalyticsBar
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <AllPost />
+      {/* <AnalyticsBar
         menu={MENU_OPTIONS}
         selectedMenu={selectedMenu}
         onChangeMenu={onChangeMenu}
@@ -36,7 +35,7 @@ const Insights = () => {
         <View key="2" style={{ flex: 1 }}>
           <MyPost />
         </View>
-      </PagerView>
+      </PagerView> */}
       <AddPost />
     </View>
   );

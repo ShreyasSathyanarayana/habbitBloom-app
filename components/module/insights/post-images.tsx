@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, TouchableHighlight, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
@@ -9,16 +9,19 @@ import Animated, {
 import { horizontalScale, verticalScale } from "@/metric";
 import { Image } from "expo-image";
 import { blurhash } from "../profile/avatar-image";
+import { useImage } from "@/context/ImageContext";
 
 const { width: screenWidth } = Dimensions.get("window");
 const _imageWidth = screenWidth - horizontalScale(32);
 
 type Props = {
   images: string[];
+  rewardPost: boolean;
 };
 
-const PostImages = ({ images }: Props) => {
+const PostImages = ({ images, rewardPost }: Props) => {
   if (!images || images.length === 0) return null;
+  const { showImage } = useImage();
 
   const scrollX = useSharedValue(0);
 
@@ -37,13 +40,15 @@ const PostImages = ({ images }: Props) => {
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => `${item}-${index}`}
         renderItem={({ item }) => (
-          <Image
-            source={{ uri: item }}
-            style={styles.image}
-            contentFit="cover"
-            // resizeMode="cover"
-            placeholder={{ blurhash }}
-          />
+          <TouchableHighlight onPress={() => showImage(item)}>
+            <Image
+              source={{ uri: item }}
+              style={styles.image}
+              contentFit={rewardPost ? "contain" : "cover"}
+              // resizeMode="cover"
+              placeholder={{ blurhash }}
+            />
+          </TouchableHighlight>
         )}
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
     height: verticalScale(258),
     // marginRight: horizontalScale(10),
     borderRadius: horizontalScale(8),
-    backgroundColor: "#eee",
+    backgroundColor: "transparent",
   },
   dotsContainer: {
     flexDirection: "row",

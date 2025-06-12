@@ -93,6 +93,7 @@ declare module "react-native-actions-sheet" {
       payload: {
         rewardUri: string;
         habitName: string;
+        habitId: string;
       };
     }>;
     "exit-confirmation": SheetDefinition;

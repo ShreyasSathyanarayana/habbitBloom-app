@@ -17,9 +17,15 @@ type ImageListProps = {
   images: string[];
   onRemoveImage: (index: number) => void;
   editMode: boolean;
+  rewardMode: boolean;
 };
 
-const ImageList = ({ images, onRemoveImage, editMode }: ImageListProps) => {
+const ImageList = ({
+  images,
+  onRemoveImage,
+  editMode,
+  rewardMode,
+}: ImageListProps) => {
   if (!images || images.length === 0) {
     return null; // Return null if there are no images to display
   }
@@ -40,7 +46,16 @@ const ImageList = ({ images, onRemoveImage, editMode }: ImageListProps) => {
         keyExtractor={(item) => item}
         ItemSeparatorComponent={() => <View style={{ width: _spacing }} />}
         renderItem={({ item, index }) => (
-          <View style={styles.container}>
+          <View
+            style={[
+              styles.container,
+              rewardMode && {
+                borderWidth: horizontalScale(1),
+                borderColor: "white",
+                paddingVertical: horizontalScale(10),
+              },
+            ]}
+          >
             {!editMode && (
               <TouchableOpacity
                 hitSlop={10}
@@ -54,6 +69,7 @@ const ImageList = ({ images, onRemoveImage, editMode }: ImageListProps) => {
               style={styles.image}
               source={item}
               placeholder={{ blurhash }}
+              contentFit={rewardMode ? "contain" : "cover"}
             />
           </View>
         )}

@@ -11,6 +11,7 @@ import PostFooter from "./post-footer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "react-native-toast-notifications";
 import { SheetManager } from "react-native-actions-sheet";
+import ExpandableText from "./expandable-text";
 
 const PostCard = ({
   content,
@@ -25,6 +26,8 @@ const PostCard = ({
   commentCount,
   likedByCurrentUser,
   comment_enable,
+  habit_name,
+  reward_post,
 }: PostWithDetails) => {
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -95,6 +98,7 @@ const PostCard = ({
                 created_at,
                 habit_id,
                 image_urls,
+                reward_post,
                 id,
                 likeCount,
                 user,
@@ -103,13 +107,29 @@ const PostCard = ({
                 commentCount,
                 likedByCurrentUser,
                 comment_enable,
+                habit_name,
               },
             },
           })
         }
       />
-      <ThemedText style={{ fontSize: getFontSize(14) }}>{content}</ThemedText>
-      <PostImages images={image_urls ?? []} />
+      {/* <ThemedText style={{ fontSize: getFontSize(14) }}>{content}</ThemedText> */}
+      <ExpandableText
+        content={content}
+        textStyle={{ fontSize: getFontSize(12) }}
+      />
+      {habit_name && (
+        <ThemedText
+          style={{
+            fontSize: getFontSize(12),
+            color: "rgba(138, 43, 226, 1)",
+            fontFamily: "PoppinsMedium",
+          }}
+        >
+          #{habit_name}
+        </ThemedText>
+      )}
+      <PostImages images={image_urls ?? []} rewardPost={reward_post} />
       <PostFooter
         likeCount={likeCount}
         commentCount={commentCount}
