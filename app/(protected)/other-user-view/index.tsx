@@ -13,7 +13,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useCallback } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
-const MENU_OPTIONS = ["All Posts ", "My Posts"];
+const MENU_OPTIONS = ["Posts ", "Habits"];
 
 const Index = () => {
   const { userId } = useLocalSearchParams<{ userId: string }>();

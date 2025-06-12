@@ -30,7 +30,7 @@ const PostHeader = ({ uri, userName, created_at, onClickThreeDot }: Props) => {
           <ThemedText
             style={{
               fontSize: getFontSize(12),
-              color: "rgba(217, 217, 217, 1)",
+              color: "rgba(217, 217, 217, 0.8)",
             }}
           >
             {timeAgo}
