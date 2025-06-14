@@ -2002,7 +2002,7 @@ export async function getPostsWithDetails({
       created_at,
       user_id,
       habit_id,
-       habit(habit_name),
+      habit(habit_name),
       post_likes(user_id),
       post_comments (
         id,
@@ -2302,3 +2302,181 @@ export async function deletePost(postId: string) {
 
   return true;
 }
+
+
+
+type PostCommentInput = {
+  postId: string;
+  content: string;
+  parentCommentId?: string; // optional for nested comments
+};
+
+export async function postComment({ postId, content, parentCommentId }: PostCommentInput) {
+  try {
+    const userId = await getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    const { data, error } = await supabase.from("post_comments").insert([
+      {
+        post_id: postId,
+        content,
+        user_id: userId,
+        parent_comment_id: parentCommentId ?? null,
+      },
+    ]).select("*").single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error posting comment:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+
+
+export async function toggleCommentLike(commentId: string) {
+  const userId = await getUserId();
+  if (!userId) return { success: false, error: "User not logged in" };
+
+  const { data: existingLike, error: findError } = await supabase
+    .from("comment_likes")
+    .select("id")
+    .eq("comment_id", commentId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (findError) return { success: false, error: findError.message };
+
+  if (existingLike) {
+    // Unlike
+    const { error: deleteError } = await supabase
+      .from("comment_likes")
+      .delete()
+      .eq("id", existingLike.id);
+    if (deleteError) return { success: false, error: deleteError.message };
+    return { success: true, liked: false };
+  } else {
+    // Like
+    const { error: insertError } = await supabase.from("comment_likes").insert([
+      {
+        comment_id: commentId,
+        user_id: userId,
+      },
+    ]);
+    if (insertError) return { success: false, error: insertError.message };
+    return { success: true, liked: true };
+  }
+}
+
+
+
+// types.ts
+export interface PostCommentDetails {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  parent_comment_id: string | null;
+  full_name: string;
+  profile_pic: string | null;
+  like_count: number;
+  liked_by_me: boolean;
+  children: PostCommentDetails[];
+}
+
+
+
+const PAGE_SIZE = 10;
+
+export async function getPaginatedNestedComments(
+  postId: string,
+  page: number,
+  // currentUserId: string
+): Promise<PostCommentDetails[]> {
+  const currentUserId = await getUserId()??"";
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+ const baseSelect = `
+  id,
+  content,
+  created_at,
+  user_id,
+  parent_comment_id,
+  profile:profile (
+    full_name,
+    profile_pic
+  ),
+  comment_likes (
+    id
+  ),
+  liked_by_me:comment_likes!comment_likes_comment_id_fkey (
+    user_id
+  )
+`;
+
+
+  // 1. Fetch top-level comments
+  const { data: topLevel, error: topError } = await supabase
+    .from("post_comments")
+    .select(baseSelect)
+    .eq("post_id", postId)
+    .is("parent_comment_id", null)
+    .order("created_at", { ascending: false })
+    .range(from, to)
+    .eq("comment_likes.user_id", currentUserId)
+    .eq("liked_by_me.user_id", currentUserId);
+
+  if (topError){
+    console.log("topError==>",topError);
+    
+     throw topError;}
+
+  const topIds = topLevel.map((c) => c.id);
+
+  // 2. Fetch children
+  const { data: replies, error: childError } = await supabase
+    .from("post_comments")
+    .select(baseSelect)
+    .eq("post_id", postId)
+    .in("parent_comment_id", topIds)
+    .order("created_at", { ascending:false })
+    .eq("comment_likes.user_id", currentUserId)
+    .eq("liked_by_me.user_id", currentUserId);
+
+  if (childError){ 
+    console.log("childError==>",childError);
+    
+    throw childError};
+
+  // 3. Normalize
+  const allComments = [...topLevel, ...replies].map((c: any) => ({
+    id: c.id,
+    content: c.content,
+    created_at: c.created_at,
+    user_id: c.user_id,
+    parent_comment_id: c.parent_comment_id,
+    full_name: c.profile?.full_name  ?? "Anonymous",
+    profile_pic:  c.profile?.profile_pic ?? null,
+    like_count: c.comment_likes?.length ?? 0,
+    liked_by_me: Array.isArray(c.liked_by_me) && c.liked_by_me.length > 0,
+    children: [] as PostCommentDetails[],
+  }));
+
+  const map = new Map<string, PostCommentDetails>();
+  allComments.forEach((c) => map.set(c.id, c));
+
+  const nested: PostCommentDetails[] = [];
+  allComments.forEach((comment) => {
+    if (comment.parent_comment_id) {
+      const parent = map.get(comment.parent_comment_id);
+      if (parent) parent.children.push(comment);
+    } else {
+      nested.push(comment);
+    }
+  });
+
+  return nested;
+}
+

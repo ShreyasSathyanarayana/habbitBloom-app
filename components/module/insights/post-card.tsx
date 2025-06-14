@@ -133,7 +133,9 @@ const PostCard = ({
       <PostFooter
         likeCount={likeCount}
         commentCount={commentCount}
-        onClickComment={() => console.log("comment")}
+        onClickComment={() =>
+          SheetManager.show("comment-post", { payload: { postId: id } })
+        }
         onClickLike={() => toggleLikeMutation.mutateAsync()}
         onClickShare={() => console.log("share")}
         likedByCurrentUser={likedByCurrentUser}

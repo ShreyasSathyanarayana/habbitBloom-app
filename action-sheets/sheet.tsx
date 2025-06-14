@@ -17,6 +17,7 @@ import ExitConfirmationSheet from "./create-or-edit-post/exit-confirmation-sheet
 import MoreOptionSheet from "./insights/more-option-sheet";
 import { PostWithDetails } from "@/api/api";
 import DeletePostSheet from "./insights/delete-post-sheet";
+import CommentPostSheet from "./insights/comment-post-sheet";
 
 type HabitDetailsProp = {
   id: string;
@@ -46,6 +47,7 @@ registerSheet("reward-sheet", RewardSheet);
 registerSheet("exit-confirmation", ExitConfirmationSheet);
 registerSheet("post-more-option", MoreOptionSheet);
 registerSheet("delete-post", DeletePostSheet);
+registerSheet("comment-post", CommentPostSheet);
 
 // Extend types for better intellisense
 declare module "react-native-actions-sheet" {
@@ -103,6 +105,11 @@ declare module "react-native-actions-sheet" {
       };
     }>;
     "delete-post": SheetDefinition<{
+      payload: {
+        postId: string;
+      };
+    }>;
+    "comment-post": SheetDefinition<{
       payload: {
         postId: string;
       };
