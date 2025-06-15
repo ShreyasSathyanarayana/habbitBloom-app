@@ -1,12 +1,23 @@
-import { getUserProfile, postComment, toggleCommentLike } from "@/api/api";
+import {
+  getPaginatedNestedComments,
+  getUserProfile,
+  postComment,
+  PostCommentDetails,
+  toggleCommentLike,
+} from "@/api/api";
 import CommentItem from "@/components/module/comment-section/comment-item";
 import CommentInput from "@/components/module/insights/comment-input";
-import { useComments } from "@/components/module/insights/useComments";
+// import { useComments } from "@/components/module/insights/useComments";
 import ActionSheetContainer1 from "@/components/ui/action-sheet-container1";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
 import { horizontalScale } from "@/metric";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Skeleton } from "moti/skeleton";
 import React, { useState } from "react";
 import {
@@ -20,8 +31,9 @@ import {
 import { SheetProps, FlatList } from "react-native-actions-sheet";
 import { useToast } from "react-native-toast-notifications";
 
-
 const windowHeight = Dimensions.get("window").height;
+
+const PAGE_SIZE = 10;
 
 const CommentPostSheet = (props: SheetProps<"comment-post">) => {
   const payload = props?.payload;
@@ -31,7 +43,17 @@ const CommentPostSheet = (props: SheetProps<"comment-post">) => {
   const [parenId, setParentId] = React.useState<string | null>(null);
   const [parentCommentUserName, setParentCommentUserName] = useState("");
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useComments(payload?.postId ?? "");
+    useInfiniteQuery<PostCommentDetails[], Error>({
+      queryKey: ["comments", payload?.postId], // Assumes postId doesn't change often
+      queryFn: ({ pageParam = 1 }) =>
+        getPaginatedNestedComments(payload?.postId ?? "", pageParam as number),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, allPages) => {
+        // If the last page has less than PAGE_SIZE, no more pages
+        if (lastPage.length < PAGE_SIZE) return undefined;
+        return allPages.length + 1;
+      },
+    });
 
   const getUserDetailsQuery = useQuery({
     queryKey: ["userDetails"],
@@ -48,18 +70,22 @@ const CommentPostSheet = (props: SheetProps<"comment-post">) => {
       postComment({
         postId: payload?.postId ?? "",
         content: comment,
-        parentCommentId: parenId ?? "",
+        parentCommentId: parenId,
       }),
     onError: () => {
       toast.show("Something went wrong", {
         type: "warning",
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       console.log("Successfully completed");
+      // toast.show("Comment submitted successfully", {
+      //   type: "success",
+      // });
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: ["comments", payload?.postId],
+        refetchType: "active", // ensures it's refetched if mounted
       });
       queryClient.setQueryData(["all-posts"], (oldData: any) => {
         if (!oldData) return oldData;
@@ -92,7 +118,7 @@ const CommentPostSheet = (props: SheetProps<"comment-post">) => {
     mutationFn: (commentId: string) => toggleCommentLike(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["comments", payload?.postId],
+        queryKey: ["comments"],
       });
     },
     onError: () => {

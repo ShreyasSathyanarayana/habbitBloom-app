@@ -2308,7 +2308,7 @@ export async function deletePost(postId: string) {
 type PostCommentInput = {
   postId: string;
   content: string;
-  parentCommentId?: string; // optional for nested comments
+  parentCommentId?: string|null; // optional for nested comments
 };
 
 export async function postComment({ postId, content, parentCommentId }: PostCommentInput) {
@@ -2391,7 +2391,7 @@ const PAGE_SIZE = 10;
 
 export async function getPaginatedNestedComments(
   postId: string,
-  page: number,
+  page: number =1,
   // currentUserId: string
 ): Promise<PostCommentDetails[]> {
   const currentUserId = await getUserId()??"";

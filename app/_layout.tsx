@@ -1,5 +1,4 @@
 import { getFontSize } from "@/font";
-import { Stack } from "expo-router";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -15,11 +14,7 @@ import { tokenKeys, useAuth } from "@/context/AuthProvider";
 import Providers from "@/components/Provider";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
-
 import { Slot, SplashScreen, useRouter } from "expo-router";
-
-import * as SecureStore from "expo-secure-store";
-import { StatusBar } from "expo-status-bar";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import {
   LogBox,
@@ -37,10 +32,8 @@ import WrongIcon from "@/assets/svg/cancel.svg";
 import InfoIcon from "@/assets/svg/Info.svg";
 import { horizontalScale } from "@/metric";
 import { useFonts } from "expo-font";
-import { sendOTP } from "@/api/auth-api";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/action-sheets/sheet";
-import { setupDatabase, syncHabitsToSupabase } from "@/database/db";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
