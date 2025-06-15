@@ -14,6 +14,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useTabBar } from "@/context/TabBarContext";
+import HabitStories from "../habit-stories/habit-stories";
 
 const SCROLL_HIDE_THRESHOLD = 10;
 const SCROLL_SHOW_THRESHOLD = -5;
@@ -77,6 +78,7 @@ const AllPost = () => {
           paddingTop: verticalScale(16),
           paddingBottom: verticalScale(100),
         }}
+        ListHeaderComponent={() => <HabitStories />}
         keyExtractor={(item) => item.id}
         data={posts}
         renderItem={renderItem}

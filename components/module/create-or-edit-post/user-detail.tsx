@@ -13,11 +13,12 @@ const UserDetail = () => {
       return getUserProfile();
     },
     networkMode: "online",
+    staleTime: Infinity,
   });
-//   console.log(
-//     "getUserDetailsQuery",
-//     JSON.stringify(getUserDetailsQuery.data, null, 2)
-//   );
+  //   console.log(
+  //     "getUserDetailsQuery",
+  //     JSON.stringify(getUserDetailsQuery.data, null, 2)
+  //   );
 
   return (
     <View style={styles.container}>
