@@ -2,6 +2,7 @@ import { horizontalScale, verticalScale } from "@/metric";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   NativeSyntheticEvent,
   StyleSheet,
   TextInput,
@@ -16,6 +17,8 @@ import { getFontSize } from "@/font";
 import { ThemedText } from "@/components/ui/theme-text";
 import CancelIcon from "@/assets/svg/cancel-icon.svg";
 const _iconSize = horizontalScale(24);
+
+const _cancelSize = horizontalScale(18);
 
 type Props = {
   value: string;
@@ -48,7 +51,10 @@ const CommentInput: React.FC<Props> = ({
   };
 
   return (
-    <View style={[styles.container, parentId && { alignItems: "center" }]}>
+    <View
+      onTouchStart={() => Keyboard.dismiss()}
+      style={[styles.container, parentId && { alignItems: "center" }]}
+    >
       <CommentAvatar uri={userImage} />
       <View
         style={[
@@ -62,7 +68,7 @@ const CommentInput: React.FC<Props> = ({
               {parentUserName}
             </ThemedText>
             <TouchableOpacity hitSlop={10} onPress={onCancelParentId}>
-              <CancelIcon />
+              <CancelIcon width={_cancelSize} height={_cancelSize} />
             </TouchableOpacity>
           </View>
         )}

@@ -104,7 +104,8 @@ const styles = StyleSheet.create({
   },
   image: {
     width: _imageWidth,
-    height: verticalScale(258),
+    // height: undefined,
+    aspectRatio: 16 / 16,
     // marginRight: horizontalScale(10),
     borderRadius: horizontalScale(8),
     backgroundColor: "transparent",

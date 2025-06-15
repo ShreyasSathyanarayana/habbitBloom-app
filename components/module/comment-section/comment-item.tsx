@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Svg, { Path } from "react-native-svg";
 import moment from "moment";
-import { PostCommentDetails } from "@/api/api";
+import { deleteCommentById, PostCommentDetails } from "@/api/api";
 import CommentAvatar from "../insights/comment-avatar";
 import { horizontalScale, verticalScale } from "@/metric";
 import { ThemedText } from "@/components/ui/theme-text";
 import ExpandableText from "../insights/expandable-text";
 import { getFontSize } from "@/font";
+import { getUserId } from "@/utils/persist-storage";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CommentProps {
   comment: PostCommentDetails;
@@ -18,6 +26,9 @@ interface CommentProps {
   onViewMoreRepliesPress?: (parentId: string) => void;
   onLikeToggle: (commentId: string, currentLikedStatus: boolean) => void;
   level: number;
+  postId: string;
+  // deleteCommentLoading: boolean;
+  // onDeleteComment: (commentId: string) => void;
 }
 
 const LINE_INDENT = horizontalScale(20);
@@ -32,6 +43,7 @@ const CommentItem: React.FC<CommentProps> = ({
   onViewMoreRepliesPress,
   onLikeToggle,
   level,
+  postId,
 }) => {
   const {
     id,
@@ -42,7 +54,42 @@ const CommentItem: React.FC<CommentProps> = ({
     like_count,
     liked_by_me,
     children,
+    user_id,
   } = comment;
+
+  const currentUserId = getUserId();
+  const queryClient = useQueryClient();
+
+  const commentDeleteMutation = useMutation({
+    mutationKey: ["deleteComment"],
+    mutationFn: (commentId: string) => deleteCommentById(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments"],
+      });
+
+      queryClient.setQueryData(["all-posts"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any[]) =>
+            page.map((post) => {
+              if (post.id === postId) {
+                return {
+                  ...post,
+                  commentCount: post.commentCount - (children?.length + 1 || 1), /// this is because when you have nested comments, the comment count is not updated
+                };
+              }
+              return post;
+            })
+          ),
+        };
+      });
+    },
+    onError: () => {
+      console.log("Error deleting comment");
+    },
+  });
 
   const [likeCount, setLikeCount] = useState(like_count);
   const [liked, setLiked] = useState(liked_by_me);
@@ -65,7 +112,7 @@ const CommentItem: React.FC<CommentProps> = ({
           AVATAR_SIZE + 10
         } ${LINE_INDENT / 2 + 5},${AVATAR_SIZE + 10} H${LINE_INDENT}`}
         stroke="#555"
-        strokeWidth="1"
+        strokeWidth="1.5"
         fill="none"
       />
     </Svg>
@@ -97,23 +144,57 @@ const CommentItem: React.FC<CommentProps> = ({
             content={content}
             textStyle={{ fontSize: getFontSize(10) }}
           />
-          {level === 0 && (
-            <View style={styles.actionsRow}>
+
+          <View style={styles.actionsRow}>
+            {level == 0 && (
               <TouchableOpacity
                 onPress={() => onReplyPress(id, full_name)}
                 style={styles.actionBtn}
               >
-                <Icon name="reply" size={ICON_SIZE} color="#888" />
-                <ThemedText style={styles.actionText}>Reply</ThemedText>
+                <ThemedText
+                  style={[styles.actionText, { fontFamily: "PoppinsSemiBold" }]}
+                >
+                  Reply
+                </ThemedText>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
+            {user_id === currentUserId && (
+              <TouchableOpacity
+                disabled={commentDeleteMutation?.isPending}
+                onPress={() => commentDeleteMutation.mutateAsync(id)}
+              >
+                {!commentDeleteMutation?.isPending && (
+                  <ThemedText
+                    style={[
+                      styles.actionText,
+                      {
+                        fontFamily: "PoppinsSemiBold",
+                        color: "rgba(255, 59, 48, 1)",
+                      },
+                    ]}
+                  >
+                    Delete
+                  </ThemedText>
+                )}
+                {commentDeleteMutation?.isPending && (
+                  <ActivityIndicator
+                    size="small"
+                    color="rgba(255, 59, 48, 1)"
+                  />
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <TouchableOpacity
           onPress={handleLike}
           style={[
             styles.actionBtn,
-            { flexDirection: "column", alignItems: "center" },
+            {
+              flexDirection: "column",
+              alignItems: "center",
+              marginTop: verticalScale(8),
+            },
           ]}
         >
           <Icon
@@ -145,6 +226,7 @@ const CommentItem: React.FC<CommentProps> = ({
               onViewMoreRepliesPress={onViewMoreRepliesPress}
               onLikeToggle={onLikeToggle}
               level={level + 1}
+              postId={postId}
             />
           ))}
           {hasMoreReplies && (
@@ -190,7 +272,7 @@ const styles = StyleSheet.create({
     left: LINE_INDENT / 2 - 0.8,
     top: AVATAR_SIZE + 7,
     bottom: 0,
-    width: 1,
+    width: 1.5,
     backgroundColor: "#555",
   },
   contentArea: {
@@ -233,7 +315,7 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 4,
     fontSize: 12,
-    color: "#888",
+    color: "rgba(142, 142, 147, 1)",
     fontWeight: "500",
   },
   childrenContainer: {

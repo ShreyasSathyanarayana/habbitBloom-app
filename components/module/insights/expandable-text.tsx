@@ -44,7 +44,7 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({
           <Text
             style={[
               {
-                color: "#007F5F",
+                color: "rgba(138, 43, 226, 1)",
                 marginTop: 4,
                 fontSize: getFontSize(12),
                 fontFamily: "PoppinsSemiBold",

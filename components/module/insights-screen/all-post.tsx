@@ -81,7 +81,7 @@ const AllPost = () => {
         data={posts}
         renderItem={renderItem}
         onEndReached={onEndReached}
-        initialNumToRender={5}
+        initialNumToRender={30}
         // windowSize={10}
         // maxToRenderPerBatch={5}
         ItemSeparatorComponent={() => (

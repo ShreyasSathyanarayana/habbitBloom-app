@@ -2480,3 +2480,24 @@ export async function getPaginatedNestedComments(
   return nested;
 }
 
+
+
+
+export async function deleteCommentById(commentId: string): Promise<{ success: boolean; error?: string }> {
+  if (!commentId) {
+    return { success: false, error: "Comment ID is required" };
+  }
+  
+
+  const { error } = await supabase
+    .from("post_comments")
+    .delete()
+    .eq("id", commentId);
+
+  if (error) {
+    console.error("Failed to delete comment:", error.message);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}

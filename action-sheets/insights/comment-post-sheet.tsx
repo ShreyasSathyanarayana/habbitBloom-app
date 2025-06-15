@@ -1,103 +1,74 @@
+import React, { useState, useCallback, useMemo } from "react";
+import { Dimensions, Keyboard, Platform, StyleSheet, View } from "react-native";
+import { SheetProps, FlatList } from "react-native-actions-sheet";
+import { useToast } from "react-native-toast-notifications";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "moti/skeleton"; // Import Skeleton from moti/skeleton
+
 import {
-  getPaginatedNestedComments,
-  getUserProfile,
   postComment,
-  PostCommentDetails,
   toggleCommentLike,
+  getUserProfile,
+  deleteCommentById,
 } from "@/api/api";
 import CommentItem from "@/components/module/comment-section/comment-item";
 import CommentInput from "@/components/module/insights/comment-input";
-// import { useComments } from "@/components/module/insights/useComments";
 import ActionSheetContainer1 from "@/components/ui/action-sheet-container1";
 import { ThemedText } from "@/components/ui/theme-text";
 import { getFontSize } from "@/font";
-import { horizontalScale } from "@/metric";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { Skeleton } from "moti/skeleton";
-import React, { useState } from "react";
-import {
-  Dimensions,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
-import { SheetProps, FlatList } from "react-native-actions-sheet";
-import { useToast } from "react-native-toast-notifications";
+import { horizontalScale, verticalScale } from "@/metric";
+import { useComments } from "@/components/module/insights/useComments";
 
 const windowHeight = Dimensions.get("window").height;
 
-const PAGE_SIZE = 10;
-
 const CommentPostSheet = (props: SheetProps<"comment-post">) => {
-  const payload = props?.payload;
+  const { payload } = props;
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [comment, setComment] = React.useState("");
-  const [parenId, setParentId] = React.useState<string | null>(null);
+
+  const [commentContent, setCommentContent] = useState("");
+  const [parentCommentId, setParentCommentId] = useState<string | null>(null);
   const [parentCommentUserName, setParentCommentUserName] = useState("");
+
+  const postId = payload?.postId ?? "";
+
+  // Fetch comments using the custom hook
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery<PostCommentDetails[], Error>({
-      queryKey: ["comments", payload?.postId], // Assumes postId doesn't change often
-      queryFn: ({ pageParam = 1 }) =>
-        getPaginatedNestedComments(payload?.postId ?? "", pageParam as number),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage, allPages) => {
-        // If the last page has less than PAGE_SIZE, no more pages
-        if (lastPage.length < PAGE_SIZE) return undefined;
-        return allPages.length + 1;
-      },
-    });
+    useComments(postId); // isLoading here indicates the *initial* fetch
 
-  const getUserDetailsQuery = useQuery({
+  // Fetch user details
+  const { data: userDetails, isLoading: isUserDetailsLoading } = useQuery({
     queryKey: ["userDetails"],
-    queryFn: () => {
-      return getUserProfile();
-    },
-    networkMode: "online",
+    queryFn: getUserProfile,
+    staleTime: Infinity,
   });
-  // console.log("data==>", JSON.stringify(data?.pages?.flat(), null, 2));
 
+  const allComments = useMemo(() => data?.pages?.flat() || [], [data]);
+
+  // Mutation for submitting a new comment
   const submitCommentMutation = useMutation({
-    mutationKey: ["submitComment"],
     mutationFn: () =>
       postComment({
-        postId: payload?.postId ?? "",
-        content: comment,
-        parentCommentId: parenId,
+        postId,
+        content: commentContent,
+        parentCommentId,
       }),
-    onError: () => {
-      toast.show("Something went wrong", {
-        type: "warning",
-      });
-    },
     onSuccess: async () => {
-      console.log("Successfully completed");
-      // toast.show("Comment submitted successfully", {
-      //   type: "success",
-      // });
-
       await queryClient.invalidateQueries({
-        queryKey: ["comments", payload?.postId],
-        refetchType: "active", // ensures it's refetched if mounted
+        queryKey: ["comments", postId],
+        refetchType: "active",
       });
+
       queryClient.setQueryData(["all-posts"], (oldData: any) => {
         if (!oldData) return oldData;
-
         return {
           ...oldData,
           pages: oldData.pages.map((page: any[]) =>
             page.map((post) => {
-              if (post.id === payload?.postId) {
+              if (post.id === postId) {
                 return {
                   ...post,
-                  commentCount: (post.commentCount || 0) + 1, // or -1 for delete
+                  commentCount: (post.commentCount || 0) + 1,
                 };
               }
               return post;
@@ -106,105 +77,201 @@ const CommentPostSheet = (props: SheetProps<"comment-post">) => {
         };
       });
 
-      setComment("");
-      setParentId(null);
+      setCommentContent("");
+      setParentCommentId(null);
       setParentCommentUserName("");
       Keyboard.dismiss();
     },
-  });
-
-  const toggleCommentLikeMutation = useMutation({
-    mutationKey: ["commentLike"],
-    mutationFn: (commentId: string) => toggleCommentLike(commentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["comments"],
-      });
-    },
     onError: () => {
-      toast.show("Something went Wrong", {
+      toast.show("Failed to submit comment. Please try again.", {
         type: "warning",
       });
     },
   });
 
-  const handleCancelReply = () => {
-    setParentId(null);
+  // Mutation for toggling comment likes
+  const toggleCommentLikeMutation = useMutation({
+    mutationFn: (commentId: string) => toggleCommentLike(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+      });
+    },
+    onError: () => {
+      toast.show("Failed to like/unlike comment. Please try again.", {
+        type: "warning",
+      });
+    },
+  });
+
+  const handleReplyPress = useCallback((parentId: string, userName: string) => {
+    setParentCommentId(parentId);
+    setParentCommentUserName(userName);
+  }, []);
+
+  const handleLikeToggle = useCallback(
+    (commentId: string) => {
+      toggleCommentLikeMutation.mutate(commentId);
+    },
+    [toggleCommentLikeMutation]
+  );
+
+  const handleCancelReply = useCallback(() => {
+    setParentCommentId(null);
     setParentCommentUserName("");
-  };
+  }, []);
+
+  const renderCommentItem = useCallback(
+    ({ item }: { item: any }) => (
+      <CommentItem
+        comment={item}
+        isLastChild={false}
+        onReplyPress={handleReplyPress}
+        onLikeToggle={handleLikeToggle}
+        level={0}
+        postId={payload?.postId ?? ""}
+        // deleteCommentLoading={commentDeleteMutation.isPending}
+        // onDeleteComment={(commentId) =>
+        //   commentDeleteMutation.mutateAsync(commentId)
+        // }
+      />
+    ),
+    [handleReplyPress, handleLikeToggle]
+  );
+
+  // --- Loading Skeletons for Initial Load ---
+  const renderLoadingSkeletons = () => (
+    <View style={styles.skeletonContainer}>
+      {[...Array(2)].map(
+        (
+          _,
+          index // Render 5 skeleton items
+        ) => (
+          <Skeleton.Group key={index} show={true}>
+            <View style={styles.skeletonItem}>
+              <Skeleton width={40} height={40} radius={"round"} />
+              <View style={styles.skeletonTextContainer}>
+                <Skeleton width={"70%"} height={12} radius={4} />
+                <Skeleton
+                  width={"90%"}
+                  height={10}
+                  radius={4}
+                  // style={{ marginTop: 8 }}
+                />
+                <Skeleton
+                  width={"40%"}
+                  height={10}
+                  radius={4}
+                  // style={{ marginTop: 4 }}
+                />
+              </View>
+            </View>
+          </Skeleton.Group>
+        )
+      )}
+    </View>
+  );
 
   return (
     <ActionSheetContainer1
       sheetId={props.sheetId}
-      // snapPoints={[windowHeight * 0.8, windowHeight * 0.9]}
-      // initialSnapIndex={0}
-      containerStyle={{
-        paddingHorizontal: 0,
-        paddingBottom: 0,
-        // height: "80%",
-        justifyContent: "space-between",
-        backgroundColor: "rgba(28, 28, 30, 1)",
-        maxHeight: windowHeight * 0.8,
-      }}
+      containerStyle={styles.actionSheetContainer}
     >
-      {data?.pages?.flat()?.length === 0 && (
-        <ThemedText
-          style={{
-            textAlign: "center",
-            color: "rgba(142, 142, 147, 1)",
-            fontSize: getFontSize(13),
-          }}
-        >
-          Be the first one to comment
-        </ThemedText>
+      {/* Conditional rendering for initial loading state */}
+      {isLoading ? (
+        renderLoadingSkeletons()
+      ) : (
+        <>
+          {allComments.length === 0 && (
+            <ThemedText style={styles.noCommentsText}>
+              Be the first one to comment
+            </ThemedText>
+          )}
+
+          <FlatList
+            data={allComments}
+            contentContainerStyle={styles.flatListContent}
+            ItemSeparatorComponent={() => (
+              <View style={styles.commentSeparator} />
+            )}
+            renderItem={renderCommentItem}
+            onEndReached={() => hasNextPage && fetchNextPage()}
+            onEndReachedThreshold={0.5}
+            keyExtractor={(item) => item.id}
+            // Show loading indicator for more comments
+            ListFooterComponent={
+              isFetchingNextPage ? <LoadingMoreIndicator /> : null
+            }
+          />
+        </>
       )}
 
-      <FlatList
-        // itemLayoutAnimation={SequencedTransition}
-        data={data?.pages?.flat()}
-        contentContainerStyle={{
-          paddingHorizontal: horizontalScale(16),
-        }}
-        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-        renderItem={({ item }) => (
-          <Skeleton show={isLoading}>
-            <CommentItem
-              comment={item}
-              isLastChild={false}
-              onReplyPress={function (
-                parentId: string,
-                userName: string
-              ): void {
-                setParentId(parentId);
-                setParentCommentUserName(userName);
-              }}
-              onLikeToggle={function (
-                commentId: string,
-                currentLikedStatus: boolean
-              ): void {
-                toggleCommentLikeMutation.mutateAsync(commentId);
-              }}
-              level={0}
-            />
-          </Skeleton>
-        )}
-        onEndReached={() => fetchNextPage()}
-      />
-
+      {/* Comment input section */}
       <CommentInput
-        value={comment}
-        onChangeText={(text) => setComment(text)}
-        onSubmit={() => submitCommentMutation?.mutateAsync()}
-        userImage={getUserDetailsQuery?.data?.profile_pic ?? ""}
-        isLoading={submitCommentMutation?.isPending}
+        value={commentContent}
+        onChangeText={setCommentContent}
+        onSubmit={submitCommentMutation.mutateAsync}
+        userImage={userDetails?.profile_pic ?? ""}
+        isLoading={submitCommentMutation.isPending || isUserDetailsLoading} // Also consider user details loading
         onCancelParentId={handleCancelReply}
-        parentId={parenId}
+        parentId={parentCommentId}
         parentUserName={parentCommentUserName}
       />
     </ActionSheetContainer1>
   );
 };
 
-const styles = StyleSheet.create({});
+// Simple loading indicator component for pagination
+const LoadingMoreIndicator = () => (
+  <View style={styles.loadingContainer}>
+    <ThemedText style={styles.loadingText}>Loading more comments...</ThemedText>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  actionSheetContainer: {
+    paddingHorizontal: 0,
+    paddingBottom: 0,
+    justifyContent: "space-between",
+    backgroundColor: "rgba(28, 28, 30, 1)",
+    maxHeight: windowHeight * 0.8,
+  },
+  noCommentsText: {
+    textAlign: "center",
+    color: "rgba(142, 142, 147, 1)",
+    fontSize: getFontSize(13),
+    paddingVertical: horizontalScale(20),
+  },
+  flatListContent: {
+    paddingHorizontal: horizontalScale(16),
+    paddingTop: horizontalScale(16),
+  },
+  commentSeparator: {
+    height: 16,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  loadingText: {
+    color: "rgba(138, 43, 226, 1)",
+    fontSize: getFontSize(12),
+  },
+  // --- Styles for Skeletons ---
+  skeletonContainer: {
+    paddingHorizontal: horizontalScale(16),
+    paddingTop: horizontalScale(16),
+  },
+  skeletonItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16, // Spacing between skeleton items
+  },
+  skeletonTextContainer: {
+    marginLeft: 10,
+    flex: 1, // Take remaining space
+    gap: verticalScale(8),
+  },
+});
 
 export default CommentPostSheet;
